@@ -1,4 +1,9 @@
 import Image from "next/image";
+import { Button } from "@/components/atoms/Button";
+import { Input } from "@/components/atoms/Input";
+import { Text } from "@/components/atoms/Text";
+import { Icon } from "@/components/atoms/Icon";
+import { Calendar, Check } from "lucide-react";
 
 export default function Home() {
   return (
@@ -50,6 +55,32 @@ export default function Home() {
             Read our docs
           </a>
         </div>
+
+        {/* Atoms preview (temporary) */}
+        <section className="w-full max-w-xl rounded-lg border p-4 space-y-4">
+          <Text as="p" size="lg" weight="semibold" className="flex items-center gap-2">
+            <Icon icon={Calendar} /> UI Atoms Preview
+          </Text>
+
+          <div className="space-y-2">
+            <Text as="label" size="sm" weight="medium" htmlFor="demo-input">
+              Email
+            </Text>
+            <Input id="demo-input" placeholder="example@mail.com" />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button>Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="outline">Outline</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button size="sm">Small</Button>
+            <Button size="lg" className="gap-1">
+              <Icon icon={Check} size="sm" /> Confirm
+            </Button>
+            <Button variant="link" className="px-1 py-0 h-auto">Link style</Button>
+          </div>
+        </section>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
