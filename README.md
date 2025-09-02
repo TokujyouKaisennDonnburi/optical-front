@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+これは[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app)でブートストラップされた[Next.js](https://nextjs.org)プロジェクトです。
 
-## Getting Started
+## shadcn による UI コンポーネント
 
-First, run the development server:
+このプロジェクトでは UI コンポーネントに[shadcn/ui](https://ui.shadcn.com)を使用しています。
+
+### インストール
+
+shadcn を初期化します：
+
+```bash
+npx shadcn@latest init
+```
+
+コンポーネントを追加します（例：button）：
+
+```bash
+npx shadcn@latest add button
+```
+
+### 注意事項
+
+- 古い`shadcn-ui` CLI は非推奨です。代わりに`shadcn`を使用してください。
+- コマンドを実行する前に Tailwind CSS が正しく設定されていることを確認してください。
+
+## はじめに
+
+まず、開発サーバーを起動します：
 
 ```bash
 npm run dev
-# or
+# または
 yarn dev
-# or
+# または
 pnpm dev
-# or
+# または
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで[http://localhost:3000](http://localhost:3000)を開いて結果を確認してください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`app/page.tsx`を編集することでページを変更できます。ファイルを編集するとページが自動的に更新されます。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+このプロジェクトは[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)を使用して、Vercel の新しいフォントファミリーである[Geist](https://vercel.com/font)を自動的に最適化し読み込みます。
 
-## Learn More
+## さらに学ぶ
 
-To learn more about Next.js, take a look at the following resources:
+Next.js についてもっと知りたい場合は、以下のリソースをご覧ください：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js ドキュメント](https://nextjs.org/docs) - Next.js の機能や API について学べます。
+- [Next.js チュートリアル](https://nextjs.org/learn) - インタラクティブな Next.js のチュートリアルです。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[Next.js の GitHub リポジトリ](https://github.com/vercel/next.js)もチェックしてみてください。フィードバックや貢献を歓迎します！
 
-## Deploy on Vercel
+## Vercel でのデプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Next.js アプリをデプロイする最も簡単な方法は、Next.js の開発元である[Vercel プラットフォーム](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)を使用することです。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+詳細は[Next.js のデプロイメントドキュメント](https://nextjs.org/docs/app/building-your-application/deploying)をご覧ください。
