@@ -1,0 +1,157 @@
+name: Notify Discord
+
+on:
+  issues:
+    types: [assigned]           # アサインされた時/変更された時
+  pull_request:
+    types: [review_requested, ready_for_review, closed, reopened] # レビュー依頼/マージ等
+  pull_request_review:
+    types: [submitted]                   # レビュー到着
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Notify
+        uses: actions/github-script@v7
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            // --- 共通: マップ読込とユーティリティ ---
+            let map = {};
+            try {
+              map = JSON.parse(fs.readFileSync('.github/discord-map.json', 'utf8'));
+            } catch (e) {
+              core.warning('discord-map.json が読めません。メンションなしで送ります。');
+            }
+
+            const mentionOf = (login) => {
+              const id = map[login];
+              return id ? `<@${id}>` : `@${login}`;
+            };
+
+            const uniq = (arr) => [...new Set(arr)].filter(Boolean);
+
+            const post = async (content) => {
+              const url = process.env.DISCORD_WEBHOOK_URL;
+              if (!url) throw new Error('DISCORD_WEBHOOK_URL が未設定です');
+              const body = { content };
+              const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+              });
+              if (!res.ok) {
+                core.setFailed(`Discord送信失敗: ${res.status} ${await res.text()}`);
+              }
+            };
+
+            const ev = context.eventName;
+            const action = context.payload.action;
+
+            // ---- ケース分岐 ----
+            if (ev === 'issues') {
+              // 仕様: Issueを立てた時に assign した人へメンション
+              // 対象: opened（初回にassigneesが付いている場合）と assigned（後から付与）
+              if (action === 'opened' || action === 'assigned') {
+                const issue = context.payload.issue;
+                const repo = context.repo.repo;
+                const owner = context.repo.owner;
+                const url = issue.html_url;
+
+                const added = context.payload.assignee?.login;
+                if (!added) return;
+                const mentions = mentionOf(added);
+
+                const title = issue.title;
+
+                const msg = [
+                  `📝 **Issue Assigned** in \`${owner}/${repo}\``,
+                  `**${title}**`,
+                  `${mentions}`,
+                  `${url}`
+                ].join('\n');
+
+                await post(msg);
+              }
+            }
+
+            else if (ev === 'pull_request') {
+              const pr = context.payload.pull_request;
+              const owner = context.repo.owner;
+              const repo = context.repo.repo;
+
+              if (action === 'review_requested') {
+                // 仕様: PRを立てた時に reviewer にした人へメンション
+                // ※「review_requested」は作成時／後から依頼した時どちらも発火
+                const reqReviewer = context.payload.requested_reviewer?.login;
+                const reqTeam = context.payload.requested_team?.name;
+                // ユーザー個別のみメンション（チームは任意でロールに置換してもOK）
+                if (reqReviewer) {
+                  const msg = [
+                    `👀 **Review Requested** in \`${owner}/${repo}\``,
+                    `**${pr.title}** by @${pr.user.login}`,
+                    `${mentionOf(reqReviewer)}`,
+                    `${pr.html_url}`
+                  ].join('\n');
+                  await post(msg);
+                }
+              }
+
+              else if (action === 'opened' || action === 'ready_for_review' || action === 'reopened') {
+                // PR作成時／Draft解除時: reviewerが同時指定されていたら通知（任意）
+                const reviewers = (pr.requested_reviewers || []).map(u => u.login);
+                if (reviewers.length > 0) {
+                  const msg = [
+                    `🆕 **PR Opened** in \`${owner}/${repo}\``,
+                    `**${pr.title}** by @${pr.user.login}`,
+                    `Reviewers: ${uniq(reviewers).map(mentionOf).join(' ')}`,
+                    `${pr.html_url}`
+                  ].join('\n');
+                  await post(msg);
+                }
+              }
+
+              else if (action === 'closed' && pr.merged) {
+                // 仕様: PRがmergeされたときに通知
+                const msg = [
+                  `✅ **PR Merged** in \`${owner}/${repo}\``,
+                  `**${pr.title}** by @${pr.user.login}`,
+                  `${pr.html_url}`
+                ].join('\n');
+                await post(msg);
+              }
+            }
+
+            else if (ev === 'pull_request_review') {
+              // 仕様: PRにreviewが来たときに通知
+              if (action === 'submitted') {
+                const pr = context.payload.pull_request;
+                const review = context.payload.review;
+                const owner = context.repo.owner;
+                const repo = context.repo.repo;
+
+                const state = (review.state || '').toUpperCase(); // APPROVED / CHANGES_REQUESTED / COMMENTED
+                const reviewer = review.user?.login;
+                const msg = [
+                  `💬 **PR Review (${state})** in \`${owner}/${repo}\``,
+                  `**${pr.title}**`,
+                  `Reviewer: ${reviewer ? mentionOf(reviewer) : '(unknown)'}`,
+                  `${pr.html_url}#pullrequestreview-${review.id}`
+                ].join('\n');
+
+                await post(msg);
+              }
+            }
+
+            // push はトリガーしていない（仕様通り通知しない）
