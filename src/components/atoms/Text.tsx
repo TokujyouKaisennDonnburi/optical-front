@@ -1,17 +1,20 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-type TextElement = keyof Pick<JSX.IntrinsicElements, "span" | "p" | "div" | "label">
+type TextElement = keyof Pick<
+  React.JSX.IntrinsicElements,
+  "span" | "p" | "div" | "label"
+>;
 
 export type TextProps = {
-  as?: TextElement
-  size?: "sm" | "md" | "lg"
-  weight?: "normal" | "medium" | "semibold" | "bold"
-  className?: string
-  children?: React.ReactNode
+  as?: TextElement;
+  size?: "sm" | "md" | "lg";
+  weight?: "normal" | "medium" | "semibold" | "bold";
+  className?: string;
+  children?: React.ReactNode;
 } & Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
-  htmlFor?: string
-}
+    htmlFor?: string;
+  };
 
 export function Text({
   as = "span",
@@ -21,22 +24,22 @@ export function Text({
   children,
   ...props
 }: TextProps) {
-  const Comp = as as any
+  const Comp = as as any;
   const sizeCls =
-    size === "sm" ? "text-sm" : size === "lg" ? "text-lg" : "text-base"
+    size === "sm" ? "text-sm" : size === "lg" ? "text-lg" : "text-base";
   const weightCls =
     weight === "medium"
       ? "font-medium"
       : weight === "semibold"
-        ? "font-semibold"
-        : weight === "bold"
-          ? "font-bold"
-          : "font-normal"
+      ? "font-semibold"
+      : weight === "bold"
+      ? "font-bold"
+      : "font-normal";
 
   return (
     <Comp className={cn(sizeCls, weightCls, className)} {...props}>
       {children}
     </Comp>
-  )
+  );
 }
 

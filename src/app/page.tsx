@@ -1,9 +1,20 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { Text } from "@/components/atoms/Text";
 import { Icon } from "@/components/atoms/Icon";
-import { Calendar, Check } from "lucide-react";
+import { Calendar as CalendarIcon, Check, User, Mail, Info } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/atoms/Avatar";
+import { Badge } from "@/components/atoms/Badge";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/atoms/Card";
+import { Checkbox } from "@/components/atoms/Checkbox";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/atoms/HoverCard";
+import { ScrollArea } from "@/components/atoms/ScrollArea";
+import { Skeleton } from "@/components/atoms/Skeleton";
+import { Calendar } from "@/components/atoms/Calendar";
+import { Toaster, toast } from "@/components/atoms/Toast";
 
 export default function Home() {
   return (
@@ -57,30 +68,7 @@ export default function Home() {
         </div>
 
         {/* Atoms preview (temporary) */}
-        <section className="w-full max-w-xl rounded-lg border p-4 space-y-4">
-          <Text as="p" size="lg" weight="semibold" className="flex items-center gap-2">
-            <Icon icon={Calendar} /> UI Atoms Preview
-          </Text>
-
-          <div className="space-y-2">
-            <Text as="label" size="sm" weight="medium" htmlFor="demo-input">
-              Email
-            </Text>
-            <Input id="demo-input" placeholder="example@mail.com" />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button>Primary</Button>
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="outline">Outline</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button size="sm">Small</Button>
-            <Button size="lg" className="gap-1">
-              <Icon icon={Check} size="sm" /> Confirm
-            </Button>
-            <Button variant="link" className="px-1 py-0 h-auto">Link style</Button>
-          </div>
-        </section>
+        <Showcase />
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
@@ -130,5 +118,122 @@ export default function Home() {
         </a>
       </footer>
     </div>
+  );
+}
+
+function Showcase() {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  return (
+    <section className="w-full max-w-5xl rounded-lg border p-6 space-y-8">
+      <div className="flex items-center gap-2">
+        <Icon icon={CalendarIcon} />
+        <Text as="p" size="lg" weight="semibold">
+          UI Atoms Preview
+        </Text>
+      </div>
+
+      {/* Inputs & Buttons */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Text as="label" size="sm" weight="medium" htmlFor="demo-input">
+            Email
+          </Text>
+          <Input id="demo-input" placeholder="example@mail.com" />
+          <Text as="p" size="sm" className="text-muted-foreground flex items-center gap-1">
+            <Icon icon={Info} size={16} /> We'll never share your email.
+          </Text>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button>Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button size="sm">Small</Button>
+          <Button size="lg" className="gap-1">
+            <Icon icon={Check} size="sm" /> Confirm
+          </Button>
+          <Button variant="link" className="px-1 py-0 h-auto">
+            Link style
+          </Button>
+        </div>
+      </div>
+
+      {/* Card & Avatar & Badge */}
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarImage src="https://i.pravatar.cc/100?img=13" alt="avatar" />
+              <AvatarFallback>
+                <Icon icon={User} />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle>Atoms Card</CardTitle>
+              <CardDescription>Avatar / Badge / Text inside Card</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex gap-2 items-center">
+            <Badge>Default</Badge>
+            <Badge variant="secondary">Secondary</Badge>
+            <Badge variant="destructive">Destructive</Badge>
+            <Badge variant="outline">Outline</Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="cb1" defaultChecked />
+            <Text as="label" htmlFor="cb1">
+              I agree to the terms
+            </Text>
+          </div>
+        </CardContent>
+        <CardFooter className="gap-2">
+          <Button onClick={() => toast.success("Saved!", { description: "Your changes were saved." })}>
+            Save
+          </Button>
+          <Button variant="outline">Cancel</Button>
+        </CardFooter>
+      </Card>
+
+      {/* HoverCard */}
+      <div>
+        <HoverCard>
+          <HoverCardTrigger>
+            <Text as="span" className="underline cursor-pointer">
+              Hover me
+            </Text>
+          </HoverCardTrigger>
+          <HoverCardContent>Here is some hover content.</HoverCardContent>
+        </HoverCard>
+      </div>
+
+      {/* ScrollArea & Skeleton */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <ScrollArea className="h-48 w-full rounded-md border p-3">
+          <div className="space-y-2">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div key={i} className="h-6 rounded bg-secondary" />
+            ))}
+          </div>
+        </ScrollArea>
+        <div className="flex items-center space-x-4">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2 w-full">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        </div>
+      </div>
+
+      {/* Calendar */}
+      <div className="space-y-2">
+        <Text weight="medium">Calendar</Text>
+        <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md border inline-block" />
+      </div>
+
+      {/* Toaster */}
+      <Toaster />
+    </section>
   );
 }
