@@ -1,6 +1,6 @@
 import * as React from "react"
 import { DayPicker, type DayPickerProps } from "react-day-picker"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils_constants_styles/utils"
 
 export type CalendarProps = DayPickerProps & {
   className?: string

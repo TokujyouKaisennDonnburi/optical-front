@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils_constants_styles/utils"
 
 export type IconSize = "sm" | "md" | "lg" | number
 

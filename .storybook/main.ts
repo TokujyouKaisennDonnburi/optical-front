@@ -8,7 +8,7 @@ const config: StorybookConfig = {
     options: {},
   },
   stories: [
-    "../src/components/atoms/**/*.stories.@(ts|tsx)",
+    "../src/components/**/*.stories.@(ts|tsx)",
   ],
   addons: [
     "@storybook/addon-essentials",
