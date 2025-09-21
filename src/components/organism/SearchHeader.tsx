@@ -1,5 +1,5 @@
 import SearchInput from "@/components/molecules/SearchInput";
-import MultiSelectDropdown from "@/components/molecules/SearchCalendar";
+import MultiSelectDropdown from "@/components/molecules/MultiSelectDropdown";
 import { Button } from "@/components/atoms/Button";
 import { useState } from "react";
 
