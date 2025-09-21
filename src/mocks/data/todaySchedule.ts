@@ -1,0 +1,35 @@
+export const todayScheduleMock = {
+  date: "2024-04-12",
+  items: [
+    {
+      id: "1",
+      title: "朝会",
+      memo: "オンライン (Zoom)",
+      location: "リモート",
+      status: "info",
+      calendarColor: "#22d3ee",
+      start: "2024-04-12T09:00:00+09:00",
+      end: "2024-04-12T09:30:00+09:00",
+    },
+    {
+      id: "2",
+      title: "顧客ミーティング",
+      memo: "製品ロードマップの共有",
+      location: "第1会議室",
+      status: "success",
+      calendarColor: "#34d399",
+      start: "2024-04-12T11:00:00+09:00",
+      end: "2024-04-12T12:00:00+09:00",
+    },
+    {
+      id: "3",
+      title: "デザインレビュー",
+      memo: "新機能のUIチェック",
+      location: "リモート",
+      status: "warning",
+      calendarColor: "#f59e0b",
+      start: "2024-04-12T15:30:00+09:00",
+      end: "2024-04-12T16:30:00+09:00",
+    },
+  ],
+};
