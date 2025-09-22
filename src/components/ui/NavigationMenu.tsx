@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, HTMLAttributes, ReactElement, ReactNode } from "react";
 import { cloneElement, createContext, isValidElement, useContext, useId, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -103,9 +103,11 @@ type NavigationMenuLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 
 function NavigationMenuLink({ asChild, className, children, ...props }: NavigationMenuLinkProps) {
   if (asChild && isValidElement(children)) {
-    return cloneElement(children, {
-      ...props,
-      className: cn(children.props.className, className),
+    // Narrow the child to a ReactElement so cloneElement has a concrete prop shape.
+    const child = children as ReactElement<Record<string, unknown>>;
+    return cloneElement(child, {
+      ...(props as Record<string, unknown>),
+      className: cn((child.props as { className?: string }).className, className),
     });
   }
   return (
