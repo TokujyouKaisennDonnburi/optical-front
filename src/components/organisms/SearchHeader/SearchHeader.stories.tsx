@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import SearchHeader from "./SearchHeader";
+import { SearchHeader } from "./SearchHeader";
 
 const meta: Meta<typeof SearchHeader> = {
   title: "Organisms/SearchHeader",
