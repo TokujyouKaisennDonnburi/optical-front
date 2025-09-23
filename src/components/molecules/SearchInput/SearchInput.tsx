@@ -49,13 +49,7 @@ interface SearchInputProps {
 }
 
 // 検索入力コンポーネント
-const SearchInput: React.FC<SearchInputProps> = ({
-  suggestions,
-  value,
-  onChange,
-  onSelect,
-  placeholder,
-}) => {
+export function SearchInput({ suggestions, value, onChange, onSelect, placeholder }: SearchInputProps) {
   // 検索候補を表示するかどうかの状態
   const [showList, setShowList] = React.useState(false);
   // 入力フィールドの参照
@@ -104,6 +98,4 @@ const SearchInput: React.FC<SearchInputProps> = ({
     </div>
   );
 };
-
-export default SearchInput;
 
