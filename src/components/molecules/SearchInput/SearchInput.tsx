@@ -3,9 +3,16 @@ import { Input } from "@/components/atoms/Input";
 import { ScrollArea } from "@/components/atoms/ScrollArea";
 
 // 検索結果の1行を表すリストアイテム
-const ListItem: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => (
+const ListItem: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => void;
+}> = ({ children, onClick }) => (
   <li
-    style={{ padding: "8px", borderBottom: "1px solid #eee", cursor: "pointer" }}
+    style={{
+      padding: "8px",
+      borderBottom: "1px solid #eee",
+      cursor: "pointer",
+    }}
     onClick={onClick}
   >
     {children}
@@ -13,7 +20,10 @@ const ListItem: React.FC<{ children: React.ReactNode; onClick?: () => void }> = 
 );
 
 // 検索結果リスト
-const SearchResultList: React.FC<{ items: string[]; onItemClick: (value: string) => void }> = ({ items, onItemClick }) => (
+const SearchResultList: React.FC<{
+  items: string[];
+  onItemClick: (value: string) => void;
+}> = ({ items, onItemClick }) => (
   <div
     style={{
       position: "absolute",
@@ -24,7 +34,7 @@ const SearchResultList: React.FC<{ items: string[]; onItemClick: (value: string)
       background: "#fff",
       boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
       borderRadius: 4,
-      border: "1px solid #ccc"
+      border: "1px solid #ccc",
     }}
   >
     <ScrollArea style={{ maxHeight: 150 }}>
@@ -49,7 +59,13 @@ interface SearchInputProps {
 }
 
 // 検索入力コンポーネント
-export function SearchInput({ suggestions, value, onChange, onSelect, placeholder }: SearchInputProps) {
+export function SearchInput({
+  suggestions,
+  value,
+  onChange,
+  onSelect,
+  placeholder,
+}: SearchInputProps) {
   // 検索候補を表示するかどうかの状態
   const [showList, setShowList] = React.useState(false);
   // 入力フィールドの参照
@@ -57,7 +73,8 @@ export function SearchInput({ suggestions, value, onChange, onSelect, placeholde
 
   // 入力値に基づきフィルタリングした提案を取得
   const filtered = suggestions.filter(
-    item => item.toLowerCase().includes(value.toLowerCase()) && item !== value
+    (item) =>
+      item.toLowerCase().includes(value.toLowerCase()) && item !== value,
   );
 
   // 入力値が変更された時の処理
@@ -97,5 +114,4 @@ export function SearchInput({ suggestions, value, onChange, onSelect, placeholde
       )}
     </div>
   );
-};
-
+}

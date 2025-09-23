@@ -21,7 +21,7 @@ export function TimeLabel({
       className={cn(
         "flex items-center gap-2 text-muted-foreground",
         isCurrent && "text-primary",
-        className
+        className,
       )}
     >
       <Text
@@ -41,7 +41,10 @@ export function TimeLabel({
         <Text
           as="span"
           size="sm"
-          className={cn("text-xs", isCurrent ? "text-primary" : "text-muted-foreground")}
+          className={cn(
+            "text-xs",
+            isCurrent ? "text-primary" : "text-muted-foreground",
+          )}
         >
           {description}
         </Text>

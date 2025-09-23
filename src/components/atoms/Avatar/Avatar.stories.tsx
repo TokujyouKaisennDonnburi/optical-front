@@ -8,7 +8,8 @@ const meta: Meta<typeof Avatar> = {
   parameters: {
     docs: {
       description: {
-        component: "Radix Avatar のラッパー。Avatar 内に AvatarImage / AvatarFallback を子として配置。",
+        component:
+          "Radix Avatar のラッパー。Avatar 内に AvatarImage / AvatarFallback を子として配置。",
       },
     },
   },

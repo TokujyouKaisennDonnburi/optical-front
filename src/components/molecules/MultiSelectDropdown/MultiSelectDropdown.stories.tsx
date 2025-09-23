@@ -16,15 +16,11 @@ export default meta;
 type Story = StoryObj<typeof MultiSelectDropdown>;
 
 export const Default: Story = {
-  render: args => {
+  render: (args) => {
     const [value, setValue] = useState<string[]>([]);
     return (
       <div style={{ width: "300px" }}>
-        <MultiSelectDropdown
-          {...args}
-          value={value}
-          onChange={setValue}
-        />
+        <MultiSelectDropdown {...args} value={value} onChange={setValue} />
       </div>
     );
   },

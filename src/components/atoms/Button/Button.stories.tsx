@@ -11,7 +11,8 @@ const meta: Meta<typeof Button> = {
   parameters: {
     docs: {
       description: {
-        component: "shadcn ベースのボタン。variant/size/asChild などに対応し、type は安全のためデフォルトで 'button'。",
+        component:
+          "shadcn ベースのボタン。variant/size/asChild などに対応し、type は安全のためデフォルトで 'button'。",
       },
     },
   },

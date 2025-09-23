@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 
 import { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { startMockServiceWorker } from "@/mocks/browser";
@@ -10,6 +11,9 @@ export type TodayScheduleApiItem = {
   title: string;
   memo?: string;
   location?: string;
+  locationUrl?: string;
+  members?: string[];
+  calendarName?: string;
   status: "default" | "info" | "success" | "warning" | "danger";
   start: string;
   end?: string;
@@ -42,7 +46,8 @@ export function useTodaySchedule() {
         }
         const json = (await response.json()) as TodayScheduleApiResponse;
         if (isMounted) {
-          setData(json);
+          const normalized = normalizeScheduleResponse(json);
+          setData(normalized);
         }
       } catch (err) {
         if (isMounted) {
@@ -72,9 +77,14 @@ export function useTodaySchedule() {
         start: formatTimeLabel(item.start),
         end: item.end ? formatTimeLabel(item.end) : undefined,
       },
+      startsAt: item.start,
+      endsAt: item.end,
       statusVariant: normalizeStatus(item.status),
       memo: item.memo,
       location: item.location,
+      locationUrl: item.locationUrl,
+      members: item.members,
+      calendarName: item.calendarName,
       calendarColor: item.calendarColor,
     }));
   }, [data]);
@@ -98,6 +108,40 @@ export function useTodaySchedule() {
   };
 }
 
+function normalizeScheduleResponse(
+  response: TodayScheduleApiResponse,
+): TodayScheduleApiResponse {
+  const today = new Date();
+  const alignedItems = response.items.map((item) => ({
+    ...item,
+    start: alignDateTime(item.start, today),
+    end: item.end ? alignDateTime(item.end, today) : undefined,
+  }));
+
+  return {
+    date: today.toISOString(),
+    items: alignedItems,
+  };
+}
+
+function alignDateTime(isoString: string, baseDate: Date): string {
+  const original = new Date(isoString);
+  if (Number.isNaN(original.getTime())) {
+    return isoString;
+  }
+
+  const aligned = new Date(baseDate);
+  aligned.setDate(original.getDate());
+  aligned.setHours(
+    original.getHours(),
+    original.getMinutes(),
+    original.getSeconds(),
+    original.getMilliseconds(),
+  );
+
+  return aligned.toISOString();
+}
+
 function formatTimeLabel(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
@@ -108,16 +152,16 @@ function formatTimeLabel(value: string) {
   return `${hours}:${minutes.toString().padStart(2, "0")}`;
 }
 
-function normalizeStatus(value: TodayScheduleApiItem["status"]) {
+function normalizeStatus(
+  value: TodayScheduleApiItem["status"],
+): StatusDotVariant {
   const statuses = new Set([
     "default",
     "info",
     "success",
     "warning",
     "danger",
-  ] satisfies TodaySchedulePanelItem["statusVariant"][]);
+  ] satisfies StatusDotVariant[]);
 
-  return statuses.has(value as TodaySchedulePanelItem["statusVariant"])
-    ? (value as TodaySchedulePanelItem["statusVariant"])
-    : "default";
+  return statuses.has(value as StatusDotVariant) ? value : "default";
 }

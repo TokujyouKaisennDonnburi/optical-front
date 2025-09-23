@@ -22,25 +22,40 @@ export function TodayScheduleHeader({
     <div
       className={cn(
         "flex flex-col gap-1.5 border-b border-border pb-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3",
-        className
+        className,
       )}
     >
       <div className="space-y-1">
-        <Text as="span" size="md" weight="semibold" className="text-foreground leading-tight">
+        <Text
+          as="span"
+          size="md"
+          weight="semibold"
+          className="text-foreground leading-tight"
+        >
           {title}
         </Text>
         {dateLabel ? (
-          <Text as="span" size="sm" className="block text-muted-foreground leading-snug">
+          <Text
+            as="span"
+            size="sm"
+            className="block text-muted-foreground leading-snug"
+          >
             {dateLabel}
           </Text>
         ) : null}
         {description ? (
-          <Text as="span" size="sm" className="block text-muted-foreground leading-snug">
+          <Text
+            as="span"
+            size="sm"
+            className="block text-muted-foreground leading-snug"
+          >
             {description}
           </Text>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-1.5">{actions}</div> : null}
+      {actions ? (
+        <div className="flex shrink-0 items-center gap-1.5">{actions}</div>
+      ) : null}
     </div>
   );
 }

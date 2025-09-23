@@ -1,5 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/atoms/Card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/atoms/Card";
 import { Button } from "@/components/atoms/Button";
 
 const meta: Meta<typeof Card> = {
@@ -9,7 +16,8 @@ const meta: Meta<typeof Card> = {
   parameters: {
     docs: {
       description: {
-        component: "枠線・影を持つカードコンテナ。Header/Content/Footer と Title/Description の構成を提供。",
+        component:
+          "枠線・影を持つカードコンテナ。Header/Content/Footer と Title/Description の構成を提供。",
       },
     },
   },

@@ -11,7 +11,8 @@ const meta: Meta<typeof Text> = {
   parameters: {
     docs: {
       description: {
-        component: "軽量なテキスト表示コンポーネント。size/weight と as (タグ) を指定可能。",
+        component:
+          "軽量なテキスト表示コンポーネント。size/weight と as (タグ) を指定可能。",
       },
     },
   },

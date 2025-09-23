@@ -7,9 +7,7 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: {},
   },
-  stories: [
-    "../src/components/**/*.stories.@(ts|tsx)",
-  ],
+  stories: ["../src/components/**/*.stories.@(ts|tsx)"],
   addons: [
     "@storybook/addon-essentials",
     "@storybook/addon-links",

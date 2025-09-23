@@ -26,7 +26,7 @@ export default meta;
 type Story = StoryObj<typeof SearchInput>;
 
 export const Default: Story = {
-  render: args => {
+  render: (args) => {
     const [value, setValue] = useState("");
 
     return (
@@ -43,7 +43,7 @@ export const Default: Story = {
 };
 
 export const WithInitialValue: Story = {
-  render: args => {
+  render: (args) => {
     const [value, setValue] = useState("会議室A");
 
     return (
@@ -60,7 +60,7 @@ export const WithInitialValue: Story = {
 };
 
 export const NoSuggestions: Story = {
-  render: args => {
+  render: (args) => {
     const [value, setValue] = useState("");
 
     return (

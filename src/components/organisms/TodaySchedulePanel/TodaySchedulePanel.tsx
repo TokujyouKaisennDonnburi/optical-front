@@ -21,10 +21,15 @@ export type TodaySchedulePanelItem = {
     start: string;
     end?: string;
   };
+  startsAt?: string;
+  endsAt?: string;
   statusVariant?: TodayScheduleTimelineEvent["statusVariant"];
   location?: string;
+  locationUrl?: string;
   memo?: string;
   calendarColor?: string;
+  members?: string[];
+  calendarName?: string;
 };
 
 export type TodaySchedulePanelProps = {
@@ -70,7 +75,12 @@ export function TodaySchedulePanel({
           actions={header.actions}
         />
       </CardHeader>
-      <CardContent className={cn("flex flex-1 flex-col overflow-hidden px-4 py-3", contentClassName)}>
+      <CardContent
+        className={cn(
+          "flex flex-1 flex-col overflow-hidden px-4 py-3",
+          contentClassName,
+        )}
+      >
         <div className="relative flex flex-1 min-h-0">
           {isLoading ? (
             <Skeleton className="h-full min-h-0 w-full" />
@@ -96,7 +106,9 @@ export function TodaySchedulePanel({
   );
 }
 
-function buildSlotsFromItems(items: TodaySchedulePanelItem[]): TodayScheduleTimelineSlot[] {
+function buildSlotsFromItems(
+  items: TodaySchedulePanelItem[],
+): TodayScheduleTimelineSlot[] {
   if (!items.length) {
     return defaultSlots();
   }
@@ -112,7 +124,9 @@ function buildSlotsFromItems(items: TodaySchedulePanelItem[]): TodayScheduleTime
     }
     minStart = Math.min(minStart, startMinutes);
 
-    const endMinutes = timeLabelToMinutes(item.timeRange.end ?? item.timeRange.start);
+    const endMinutes = timeLabelToMinutes(
+      item.timeRange.end ?? item.timeRange.start,
+    );
     maxEnd = Math.max(maxEnd, endMinutes ?? startMinutes);
 
     const existing = slots.get(startMinutes);
@@ -161,7 +175,9 @@ function buildSlotsFromItems(items: TodaySchedulePanelItem[]): TodayScheduleTime
       return {
         ...slot,
         events,
-        description: events.length ? events.map((event) => event.title).join(" / ") : slot.description,
+        description: events.length
+          ? events.map((event) => event.title).join(" / ")
+          : slot.description,
       };
     });
 }
@@ -176,7 +192,9 @@ function defaultSlots(): TodayScheduleTimelineSlot[] {
   return result;
 }
 
-function markCurrentSlot(slots: TodayScheduleTimelineSlot[]): TodayScheduleTimelineSlot[] {
+function markCurrentSlot(
+  slots: TodayScheduleTimelineSlot[],
+): TodayScheduleTimelineSlot[] {
   const now = new Date();
   const currentMinutes = now.getHours() * 60;
   return slots.map((slot) =>
@@ -185,7 +203,7 @@ function markCurrentSlot(slots: TodayScheduleTimelineSlot[]): TodayScheduleTimel
       : {
           ...slot,
           isCurrent: timeLabelToMinutes(slot.time) === currentMinutes,
-        }
+        },
   );
 }
 

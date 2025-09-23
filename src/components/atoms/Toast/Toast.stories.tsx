@@ -8,7 +8,8 @@ const meta: Meta = {
   parameters: {
     docs: {
       description: {
-        component: "sonner を用いた Toaster と toast API。ページルートに <Toaster /> を配置して使用。",
+        component:
+          "sonner を用いた Toaster と toast API。ページルートに <Toaster /> を配置して使用。",
       },
     },
   },

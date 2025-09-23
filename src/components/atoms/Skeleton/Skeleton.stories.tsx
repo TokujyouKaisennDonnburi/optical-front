@@ -8,7 +8,8 @@ const meta: Meta<typeof Skeleton> = {
   parameters: {
     docs: {
       description: {
-        component: "ローディング状態を示すスケルトンプレースホルダー。任意のサイズ/形状で使用可能。",
+        component:
+          "ローディング状態を示すスケルトンプレースホルダー。任意のサイズ/形状で使用可能。",
       },
     },
   },

@@ -9,7 +9,8 @@ const meta: Meta<typeof Calendar> = {
   parameters: {
     docs: {
       description: {
-        component: "react-day-picker を用いたカレンダー。single/multiple/range などのモードをサポート。",
+        component:
+          "react-day-picker を用いたカレンダー。single/multiple/range などのモードをサポート。",
       },
     },
   },
@@ -22,7 +23,12 @@ export const Single: Story = {
   render: () => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     return (
-      <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md border" />
+      <Calendar
+        mode="single"
+        selected={date}
+        onSelect={setDate}
+        className="rounded-md border"
+      />
     );
   },
 };

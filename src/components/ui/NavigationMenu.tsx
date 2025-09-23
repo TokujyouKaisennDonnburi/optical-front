@@ -1,5 +1,18 @@
-import type { AnchorHTMLAttributes, HTMLAttributes, ReactElement, ReactNode } from "react";
-import { cloneElement, createContext, isValidElement, useContext, useId, useMemo, useState } from "react";
+import type {
+  AnchorHTMLAttributes,
+  HTMLAttributes,
+  ReactElement,
+  ReactNode,
+} from "react";
+import {
+  cloneElement,
+  createContext,
+  isValidElement,
+  useContext,
+  useId,
+  useMemo,
+  useState,
+} from "react";
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/utils_constants_styles/utils";
@@ -8,7 +21,7 @@ const navigationMenuTriggerStyle = cn(
   "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium",
   "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   "disabled:pointer-events-none disabled:opacity-50",
-  "bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground"
+  "bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
 );
 
 type NavigationMenuState = {
@@ -39,7 +52,11 @@ type NavigationMenuListProps = HTMLAttributes<HTMLUListElement> & {
 };
 
 function NavigationMenuList({ className, children }: NavigationMenuListProps) {
-  return <ul className={cn("flex flex-wrap items-center gap-1", className)}>{children}</ul>;
+  return (
+    <ul className={cn("flex flex-wrap items-center gap-1", className)}>
+      {children}
+    </ul>
+  );
 }
 
 type NavigationMenuItemProps = HTMLAttributes<HTMLLIElement> & {
@@ -59,7 +76,11 @@ type NavigationMenuTriggerProps = HTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
 };
 
-function NavigationMenuTrigger({ className, children, ...props }: NavigationMenuTriggerProps) {
+function NavigationMenuTrigger({
+  className,
+  children,
+  ...props
+}: NavigationMenuTriggerProps) {
   const { openItem, setOpenItem } = useNavigationMenu();
   const id = useItem();
   const isOpen = openItem === id;
@@ -73,7 +94,12 @@ function NavigationMenuTrigger({ className, children, ...props }: NavigationMenu
       {...props}
     >
       <span>{children}</span>
-      <ChevronDown className={cn("ml-1 h-3 w-3 transition-transform", isOpen && "rotate-180")} />
+      <ChevronDown
+        className={cn(
+          "ml-1 h-3 w-3 transition-transform",
+          isOpen && "rotate-180",
+        )}
+      />
     </button>
   );
 }
@@ -82,7 +108,10 @@ type NavigationMenuContentProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
 };
 
-function NavigationMenuContent({ className, children }: NavigationMenuContentProps) {
+function NavigationMenuContent({
+  className,
+  children,
+}: NavigationMenuContentProps) {
   const { openItem } = useNavigationMenu();
   const id = useItem();
   const isOpen = openItem === id;
@@ -90,7 +119,12 @@ function NavigationMenuContent({ className, children }: NavigationMenuContentPro
   if (!isOpen) return null;
 
   return (
-    <div className={cn("absolute left-0 top-full z-20 mt-2 min-w-[220px] rounded-md border bg-popover p-4 shadow-lg", className)}>
+    <div
+      className={cn(
+        "absolute left-0 top-full z-20 mt-2 min-w-[220px] rounded-md border bg-popover p-4 shadow-lg",
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -101,13 +135,21 @@ type NavigationMenuLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   children: ReactNode;
 };
 
-function NavigationMenuLink({ asChild, className, children, ...props }: NavigationMenuLinkProps) {
+function NavigationMenuLink({
+  asChild,
+  className,
+  children,
+  ...props
+}: NavigationMenuLinkProps) {
   if (asChild && isValidElement(children)) {
     // Narrow the child to a ReactElement so cloneElement has a concrete prop shape.
     const child = children as ReactElement<Record<string, unknown>>;
     return cloneElement(child, {
       ...(props as Record<string, unknown>),
-      className: cn((child.props as { className?: string }).className, className),
+      className: cn(
+        (child.props as { className?: string }).className,
+        className,
+      ),
     });
   }
   return (
@@ -117,19 +159,28 @@ function NavigationMenuLink({ asChild, className, children, ...props }: Navigati
   );
 }
 
-function NavigationMenuIndicator({ className }: HTMLAttributes<HTMLDivElement>) {
+function NavigationMenuIndicator({
+  className,
+}: HTMLAttributes<HTMLDivElement>) {
   const { openItem } = useNavigationMenu();
-  return openItem ? <div className={cn("mt-2 h-0.5 w-12 bg-primary", className)} aria-hidden /> : null;
+  return openItem ? (
+    <div className={cn("mt-2 h-0.5 w-12 bg-primary", className)} aria-hidden />
+  ) : null;
 }
 
-function NavigationMenuViewport({ className, children }: HTMLAttributes<HTMLDivElement>) {
+function NavigationMenuViewport({
+  className,
+  children,
+}: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("relative", className)}>{children}</div>;
 }
 
 function useNavigationMenu() {
   const context = useContext(NavigationMenuContext);
   if (!context) {
-    throw new Error("NavigationMenu components must be used within <NavigationMenu>");
+    throw new Error(
+      "NavigationMenu components must be used within <NavigationMenu>",
+    );
   }
   return context;
 }
@@ -137,7 +188,9 @@ function useNavigationMenu() {
 function useItem() {
   const context = useContext(ItemContext);
   if (!context) {
-    throw new Error("NavigationMenuTrigger must be used inside NavigationMenuItem");
+    throw new Error(
+      "NavigationMenuTrigger must be used inside NavigationMenuItem",
+    );
   }
   return context;
 }

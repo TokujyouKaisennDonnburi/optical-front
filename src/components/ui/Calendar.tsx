@@ -1,13 +1,18 @@
-import * as React from "react"
-import { DayPicker, type DayPickerProps } from "react-day-picker"
-import { cn } from "@/utils_constants_styles/utils"
+import * as React from "react";
+import { DayPicker, type DayPickerProps } from "react-day-picker";
+import { cn } from "@/utils_constants_styles/utils";
 
 export type CalendarProps = DayPickerProps & {
-  className?: string
-  classNames?: Partial<NonNullable<DayPickerProps["classNames"]>>
-}
+  className?: string;
+  classNames?: Partial<NonNullable<DayPickerProps["classNames"]>>;
+};
 
-function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+function Calendar({
+  className,
+  classNames,
+  showOutsideDays = true,
+  ...props
+}: CalendarProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -30,7 +35,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         cell: cn(
           "h-9 w-9 text-center text-sm p-0 relative",
           "[&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md",
-          "last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
+          "last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         ),
         day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
         day_selected:
@@ -38,13 +43,14 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day_today: "bg-accent text-accent-foreground",
         day_outside: "text-muted-foreground opacity-50",
         day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+        day_range_middle:
+          "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...(classNames as any),
       }}
       {...props}
     />
-  )
+  );
 }
 
-export { Calendar }
+export { Calendar };

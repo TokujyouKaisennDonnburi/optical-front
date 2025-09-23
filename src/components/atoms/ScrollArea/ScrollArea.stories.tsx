@@ -8,7 +8,8 @@ const meta: Meta<typeof ScrollArea> = {
   parameters: {
     docs: {
       description: {
-        component: "オーバーフロー時にスクロール可能な領域を提供するコンテナ。独自スクロールバーを含む。",
+        component:
+          "オーバーフロー時にスクロール可能な領域を提供するコンテナ。独自スクロールバーを含む。",
       },
     },
   },

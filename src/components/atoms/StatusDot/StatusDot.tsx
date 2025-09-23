@@ -30,7 +30,7 @@ export function StatusDot({
       className={cn(
         "inline-flex h-2.5 w-2.5 items-center justify-center rounded-full",
         variantStyles[variant],
-        className
+        className,
       )}
       style={style}
       aria-hidden={label ? undefined : true}

@@ -5,9 +5,10 @@ import {
 } from "@/components/atoms/HoverCard";
 import { ScrollArea, ScrollBar } from "@/components/atoms/ScrollArea";
 import { Separator } from "@/components/atoms/Separator";
-import { StatusDot, type StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
+import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
+import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type TodayScheduleTimelineEvent = {
@@ -46,7 +47,7 @@ export function TodayScheduleTimeline({
     <ScrollArea
       className={cn(
         "flex-1 rounded-md border border-border bg-muted/20",
-        className
+        className,
       )}
     >
       <div className={cn("flex flex-col", contentClassName)}>
@@ -67,39 +68,21 @@ export function TodayScheduleTimeline({
                         type="button"
                         className="flex w-full items-center gap-2.5 rounded-md border border-border bg-background px-3 py-1.5 text-left text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
-                        <StatusDot
-                          variant={
-                            event.calendarColor
-                              ? "default"
-                              : event.statusVariant
-                          }
-                          style={
-                            event.calendarColor
-                              ? { backgroundColor: event.calendarColor }
+                        <ScheduleEventCard
+                          title={event.title}
+                          subtitle={
+                            event.timeRange
+                              ? event.timeRange.end
+                                ? `${event.timeRange.start} - ${event.timeRange.end}`
+                                : `${event.timeRange.start} 開始`
                               : undefined
                           }
-                          className="mt-0.5 shrink-0"
+                          calendarColor={event.calendarColor}
+                          statusVariant={event.statusVariant}
+                          variant="timeline"
+                          className="flex-1"
+                          indicatorClassName="mt-0.5"
                         />
-                        <div className="flex flex-1 flex-col">
-                          <Text
-                            as="span"
-                            weight="medium"
-                            className="text-foreground"
-                          >
-                            {event.title}
-                          </Text>
-                          {event.timeRange ? (
-                            <Text
-                              as="span"
-                              size="sm"
-                              className="text-muted-foreground"
-                            >
-                              {event.timeRange.end
-                                ? `${event.timeRange.start} - ${event.timeRange.end}`
-                                : `${event.timeRange.start} 開始`}
-                            </Text>
-                          ) : null}
-                        </div>
                       </button>
                     </HoverCardTrigger>
                     <HoverCardContent

@@ -49,12 +49,11 @@ const filterData = [
   },
 ];
 
-
 export function SearchHeader() {
-  const [search, setSearch] = useState("");   // 検索バーの入力値
+  const [search, setSearch] = useState(""); // 検索バーの入力値
   const [calendar, setCalendar] = useState<string[]>([]); // カレンダーフィルターの選択値
   const [period, setPeriod] = useState<string[]>([]); // 期間フィルターの選択値
-  
+
   // クリアボタンの処理
   const handleClear = () => {
     setSearch("");
@@ -68,32 +67,33 @@ export function SearchHeader() {
         {/* 検索バー */}
         <div className="w-[600px]">
           <SearchInput
-            suggestions={filterData.map(item => item.title)}
+            suggestions={filterData.map((item) => item.title)}
             value={search}
             onChange={setSearch}
             onSelect={setSearch}
             placeholder="スケジュール、参加者、場所を検索..."
           />
         </div>
-        
+
         {/* カレンダーフィルター */}
         <div className="w-[180px]">
-        <MultiSelectDropdown
-          options={filterData.map(item => item.calendar)}
-          placeholder="全てのカレンダー"
-          value={calendar}
-          onChange={setCalendar}
-        />
+          <MultiSelectDropdown
+            options={filterData.map((item) => item.calendar)}
+            placeholder="全てのカレンダー"
+            value={calendar}
+            onChange={setCalendar}
+          />
         </div>
 
         {/* 期間フィルター */}
         <div className="w-[100px]">
-        <MultiSelectDropdown
-          options={filterData.map(item => item.year.toString())}
-          placeholder="全期間"
-          value={period}
-          onChange={setPeriod}
-        /></div>
+          <MultiSelectDropdown
+            options={filterData.map((item) => item.year.toString())}
+            placeholder="全期間"
+            value={period}
+            onChange={setPeriod}
+          />
+        </div>
 
         {/* クリアボタン */}
         <Button variant="outline" onClick={handleClear}>

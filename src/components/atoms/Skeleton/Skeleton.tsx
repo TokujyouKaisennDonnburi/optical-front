@@ -1,2 +1,1 @@
-export { Skeleton } from "@/components/ui/Skeleton"
-
+export { Skeleton } from "@/components/ui/Skeleton";

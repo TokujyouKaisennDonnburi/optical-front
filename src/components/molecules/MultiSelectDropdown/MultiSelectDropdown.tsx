@@ -42,8 +42,8 @@ export function MultiSelectDropdown({
 
   // チェックボックスの選択管理
   const handleTempChange = (option: string, checked: boolean) => {
-    setTempSelected(prev =>
-      checked ? [...prev, option] : prev.filter(o => o !== option)
+    setTempSelected((prev) =>
+      checked ? [...prev, option] : prev.filter((o) => o !== option),
     );
   };
 
@@ -68,12 +68,12 @@ export function MultiSelectDropdown({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent sideOffset={4}>
-        {[...new Set(options)].map(option => (
+        {[...new Set(options)].map((option) => (
           <DropdownMenuCheckboxItem
             key={option}
             checked={tempSelected.includes(option)}
-            onCheckedChange={checked => handleTempChange(option, checked)}
-            onSelect={e => e.preventDefault()} // チェック後に閉じないように
+            onCheckedChange={(checked) => handleTempChange(option, checked)}
+            onSelect={(e) => e.preventDefault()} // チェック後に閉じないように
           >
             {option}
           </DropdownMenuCheckboxItem>

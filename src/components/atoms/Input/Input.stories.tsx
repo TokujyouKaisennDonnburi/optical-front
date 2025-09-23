@@ -11,7 +11,8 @@ const meta: Meta<typeof Input> = {
   parameters: {
     docs: {
       description: {
-        component: "shadcn ベースのテキスト入力。type のデフォルトは 'text'。disabled や placeholder 等に対応。",
+        component:
+          "shadcn ベースのテキスト入力。type のデフォルトは 'text'。disabled や placeholder 等に対応。",
       },
     },
   },
@@ -22,4 +23,6 @@ type Story = StoryObj<typeof Input>;
 
 export const Default: Story = {};
 export const Disabled: Story = { args: { disabled: true } };
-export const Password: Story = { args: { type: "password", placeholder: "••••••" } };
+export const Password: Story = {
+  args: { type: "password", placeholder: "••••••" },
+};

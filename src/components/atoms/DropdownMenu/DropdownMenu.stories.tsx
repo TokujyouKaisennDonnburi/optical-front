@@ -61,7 +61,9 @@ export const Default: Story = {
               <DropdownMenuItem>システム</DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
-          <DropdownMenuCheckboxItem defaultChecked>通知を有効にする</DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem defaultChecked>
+            通知を有効にする
+          </DropdownMenuCheckboxItem>
           <DropdownMenuRadioGroup defaultValue="ja">
             <DropdownMenuLabel inset>言語</DropdownMenuLabel>
             <DropdownMenuRadioItem value="ja">日本語</DropdownMenuRadioItem>

@@ -5,5 +5,4 @@ export {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/Card"
-
+} from "@/components/ui/Card";

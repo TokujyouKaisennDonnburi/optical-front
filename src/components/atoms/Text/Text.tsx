@@ -3,7 +3,7 @@ import { cn } from "@/utils_constants_styles/utils";
 
 type TextElement = keyof Pick<
   React.JSX.IntrinsicElements,
-  "span" | "p" | "div" | "label"
+  "span" | "p" | "div" | "label" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 >;
 
 export type TextProps = {
@@ -31,10 +31,10 @@ export function Text({
     weight === "medium"
       ? "font-medium"
       : weight === "semibold"
-      ? "font-semibold"
-      : weight === "bold"
-      ? "font-bold"
-      : "font-normal";
+        ? "font-semibold"
+        : weight === "bold"
+          ? "font-bold"
+          : "font-normal";
 
   return (
     <Comp className={cn(sizeCls, weightCls, className)} {...props}>
@@ -42,4 +42,3 @@ export function Text({
     </Comp>
   );
 }
-

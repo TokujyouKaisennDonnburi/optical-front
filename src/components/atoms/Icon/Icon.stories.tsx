@@ -12,7 +12,8 @@ const meta: Meta<typeof Icon> = {
   parameters: {
     docs: {
       description: {
-        component: "Lucide アイコンをラップし、size プロップで手軽にサイズ指定可能 (sm/md/lg/number)。",
+        component:
+          "Lucide アイコンをラップし、size プロップで手軽にサイズ指定可能 (sm/md/lg/number)。",
       },
     },
   },
