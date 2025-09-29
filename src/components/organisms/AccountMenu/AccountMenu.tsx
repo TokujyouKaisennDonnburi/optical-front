@@ -12,6 +12,7 @@ import { LogOut } from "lucide-react";
 // アカウントメニューのプロパティ型
 export interface AccountMenuProps {
   name: string;
+  email: string;  // ← 追加
   avatarUrl?: string;
   menuWidthClass?: string;
   avatarSizeClass?: string;
@@ -19,8 +20,9 @@ export interface AccountMenuProps {
 
 export function AccountMenu({
   name,
+  email,
   avatarUrl,
-  menuWidthClass = "w-44",
+  menuWidthClass = "w-52",
   avatarSizeClass = "h-10 w-10",
 }: AccountMenuProps) {
   // メニューアイテムの定義（必要に応じて追加可能）
@@ -47,7 +49,7 @@ export function AccountMenu({
         className={cn("rounded-lg border bg-popover p-0 shadow-md", menuWidthClass)}
       >
         {/* メニューアイテムのリストを表示 */}
-        <AccountMenuItems name={name} items={menuItems} />
+        <AccountMenuItems name={name} email={email} avatarUrl={avatarUrl} items={menuItems} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

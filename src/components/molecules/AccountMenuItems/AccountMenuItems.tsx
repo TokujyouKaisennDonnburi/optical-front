@@ -5,25 +5,47 @@ import {
   DropdownMenuSeparator,
 } from "@/components/atoms/DropdownMenu";
 
-// 単一メニューアイテムの型
-export interface AccountMenuItem {
-  label: string;                   // メニュー名
-  icon?: React.ReactNode;           // アイコン（任意）
-  onSelect?: () => void;           // 選択時の処理（任意）
-}
+type AccountMenuItemsProps = {
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  items: {
+    label: string;
+    icon: React.ReactNode;
+    onSelect: () => void;
+  }[];
+};
 
-// メニュー全体の型
-export interface AccountMenuItemsProps {
-  name: string;                     // ユーザー名
-  items: AccountMenuItem[];         // メニューアイテム配列
-}
-
-export function AccountMenuItems({ name, items }: AccountMenuItemsProps) {
+export function AccountMenuItems({ name, email, avatarUrl, items }: AccountMenuItemsProps) {
   return (
-    <div>
-      {/* ユーザー名表示 */}
-      <DropdownMenuLabel className="text-center">{name}</DropdownMenuLabel>
-      <DropdownMenuSeparator />
+    <div className="flex flex-col w-full">
+      {/* プロフィール情報 */}
+      <div className="flex flex-col items-center p-4 text-center">
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={name}
+            className="w-16 h-16 rounded-full border"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white text-xl">
+            {name.charAt(0)}
+          </div>
+        )}
+
+        {/* ユーザー名 */}
+        <div className="mt-2 text-sm font-medium w-full truncate" title={name}>
+          {name}
+        </div>
+        
+        {/* メールアドレス */}
+        <div className="text-xs text-gray-500 w-full truncate" title={email}>
+          {email}
+        </div>
+      </div>
+
+      {/* 区切り線 */}
+      <hr className="my-2" />
 
       {/* メニューアイテムを動的に展開 */}
       {items.map((item, index) => (
@@ -36,7 +58,7 @@ export function AccountMenuItems({ name, items }: AccountMenuItemsProps) {
           className="flex items-center gap-3 px-4 py-3 text-sm"
         >
           {item.icon}
-          <span>{item.label}</span>
+          <span className="text-sm">{item.label}</span>
         </DropdownMenuItem>
       ))}
     </div>
