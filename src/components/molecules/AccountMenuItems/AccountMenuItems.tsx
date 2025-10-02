@@ -1,9 +1,8 @@
 import * as React from "react";
 import {
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
 } from "@/components/atoms/DropdownMenu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/atoms/Avatar";
 
 type AccountMenuItemsProps = {
   name: string;
@@ -21,23 +20,19 @@ export function AccountMenuItems({ name, email, avatarUrl, items }: AccountMenuI
     <div className="flex flex-col w-full">
       {/* プロフィール情報 */}
       <div className="flex flex-col items-center p-4 text-center">
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={name}
-            className="w-16 h-16 rounded-full border"
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white text-xl">
-            {name.charAt(0)}
-          </div>
-        )}
+        <Avatar className="w-16 h-16">
+          {avatarUrl ? (
+            <AvatarImage src={avatarUrl} alt={name} />
+          ) : (
+            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+          )}
+        </Avatar>
 
         {/* ユーザー名 */}
         <div className="mt-2 text-sm font-medium w-full truncate" title={name}>
           {name}
         </div>
-        
+
         {/* メールアドレス */}
         <div className="text-xs text-gray-500 w-full truncate" title={email}>
           {email}
