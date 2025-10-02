@@ -11,17 +11,22 @@ import { LogOut } from "lucide-react";
 
 // アカウントメニューのプロパティ型
 export interface AccountMenuProps {
-  name: string;
-  email: string;  // ← 追加
-  avatarUrl?: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    iconUrl?: string;
+  } | null;
+  isLoading?: boolean;
+  error?: Error | null;
   menuWidthClass?: string;
   avatarSizeClass?: string;
 }
 
 export function AccountMenu({
-  name,
-  email,
-  avatarUrl,
+  user,
+  isLoading,
+  error,
   menuWidthClass = "w-52",
   avatarSizeClass = "h-10 w-10",
 }: AccountMenuProps) {
@@ -34,12 +39,27 @@ export function AccountMenu({
     },
   ];
 
+  // ローディング中のフォールバック処理(現状は仮アイコンの表示)
+  if (isLoading) {
+    return <AccountMenuButton avatarUrl={"https://i.pravatar.cc/100?img=0"} avatarSizeClass={avatarSizeClass} />;
+  }
+
+  // エラー時のフォールバック処理(現状は仮アイコンの表示)
+  if (error) {
+    return <AccountMenuButton avatarUrl={"https://i.pravatar.cc/100?img=0"} avatarSizeClass={avatarSizeClass} />;
+  }
+  
+  // ユーザー情報がない場合のフォールバック処理(現状は何も表示しない)
+  if (!user) {
+    return null;
+  }
+
   return (
     // ドロップダウン全体のコンテナ
     <DropdownMenu>
       {/* プロフィール画像(メニューを開くトリガー) */}
       <DropdownMenuTrigger asChild>
-        <AccountMenuButton name={name} avatarUrl={avatarUrl} avatarSizeClass={avatarSizeClass} />
+        <AccountMenuButton name={user.name} avatarUrl={user.iconUrl} avatarSizeClass={avatarSizeClass} />
       </DropdownMenuTrigger>
 
       {/* ドロップダウンメニューのコンテンツ */}
@@ -49,7 +69,7 @@ export function AccountMenu({
         className={cn("rounded-lg border bg-popover p-0 shadow-md", menuWidthClass)}
       >
         {/* メニューアイテムのリストを表示 */}
-        <AccountMenuItems name={name} email={email} avatarUrl={avatarUrl} items={menuItems} />
+        <AccountMenuItems name={user.name} email={user.email} avatarUrl={user.iconUrl} items={menuItems} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
