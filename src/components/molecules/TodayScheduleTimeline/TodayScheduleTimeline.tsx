@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef } from "react";
+
 import {
   HoverCard,
   HoverCardContent,
@@ -43,16 +45,60 @@ export function TodayScheduleTimeline({
   className,
   contentClassName,
 }: TodayScheduleTimelineProps) {
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const currentSlotRef = useRef<HTMLDivElement | null>(null);
+  const hasAutoScrolledRef = useRef(false);
+
+  const setCurrentSlotRef = useCallback((node: HTMLDivElement | null) => {
+    currentSlotRef.current = node;
+  }, []);
+
+  useEffect(() => {
+    hasAutoScrolledRef.current = false;
+  }, [slots]);
+
+  useEffect(() => {
+    if (hasAutoScrolledRef.current) {
+      return;
+    }
+
+    const viewport = viewportRef.current;
+    const currentSlot = currentSlotRef.current;
+
+    if (!viewport || !currentSlot) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      const slotOffset = currentSlot.offsetTop;
+      const slotHeight = currentSlot.offsetHeight;
+      const target = slotOffset - viewport.clientHeight / 2 + slotHeight / 2;
+
+      viewport.scrollTo({
+        top: Math.max(target, 0),
+        behavior: "auto",
+      });
+      hasAutoScrolledRef.current = true;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [slots]);
+
   return (
     <ScrollArea
       className={cn(
-        "flex-1 rounded-md border border-border bg-muted/20",
+        "flex-1 min-w-0 rounded-md border border-border bg-muted/20",
         className,
       )}
+      viewportRef={viewportRef}
     >
-      <div className={cn("flex flex-col", contentClassName)}>
+      <div className={cn("flex w-full flex-col", contentClassName)}>
         {slots.map((slot, index) => (
-          <div key={`${slot.time}-${index}`} className="px-2.5 py-2">
+          <div
+            key={`${slot.time}-${index}`}
+            className="w-full px-2.5 py-2"
+            ref={slot.isCurrent ? setCurrentSlotRef : undefined}
+          >
             <TimeLabel
               time={slot.time}
               suffix={slot.suffix}
@@ -66,7 +112,7 @@ export function TodayScheduleTimeline({
                     <HoverCardTrigger asChild>
                       <button
                         type="button"
-                        className="flex w-full items-center gap-2.5 rounded-md border border-border bg-background px-3 py-1.5 text-left text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="flex w-full min-w-0 items-center gap-2.5 rounded-md border border-border bg-background px-3 py-1.5 text-left text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <ScheduleEventCard
                           title={event.title}

@@ -1,10 +1,10 @@
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
 import { MultiSelectDropdown } from "@/components/molecules/MultiSelectDropdown/MultiSelectDropdown";
 import { Button } from "@/components/atoms/Button";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // 検索候補・フィルターのリスト(仮)
-const filterData = [
+const fallbackFilterData = [
   {
     title: "会議室A",
     calendar: "仕事用",
@@ -49,15 +49,65 @@ const filterData = [
   },
 ];
 
-export function SearchHeader() {
-  const [search, setSearch] = useState(""); // 検索バーの入力値
-  const [calendar, setCalendar] = useState<string[]>([]); // カレンダーフィルターの選択値
+type SearchHeaderProps = {
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  calendarOptions?: string[];
+  selectedCalendars?: string[];
+  onCalendarChange?: (value: string[]) => void;
+  periodOptions?: string[];
+};
+
+export function SearchHeader({
+  searchValue,
+  onSearchChange,
+  calendarOptions,
+  selectedCalendars,
+  onCalendarChange,
+  periodOptions,
+}: SearchHeaderProps) {
+  const [search, setSearch] = useState(searchValue ?? ""); // 検索バーの入力値
+  const [calendar, setCalendar] = useState<string[]>(selectedCalendars ?? []); // カレンダーフィルターの選択値
   const [period, setPeriod] = useState<string[]>([]); // 期間フィルターの選択値
+
+  useEffect(() => {
+    setSearch(searchValue ?? "");
+  }, [searchValue]);
+
+  useEffect(() => {
+    setCalendar(selectedCalendars ?? []);
+  }, [selectedCalendars]);
+
+  const availableCalendars = useMemo(() => {
+    if (calendarOptions && calendarOptions.length > 0) {
+      return Array.from(new Set(calendarOptions));
+    }
+    return Array.from(new Set(fallbackFilterData.map((item) => item.calendar)));
+  }, [calendarOptions]);
+
+  const availablePeriods = useMemo(() => {
+    if (periodOptions && periodOptions.length > 0) {
+      return Array.from(new Set(periodOptions));
+    }
+    return Array.from(
+      new Set(fallbackFilterData.map((item) => item.year.toString())),
+    );
+  }, [periodOptions]);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    onSearchChange?.(value);
+  };
+
+  const handleCalendarChange = (value: string[]) => {
+    setCalendar(value);
+    onCalendarChange?.(value);
+  };
 
   // クリアボタンの処理
   const handleClear = () => {
-    setSearch("");
-    setCalendar([]);
+    handleSearchChange("");
+    handleCalendarChange([]);
     setPeriod([]);
   };
 
@@ -67,10 +117,9 @@ export function SearchHeader() {
         {/* 検索バー */}
         <div className="w-[600px]">
           <SearchInput
-            suggestions={filterData.map((item) => item.title)}
             value={search}
-            onChange={setSearch}
-            onSelect={setSearch}
+            onChange={handleSearchChange}
+            onSelect={handleSearchChange}
             placeholder="スケジュール、参加者、場所を検索..."
           />
         </div>
@@ -78,17 +127,17 @@ export function SearchHeader() {
         {/* カレンダーフィルター */}
         <div className="w-[180px]">
           <MultiSelectDropdown
-            options={filterData.map((item) => item.calendar)}
+            options={availableCalendars}
             placeholder="全てのカレンダー"
             value={calendar}
-            onChange={setCalendar}
+            onChange={handleCalendarChange}
           />
         </div>
 
         {/* 期間フィルター */}
         <div className="w-[100px]">
           <MultiSelectDropdown
-            options={filterData.map((item) => item.year.toString())}
+            options={availablePeriods}
             placeholder="全期間"
             value={period}
             onChange={setPeriod}

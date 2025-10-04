@@ -6,6 +6,13 @@ import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { startMockServiceWorker } from "@/mocks/browser";
 
+export type TodayScheduleApiCalendar = {
+  id: string;
+  name: string;
+  color: string;
+  description?: string;
+};
+
 export type TodayScheduleApiItem = {
   id: string;
   title: string;
@@ -13,6 +20,7 @@ export type TodayScheduleApiItem = {
   location?: string;
   locationUrl?: string;
   members?: string[];
+  calendarId?: string;
   calendarName?: string;
   status: "default" | "info" | "success" | "warning" | "danger";
   start: string;
@@ -23,6 +31,7 @@ export type TodayScheduleApiItem = {
 export type TodayScheduleApiResponse = {
   date: string;
   items: TodayScheduleApiItem[];
+  calendars?: TodayScheduleApiCalendar[];
 };
 
 export function useTodaySchedule() {
@@ -67,27 +76,39 @@ export function useTodaySchedule() {
     };
   }, []);
 
+  const calendars = useMemo(() => data?.calendars ?? [], [data?.calendars]);
+
+  const calendarIndex = useMemo(() => {
+    return new Map(calendars.map((calendar) => [calendar.id, calendar]));
+  }, [calendars]);
+
   const items: TodaySchedulePanelItem[] = useMemo(() => {
     if (!data) return [];
 
-    return data.items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      timeRange: {
-        start: formatTimeLabel(item.start),
-        end: item.end ? formatTimeLabel(item.end) : undefined,
-      },
-      startsAt: item.start,
-      endsAt: item.end,
-      statusVariant: normalizeStatus(item.status),
-      memo: item.memo,
-      location: item.location,
-      locationUrl: item.locationUrl,
-      members: item.members,
-      calendarName: item.calendarName,
-      calendarColor: item.calendarColor,
-    }));
-  }, [data]);
+    return data.items.map((item) => {
+      const calendar = item.calendarId
+        ? calendarIndex.get(item.calendarId)
+        : undefined;
+
+      return {
+        id: item.id,
+        title: item.title,
+        timeRange: {
+          start: formatTimeLabel(item.start),
+          end: item.end ? formatTimeLabel(item.end) : undefined,
+        },
+        startsAt: item.start,
+        endsAt: item.end,
+        statusVariant: normalizeStatus(item.status),
+        memo: item.memo,
+        location: item.location,
+        locationUrl: item.locationUrl,
+        members: item.members,
+        calendarName: item.calendarName ?? calendar?.name,
+        calendarColor: item.calendarColor ?? calendar?.color,
+      };
+    });
+  }, [calendarIndex, data]);
 
   const dateLabel = useMemo(() => {
     if (!data) return "";
@@ -102,6 +123,7 @@ export function useTodaySchedule() {
 
   return {
     items,
+    calendars,
     dateLabel,
     isLoading,
     error,
@@ -112,15 +134,23 @@ function normalizeScheduleResponse(
   response: TodayScheduleApiResponse,
 ): TodayScheduleApiResponse {
   const today = new Date();
+  const calendarIndex = new Map(
+    (response.calendars ?? []).map((calendar) => [calendar.id, calendar]),
+  );
   const alignedItems = response.items.map((item) => ({
     ...item,
     start: alignDateTime(item.start, today),
     end: item.end ? alignDateTime(item.end, today) : undefined,
+    calendarName:
+      item.calendarName ?? calendarIndex.get(item.calendarId ?? "")?.name,
+    calendarColor:
+      item.calendarColor ?? calendarIndex.get(item.calendarId ?? "")?.color,
   }));
 
   return {
     date: today.toISOString(),
     items: alignedItems,
+    calendars: response.calendars ?? [],
   };
 }
 

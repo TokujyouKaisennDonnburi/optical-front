@@ -1,1 +1,1 @@
-export * from "./todayScheduleHandlers";
+export * from "./scheduleHandlers";
