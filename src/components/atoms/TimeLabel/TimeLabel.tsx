@@ -20,6 +20,7 @@ export function TimeLabel({
     <div
       className={cn(
         "flex items-center gap-2 text-muted-foreground",
+        "min-w-0",
         isCurrent && "text-primary",
         className,
       )}
@@ -28,12 +29,12 @@ export function TimeLabel({
         as="span"
         size="sm"
         weight={isCurrent ? "semibold" : "normal"}
-        className="tabular-nums"
+        className="tabular-nums shrink-0"
       >
         {time}
       </Text>
       {suffix ? (
-        <Text as="span" size="sm" className="uppercase">
+        <Text as="span" size="sm" className="uppercase shrink-0">
           {suffix}
         </Text>
       ) : null}
@@ -42,9 +43,11 @@ export function TimeLabel({
           as="span"
           size="sm"
           className={cn(
-            "text-xs",
+            "text-xs truncate",
+            "min-w-0 flex-1",
             isCurrent ? "text-primary" : "text-muted-foreground",
           )}
+          title={description}
         >
           {description}
         </Text>

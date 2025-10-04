@@ -3,24 +3,70 @@
 import { useMemo, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
-import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
-import { Icon } from "@/components/atoms/Icon";
-import { Input } from "@/components/atoms/Input";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import {
   GeneralScheduleBoard,
   ScheduleEventDialog,
   type GeneralScheduleBoardItem,
 } from "@/components/organisms/GeneralScheduleBoard";
+import { SearchHeader } from "@/components/organisms/SearchHeader/SearchHeader";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useTodaySchedule } from "@/hooks/useTodaySchedule";
 import { cn } from "@/utils_constants_styles/utils";
-import { CalendarDays, ChevronDown, Plus } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 export default function Home() {
-  const { items, dateLabel, isLoading, error } = useTodaySchedule();
+  const { items, calendars, dateLabel, isLoading, error } = useTodaySchedule();
   const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
+
+  const filteredItems = useMemo(() => {
+    const normalized = searchTerm.trim().toLowerCase();
+    const calendarFilter = new Set(selectedCalendars);
+
+    return items.filter((item) => {
+      const matchesSearch =
+        !normalized || item.title.toLowerCase().includes(normalized);
+
+      if (!matchesSearch) {
+        return false;
+      }
+
+      if (!calendarFilter.size) {
+        return true;
+      }
+
+      const calendarName = item.calendarName ?? "";
+      return calendarFilter.has(calendarName);
+    });
+  }, [items, searchTerm, selectedCalendars]);
+
+  const todayItems = useMemo(() => {
+    const todayStart = startOfDay(new Date());
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayEnd.getDate() + 1);
+
+    return filteredItems.filter((item) => {
+      const startsAt = item.startsAt ? new Date(item.startsAt) : null;
+      const endsAt = item.endsAt ? new Date(item.endsAt) : null;
+
+      if (!startsAt || Number.isNaN(startsAt.getTime())) {
+        return false;
+      }
+
+      const hasValidEnd = endsAt && !Number.isNaN(endsAt.getTime());
+      const rangeStart = startsAt;
+      const rangeEnd = hasValidEnd ? endsAt : startsAt;
+
+      return rangeStart < todayEnd && rangeEnd >= todayStart;
+    });
+  }, [filteredItems]);
+
+  const calendarOptions = useMemo(() => {
+    return Array.from(new Set(calendars.map((calendar) => calendar.name)));
+  }, [calendars]);
 
   const boardHeader = useMemo(
     () => ({
@@ -36,20 +82,34 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-muted/10">
-      <HeaderBar />
-      <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-3 overflow-hidden px-2 py-2 lg:grid-cols-[minmax(0,1fr)_320px] ">
+      <header className="border-b border-border bg-card/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2.5 px-4 py-2.5 lg:px-8">
+          <SearchHeader
+            searchValue={searchTerm}
+            onSearchChange={(value) => setSearchTerm(value)}
+            calendarOptions={calendarOptions}
+            selectedCalendars={selectedCalendars}
+            onCalendarChange={setSelectedCalendars}
+          />
+          <Avatar className="ml-auto h-10 w-10 border">
+            <AvatarImage src="https://i.pravatar.cc/100?img=40" alt="User" />
+            <AvatarFallback>YO</AvatarFallback>
+          </Avatar>
+        </div>
+      </header>
+      <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-3 overflow-hidden px-2 py-2 lg:grid-cols-[minmax(0,1fr)_clamp(24rem,32vw,32rem)] ">
         <BoardArea
           className="flex-1 min-h-0 lg:col-start-1"
-          items={items}
+          items={filteredItems}
           isLoading={isLoading}
           error={error}
           viewDate={viewDate}
           onChangeViewDate={handleViewDateChange}
         />
-        <div className="flex h-full w-full min-h-0 lg:col-start-2">
+        <div className="flex h-full w-full min-h-0 lg:col-start-2 lg:w-full lg:max-w-[32rem]">
           <TodaySchedulePanel
             header={boardHeader}
-            items={items}
+            items={todayItems}
             isLoading={isLoading}
             emptyMessage={
               error ? "予定を取得できませんでした" : "今日の予定はありません。"
@@ -59,38 +119,6 @@ export default function Home() {
       </main>
       <AvatarStrip />
     </div>
-  );
-}
-
-function HeaderBar() {
-  return (
-    <header className="border-b border-border bg-card/80 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2.5 px-4 py-2.5 lg:px-8">
-        <Input
-          placeholder="スケジュール、参加者、場所を検索..."
-          className="h-10 flex-1 min-w-[220px]"
-        />
-        <HeaderDropdown label="全てのカレンダー" />
-        <HeaderDropdown label="全期間" />
-        <Button variant="outline">クリア</Button>
-        <Button className="gap-2">
-          <Icon icon={Plus} size="sm" /> 予定を追加
-        </Button>
-        <Avatar className="h-10 w-10 border">
-          <AvatarImage src="https://i.pravatar.cc/100?img=40" alt="User" />
-          <AvatarFallback>YO</AvatarFallback>
-        </Avatar>
-      </div>
-    </header>
-  );
-}
-
-function HeaderDropdown({ label }: { label: string }) {
-  return (
-    <Button variant="secondary" className="gap-2">
-      {label}
-      <Icon icon={ChevronDown} size="sm" />
-    </Button>
   );
 }
 

@@ -66,7 +66,7 @@ export function TodaySchedulePanel({
   }, [items, timeline?.slots]);
 
   return (
-    <Card className={cn("flex h-full min-h-0 flex-col", className)}>
+    <Card className={cn("flex h-full w-full min-h-0 flex-col", className)}>
       <CardHeader className="border-b border-border px-4 py-3">
         <TodayScheduleHeader
           title={header.title}
@@ -151,10 +151,10 @@ function buildSlotsFromItems(
     return defaultSlots();
   }
 
-  const startHour = Math.max(0, Math.floor(minStart / 60) * 60 - 60);
-  const endHour = Math.min(23 * 60, Math.ceil(maxEnd / 60) * 60 + 60);
+  const startHour = 0;
+  const endHour = 24 * 60;
 
-  for (let minute = startHour; minute <= endHour; minute += 60) {
+  for (let minute = startHour; minute < endHour; minute += 60) {
     if (!slots.has(minute)) {
       slots.set(minute, {
         time: minutesToTimeLabel(minute),
@@ -183,10 +183,8 @@ function buildSlotsFromItems(
 }
 
 function defaultSlots(): TodayScheduleTimelineSlot[] {
-  const start = 8 * 60;
-  const end = 18 * 60;
   const result: TodayScheduleTimelineSlot[] = [];
-  for (let minute = start; minute <= end; minute += 60) {
+  for (let minute = 0; minute < 24 * 60; minute += 60) {
     result.push({ time: minutesToTimeLabel(minute) });
   }
   return result;

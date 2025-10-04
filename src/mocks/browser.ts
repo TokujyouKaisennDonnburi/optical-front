@@ -11,9 +11,9 @@ let worker: WorkerInstance | null = null;
 
 async function initializeWorker() {
   const { setupWorker } = await import("msw/browser");
-  const { todayScheduleHandlers } = await import("@/mocks/handlers");
+  const { scheduleHandlers } = await import("@/mocks/handlers");
 
-  return setupWorker(...todayScheduleHandlers);
+  return setupWorker(...scheduleHandlers);
 }
 
 export function startMockServiceWorker() {

@@ -74,7 +74,7 @@ export const ScheduleEventCard = forwardRef<
             as="span"
             weight={isCompact ? "normal" : "medium"}
             className={cn(
-              "truncate",
+              "block truncate",
               isCompact
                 ? "text-[10px] leading-tight text-white"
                 : "text-foreground",
@@ -88,7 +88,7 @@ export const ScheduleEventCard = forwardRef<
               as="span"
               size="sm"
               className={cn(
-                "truncate text-xs",
+                "block truncate text-xs",
                 isCompact ? "text-white/70" : "text-muted-foreground",
                 subtitleClassName,
               )}

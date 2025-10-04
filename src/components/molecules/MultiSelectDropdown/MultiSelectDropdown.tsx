@@ -5,7 +5,9 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/atoms/DropdownMenu";
 import { Button } from "@/components/atoms/Button";
-import { useState, useEffect } from "react";
+import { ScrollArea } from "@/components/atoms/ScrollArea";
+import type { CheckedState } from "@radix-ui/react-checkbox";
+import { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface MultiSelectDropdownProps {
@@ -22,29 +24,30 @@ export function MultiSelectDropdown({
   onChange,
 }: MultiSelectDropdownProps) {
   const [open, setOpen] = useState(false);
-  const [tempSelected, setTempSelected] = useState<string[]>(value);
+  const uniqueOptions = useMemo(() => Array.from(new Set(options)), [options]);
 
-  // value と open が変化したときの同期処理
-  useEffect(() => {
-    if (!open) {
-      setTempSelected(value);
-    }
-  }, [value, open]);
+  const MAX_VISIBLE_OPTIONS = 3;
+  const ITEM_HEIGHT_PX = 40;
+  const shouldScroll = uniqueOptions.length > MAX_VISIBLE_OPTIONS;
+  const scrollAreaMaxHeight = shouldScroll
+    ? MAX_VISIBLE_OPTIONS * ITEM_HEIGHT_PX
+    : undefined;
 
   // open/close 管理
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
-    if (!isOpen) {
-      // 閉じた時に確定
-      onChange(tempSelected);
-    }
   };
 
   // チェックボックスの選択管理
-  const handleTempChange = (option: string, checked: boolean) => {
-    setTempSelected((prev) =>
-      checked ? [...prev, option] : prev.filter((o) => o !== option),
-    );
+  const handleTempChange = (option: string, checked: CheckedState) => {
+    const isChecked = checked === true;
+    const current = new Set(value);
+    if (isChecked) {
+      current.add(option);
+    } else {
+      current.delete(option);
+    }
+    onChange(Array.from(current));
   };
 
   return (
@@ -67,17 +70,28 @@ export function MultiSelectDropdown({
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent sideOffset={4}>
-        {[...new Set(options)].map((option) => (
-          <DropdownMenuCheckboxItem
-            key={option}
-            checked={tempSelected.includes(option)}
-            onCheckedChange={(checked) => handleTempChange(option, checked)}
-            onSelect={(e) => e.preventDefault()} // チェック後に閉じないように
-          >
-            {option}
-          </DropdownMenuCheckboxItem>
-        ))}
+      <DropdownMenuContent sideOffset={4} className="p-0">
+        <ScrollArea
+          className="w-full"
+          style={
+            scrollAreaMaxHeight
+              ? { maxHeight: `${scrollAreaMaxHeight}px` }
+              : undefined
+          }
+        >
+          <div className="py-1">
+            {uniqueOptions.map((option) => (
+              <DropdownMenuCheckboxItem
+                key={option}
+                checked={value.includes(option)}
+                onCheckedChange={(checked) => handleTempChange(option, checked)}
+                onSelect={(e) => e.preventDefault()} // チェック後に閉じないように
+              >
+                {option}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </div>
+        </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   );
