@@ -13,7 +13,7 @@ export type User = {
 };
 
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null);  // ユーザー情報の状態
+  const [user, setUser] = useState<User | null>(null); // ユーザー情報の状態
   const [isLoading, setIsLoading] = useState(true); // ローディング状態
   const [error, setError] = useState<Error | null>(null); // エラー状態
 
@@ -35,7 +35,7 @@ export function useUser() {
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);
         }
-        
+
         const json = (await response.json()) as User;
 
         // コンポーネントがまだ画面にある場合のみ、状態を更新
@@ -56,7 +56,7 @@ export function useUser() {
     };
 
     void fetchUser();
-    
+
     // コンポーネントが画面から消えたときに実行される(アンマウント処理)
     return () => {
       // 非同期処理が終わったあとに不要な setState を防ぐ
