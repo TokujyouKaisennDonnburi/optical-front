@@ -5,7 +5,8 @@ import { Pencil } from "lucide-react";
 
 // バリデーション関数
 const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/;
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/;
   return emailRegex.test(email);
 };
 
@@ -18,16 +19,28 @@ type AccountMenuItemsProps = {
     icon: React.ReactNode;
     onSelect: () => void;
   }[];
+  onRequestEmailSave?: (newEmail: string) => void; // 親に渡す
 };
 
-export function AccountMenuItems({ name, email, avatarUrl, items }: AccountMenuItemsProps) {
-  const [editingField, setEditingField] = React.useState<"name" | "email" | "icon" | null>(null);
+export function AccountMenuItems({
+  name,
+  email,
+  avatarUrl,
+  items,
+  onRequestEmailSave,
+}: AccountMenuItemsProps) {
+  // 編集中のフィールドを管理（"name", "email", "icon"）
+  const [editingField, setEditingField] = React.useState<
+    "name" | "email" | "icon" | null
+  >(null);
+
+  // 編集された値を保持するステート
   const [editedName, setEditedName] = React.useState(name);
   const [editedEmail, setEditedEmail] = React.useState(email);
   const [editedAvatar, setEditedAvatar] = React.useState(avatarUrl ?? "");
   const [emailError, setEmailError] = React.useState<string | null>(null);
 
-  // 初期値の保持（useRefで一度だけ保持）
+  // 初期値の保持 (useRefで一度だけ保持)
   const originalNameRef = React.useRef(name);
   const originalEmailRef = React.useRef(email);
   const originalAvatarRef = React.useRef(avatarUrl ?? "");
@@ -35,54 +48,76 @@ export function AccountMenuItems({ name, email, avatarUrl, items }: AccountMenuI
   // 編集開始時に元の値を復元
   const handleEdit = (field: "name" | "email" | "icon") => {
     setEditingField(field);
-    if (field === "name") {
-      setEditedName(originalNameRef.current);
-    } else if (field === "email") {
-      setEditedEmail(originalEmailRef.current);
-    } else if (field === "icon") {
-      setEditedAvatar(originalAvatarRef.current);
-    }
     setEmailError(null);
   };
 
+  // キャンセル処理 (元の値に戻す)
   const handleCancel = () => {
-    if (editingField === "name") {
-      setEditedName(originalNameRef.current);
-    } else if (editingField === "email") {
-      setEditedEmail(originalEmailRef.current);
-    } else if (editingField === "icon") {
-      setEditedAvatar(originalAvatarRef.current);
-    }
+    setEditedName(originalNameRef.current);
+    setEditedEmail(originalEmailRef.current);
+    setEditedAvatar(originalAvatarRef.current);
     setEmailError(null);
     setEditingField(null);
   };
 
+  // 保存処理 (メールアドレスのバリデーションも行う)
   const handleSave = () => {
-    if (editingField === "email" && !validateEmail(editedEmail)) {
-      setEmailError("有効なメールアドレスを入力してください。");
+    // メールアドレスが変更されていない場合
+    if (editingField === "email") {
+      // メールアドレスが有効かチェック
+      if (!validateEmail(editedEmail)) {
+        setEmailError("有効なメールアドレスを入力してください。");
+        return;
+      }
+
+      // 値が変更されていなければ何もしない
+      if (editedEmail === originalEmailRef.current) {
+        setEditingField(null); // 編集モードを終了する
+        return;
+      }
+
+      // メールアドレスが有効なら親に保存要求を通知
+      onRequestEmailSave?.(editedEmail);
       return;
     }
 
-    setEmailError(null);
+    // ユーザー名とアバターの変更チェック
+    const isNameChanged = editedName !== originalNameRef.current;
+    const isAvatarChanged = editedAvatar !== originalAvatarRef.current;
 
+    // ユーザー名またはアバターが変更されていない場合
+    if (!isNameChanged && !isAvatarChanged) {
+      setEditingField(null); // 変更がなければ編集モードを終了する
+      return;
+    }
+
+    doSave();
+  };
+
+  // 保存処理 (名前やアバターが保存される)
+  const doSave = () => {
     // 保存後に元の値を更新
     originalNameRef.current = editedName;
     originalEmailRef.current = editedEmail;
     originalAvatarRef.current = editedAvatar;
 
+    // ここで実際の保存処理を実装
     console.log("保存:", { editedName, editedEmail, editedAvatar });
+
+    // 編集状態を解除
     setEditingField(null);
   };
 
+  // アバター画像変更時の処理
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-      setEditedAvatar(reader.result as string);
+      setEditedAvatar(reader.result as string); // 読み込んだ画像をステートにセット
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 画像をDataURLとして読み込む
   };
 
   return (
@@ -93,7 +128,11 @@ export function AccountMenuItems({ name, email, avatarUrl, items }: AccountMenuI
         <div className="relative">
           <Avatar className="w-16 h-16 overflow-hidden rounded-full">
             {editedAvatar ? (
-              <AvatarImage src={editedAvatar} alt={editedName} className="object-cover" />
+              <AvatarImage
+                src={editedAvatar}
+                alt={editedName}
+                className="object-cover"
+              />
             ) : (
               <AvatarFallback>{editedName.charAt(0)}</AvatarFallback>
             )}
