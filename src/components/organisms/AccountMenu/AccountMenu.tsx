@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuPortal,
 } from "@/components/atoms/DropdownMenu";
 import { cn } from "@/utils_constants_styles/utils";
 import { AccountMenuItems } from "@/components/molecules/AccountMenuItems/AccountMenuItems";
@@ -79,23 +80,26 @@ export function AccountMenu({
       </DropdownMenuTrigger>
 
       {/* ドロップダウンメニューのコンテンツ */}
-      <DropdownMenuContent
-        align="end"
-        sideOffset={8}
-        className={cn(
-          "rounded-lg border bg-popover p-0 shadow-md",
-          menuWidthClass,
-        )}
-      >
-        {/* メニューアイテムのリストを表示 */}
-        <AccountMenuItems
-          name={user.name}
-          email={user.email}
-          avatarUrl={user.iconUrl}
-          items={menuItems}
-          onRequestEmailSave={onRequestEmailSave} // 親に渡す
-        />
-      </DropdownMenuContent>
+      <DropdownMenuPortal>
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          className={cn(
+            "z-[9999] rounded-lg border bg-popover p-0 shadow-md",
+            menuWidthClass,
+          )}
+          
+        >
+          {/* メニューアイテムのリストを表示 */}
+          <AccountMenuItems
+            name={user.name}
+            email={user.email}
+            avatarUrl={user.iconUrl}
+            items={menuItems}
+            onRequestEmailSave={onRequestEmailSave} // 親に渡す
+          />
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   );
 }
