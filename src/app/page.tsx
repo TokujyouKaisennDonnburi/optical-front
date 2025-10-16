@@ -16,6 +16,10 @@ import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip"
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { type ScheduleCalendar, useSchedule } from "@/hooks/useSchedule";
 import { cn } from "@/utils_constants_styles/utils";
+import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
+import { useUser } from "@/hooks/useUser";
+import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
+import * as React from "react";
 
 export default function Home() {
   const { items, calendars, dateLabel, isLoading, error } = useSchedule();
@@ -92,6 +96,34 @@ export default function Home() {
     setViewDate(startOfDay(next));
   };
 
+  // ユーザー情報の取得
+  const { user, isLoading: userLoading, error: userError } = useUser();
+
+  // モーダル制御用の state
+  const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+  const [pendingEmail, setPendingEmail] = React.useState<string | null>(null);
+
+  // メール保存リクエストを受け取るハンドラ
+  const handleRequestEmailSave = (newEmail: string) => {
+    setPendingEmail(newEmail);
+    setIsConfirmOpen(true);
+  };
+
+  // モーダルの「保存」ボタン押下時のハンドラ
+  const handleConfirm = () => {
+    // ここで実際の保存処理を実装
+    console.log("保存:", pendingEmail);
+
+    setIsConfirmOpen(false);
+    setPendingEmail(null);
+  };
+
+  // モーダルの「キャンセル」ボタン押下時のハンドラ
+  const handleCancel = () => {
+    setIsConfirmOpen(false);
+    setPendingEmail(null);
+  };
+
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-muted/10">
       <header className="border-b border-border bg-card/80 backdrop-blur">
@@ -107,6 +139,18 @@ export default function Home() {
             <AvatarImage src="https://i.pravatar.cc/100?img=40" alt="User" />
             <AvatarFallback>YO</AvatarFallback>
           </Avatar>
+
+          {/* アカウントボタンの表示 */}
+          {/*
+          <div className="ml-auto h-10 w-10">
+            <AccountMenu
+              user={user}
+              isLoading={userLoading}
+              error={userError}
+              onRequestEmailSave={handleRequestEmailSave}
+            />
+          </div>
+          */}
         </div>
       </header>
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-3 overflow-hidden px-2 py-2 lg:grid-cols-[minmax(0,1fr)_clamp(24rem,32vw,32rem)] ">
@@ -156,6 +200,13 @@ export default function Home() {
           setAddedCalendars((prev) => [...prev, newCal]);
           console.log("[navigate] 単体スケジュール作成画面へ遷移");
         }}
+      />
+      {/* メールアドレス変更確認モーダル */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        message={`メールアドレスを「${pendingEmail}」に変更しますか？`}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
       />
     </div>
   );
