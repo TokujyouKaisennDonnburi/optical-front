@@ -101,10 +101,7 @@ export const WithModal: Story = {
 
     return (
       <>
-        <AccountMenu
-          {...args}
-          onRequestEmailSave={handleRequestEmailSave}
-        />
+        <AccountMenu {...args} onRequestEmailSave={handleRequestEmailSave} />
         <ConfirmModal
           isOpen={isConfirmOpen}
           message={`メールアドレスを「${pendingEmail}」に変更しますか？`}

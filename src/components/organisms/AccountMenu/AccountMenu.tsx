@@ -88,7 +88,6 @@ export function AccountMenu({
             "z-[9999] rounded-lg border bg-popover p-0 shadow-md",
             menuWidthClass,
           )}
-          
         >
           {/* メニューアイテムのリストを表示 */}
           <AccountMenuItems

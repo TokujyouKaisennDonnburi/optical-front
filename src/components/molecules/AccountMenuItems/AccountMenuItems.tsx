@@ -151,7 +151,7 @@ export function AccountMenuItems({
         </div>
 
         {/* ユーザー名 */}
-        <div className="mt-2 w-full relative">
+        <div className="relative flex items-center justify-center mt-2 w-full">
           {editingField === "name" ? (
             <input
               value={editedName}
@@ -159,14 +159,17 @@ export function AccountMenuItems({
               className="w-full border rounded px-2 text-sm"
             />
           ) : (
-            <div className="text-sm font-medium truncate" title={editedName}>
+            <div
+              className="text-sm font-medium truncate text-center ml-5"
+              title={editedName}
+            >
               {editedName}
             </div>
           )}
           {editingField !== "name" && (
             <button
               onClick={() => handleEdit("name")}
-              className="absolute -top-2 -right-4"
+              className="ml-2 p-1 flex items-center justify-center"
             >
               <Pencil className="h-3 w-3 text-gray-600" />
             </button>
@@ -174,7 +177,7 @@ export function AccountMenuItems({
         </div>
 
         {/* メールアドレス */}
-        <div className="mt-1 w-full text-xs text-gray-500 relative">
+        <div className="relative flex items-center justify-center mt-1 w-full text-xs text-center text-gray-500">
           {editingField === "email" ? (
             <>
               <input
@@ -189,14 +192,14 @@ export function AccountMenuItems({
               )}
             </>
           ) : (
-            <div className="truncate" title={editedEmail}>
+            <div className="truncate text-center ml-5" title={editedEmail}>
               {editedEmail}
             </div>
           )}
           {editingField !== "email" && (
             <button
               onClick={() => handleEdit("email")}
-              className="absolute -top-2 -right-4"
+              className="ml-2 p-1 flex items-center justify-center"
             >
               <Pencil className="h-3 w-3 text-gray-600" />
             </button>
