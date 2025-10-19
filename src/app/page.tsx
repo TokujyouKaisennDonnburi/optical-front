@@ -10,17 +10,19 @@ import {
   ScheduleEventDialog,
   type GeneralScheduleBoardItem,
 } from "@/components/organisms/GeneralScheduleBoard";
+import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { SearchHeader } from "@/components/organisms/SearchHeader/SearchHeader";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
-import { useTodaySchedule } from "@/hooks/useTodaySchedule";
+import { useSchedule, type ScheduleCalendar } from "@/hooks/useSchedule";
 import { cn } from "@/utils_constants_styles/utils";
 import { CalendarDays } from "lucide-react";
 
 export default function Home() {
-  const { items, calendars, dateLabel, isLoading, error } = useTodaySchedule();
+  const { items, calendars, dateLabel, isLoading, error } = useSchedule();
   const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
+  const [addedCalendars, setAddedCalendars] = useState<ScheduleCalendar[]>([]);
 
   const filteredItems = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -38,8 +40,8 @@ export default function Home() {
         return true;
       }
 
-      const calendarName = item.calendarName ?? "";
-      return calendarFilter.has(calendarName);
+      const calendarId = item.calendarId ?? "";
+      return calendarFilter.has(calendarId);
     });
   }, [items, searchTerm, selectedCalendars]);
 
@@ -64,9 +66,19 @@ export default function Home() {
     });
   }, [filteredItems]);
 
+  const mergedCalendars = useMemo(() => {
+    const byId = new Map<string, ScheduleCalendar>();
+    for (const c of calendars) byId.set(c.id, c);
+    for (const c of addedCalendars) byId.set(c.id, c);
+    return Array.from(byId.values());
+  }, [calendars, addedCalendars]);
+
   const calendarOptions = useMemo(() => {
-    return Array.from(new Set(calendars.map((calendar) => calendar.name)));
-  }, [calendars]);
+    return mergedCalendars.map((calendar) => ({
+      label: calendar.name,
+      value: calendar.id,
+    }));
+  }, [mergedCalendars]);
 
   const boardHeader = useMemo(
     () => ({
@@ -117,7 +129,34 @@ export default function Home() {
           />
         </div>
       </main>
-      <AvatarStrip />
+      <SelectCalendarStrip
+        calendars={mergedCalendars}
+        onSelectCalendar={(cal) => {
+          console.log(`[navigate] 単体カレンダーページへ遷移: ${cal.name}`);
+        }}
+        onAddCalendar={() => {
+          // 簡易的に新規カレンダーを追加（即時に検索バーへも反映）
+          const idx = addedCalendars.length + 1;
+          const palette = [
+            "#ef4444",
+            "#10b981",
+            "#f59e0b",
+            "#3b82f6",
+            "#8b5cf6",
+            "#14b8a6",
+            "#84cc16",
+            "#06b6d4",
+          ];
+          const color = palette[(idx - 1) % palette.length];
+          const newCal: ScheduleCalendar = {
+            id: `local-${Date.now()}-${idx}`,
+            name: `新規カレンダー ${idx}`,
+            color,
+          };
+          setAddedCalendars((prev) => [...prev, newCal]);
+          console.log("[navigate] 単体スケジュール作成画面へ遷移");
+        }}
+      />
     </div>
   );
 }
@@ -131,7 +170,7 @@ function BoardArea({
   onChangeViewDate,
 }: {
   className?: string;
-  items: ReturnType<typeof useTodaySchedule>["items"];
+  items: ReturnType<typeof useSchedule>["items"];
   isLoading: boolean;
   error: Error | null;
   viewDate: Date;
@@ -141,6 +180,9 @@ function BoardArea({
     useState<GeneralScheduleBoardItem | null>(null);
 
   const boardItems = useMemo(() => {
+    const viewYear = viewDate.getFullYear();
+    const viewMonth = viewDate.getMonth();
+
     return items
       .map((item) => {
         if (!item.startsAt) {
@@ -152,35 +194,26 @@ function BoardArea({
           return null;
         }
 
-        const adjustedStart = new Date(viewDate);
-        adjustedStart.setDate(originalStart.getDate());
-        adjustedStart.setHours(
-          originalStart.getHours(),
-          originalStart.getMinutes(),
-          originalStart.getSeconds(),
-          originalStart.getMilliseconds(),
-        );
+        if (
+          originalStart.getFullYear() !== viewYear ||
+          originalStart.getMonth() !== viewMonth
+        ) {
+          return null;
+        }
 
-        let adjustedEnd: Date | undefined;
+        let normalizedEnd: string | undefined;
         if (item.endsAt) {
           const originalEnd = new Date(item.endsAt);
           if (!Number.isNaN(originalEnd.getTime())) {
-            adjustedEnd = new Date(viewDate);
-            adjustedEnd.setDate(originalEnd.getDate());
-            adjustedEnd.setHours(
-              originalEnd.getHours(),
-              originalEnd.getMinutes(),
-              originalEnd.getSeconds(),
-              originalEnd.getMilliseconds(),
-            );
+            normalizedEnd = originalEnd.toISOString();
           }
         }
 
         return {
           id: item.id,
           title: item.title,
-          start: adjustedStart.toISOString(),
-          end: adjustedEnd?.toISOString(),
+          start: originalStart.toISOString(),
+          end: normalizedEnd,
           memo: item.memo,
           location: item.location,
           locationUrl: item.locationUrl,
@@ -263,29 +296,6 @@ function BoardArea({
         />
       ) : null}
     </Card>
-  );
-}
-
-function AvatarStrip() {
-  return (
-    <div className="mx-auto w-full max-w-7xl shrink-0 px-3 py-2 lg:px-6">
-      <div className="flex gap-2.5 overflow-x-auto pb-1 lg:grid lg:grid-cols-5 lg:gap-2.5 lg:overflow-visible lg:pb-0">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Card
-            key={`avatar-${index}`}
-            className="flex min-w-[110px] items-center justify-center bg-slate-800/80 py-3.5 lg:min-w-0"
-          >
-            <Avatar className="h-16 w-16 border-4 border-primary">
-              <AvatarImage
-                src={`https://i.pravatar.cc/100?img=${30 + index}`}
-                alt={`Member ${index + 1}`}
-              />
-              <AvatarFallback>{`M${index + 1}`}</AvatarFallback>
-            </Avatar>
-          </Card>
-        ))}
-      </div>
-    </div>
   );
 }
 

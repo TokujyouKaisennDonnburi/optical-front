@@ -6,14 +6,14 @@ import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { startMockServiceWorker } from "@/mocks/browser";
 
-export type TodayScheduleApiCalendar = {
+export type ScheduleCalendar = {
   id: string;
   name: string;
   color: string;
   description?: string;
 };
 
-export type TodayScheduleApiItem = {
+export type ScheduleItem = {
   id: string;
   title: string;
   memo?: string;
@@ -28,21 +28,22 @@ export type TodayScheduleApiItem = {
   calendarColor?: string;
 };
 
-export type TodayScheduleApiResponse = {
-  date: string;
-  items: TodayScheduleApiItem[];
-  calendars?: TodayScheduleApiCalendar[];
+export type ScheduleApiResponse = {
+  // API によっては日付の返却が無いケースも想定し optional にする
+  date?: string;
+  items: ScheduleItem[];
+  calendars?: ScheduleCalendar[];
 };
 
-export function useTodaySchedule() {
-  const [data, setData] = useState<TodayScheduleApiResponse | null>(null);
+export function useSchedule() {
+  const [data, setData] = useState<ScheduleApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchTodaySchedule = async () => {
+    const fetchSchedule = async () => {
       if (typeof window !== "undefined") {
         await startMockServiceWorker();
       }
@@ -53,7 +54,7 @@ export function useTodaySchedule() {
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);
         }
-        const json = (await response.json()) as TodayScheduleApiResponse;
+        const json = (await response.json()) as ScheduleApiResponse;
         if (isMounted) {
           const normalized = normalizeScheduleResponse(json);
           setData(normalized);
@@ -69,7 +70,7 @@ export function useTodaySchedule() {
       }
     };
 
-    void fetchTodaySchedule();
+    void fetchSchedule();
 
     return () => {
       isMounted = false;
@@ -99,6 +100,7 @@ export function useTodaySchedule() {
         },
         startsAt: item.start,
         endsAt: item.end,
+        calendarId: item.calendarId,
         statusVariant: normalizeStatus(item.status),
         memo: item.memo,
         location: item.location,
@@ -112,7 +114,7 @@ export function useTodaySchedule() {
 
   const dateLabel = useMemo(() => {
     if (!data) return "";
-    const date = new Date(data.date);
+    const date = data.date ? new Date(data.date) : new Date();
     return new Intl.DateTimeFormat("ja-JP", {
       year: "numeric",
       month: "long",
@@ -131,16 +133,14 @@ export function useTodaySchedule() {
 }
 
 function normalizeScheduleResponse(
-  response: TodayScheduleApiResponse,
-): TodayScheduleApiResponse {
-  const today = new Date();
+  response: ScheduleApiResponse,
+): ScheduleApiResponse {
   const calendarIndex = new Map(
     (response.calendars ?? []).map((calendar) => [calendar.id, calendar]),
   );
-  const alignedItems = response.items.map((item) => ({
+
+  const normalizedItems = response.items.map((item) => ({
     ...item,
-    start: alignDateTime(item.start, today),
-    end: item.end ? alignDateTime(item.end, today) : undefined,
     calendarName:
       item.calendarName ?? calendarIndex.get(item.calendarId ?? "")?.name,
     calendarColor:
@@ -148,28 +148,10 @@ function normalizeScheduleResponse(
   }));
 
   return {
-    date: today.toISOString(),
-    items: alignedItems,
+    date: response.date,
+    items: normalizedItems,
     calendars: response.calendars ?? [],
   };
-}
-
-function alignDateTime(isoString: string, baseDate: Date): string {
-  const original = new Date(isoString);
-  if (Number.isNaN(original.getTime())) {
-    return isoString;
-  }
-
-  const aligned = new Date(baseDate);
-  aligned.setDate(original.getDate());
-  aligned.setHours(
-    original.getHours(),
-    original.getMinutes(),
-    original.getSeconds(),
-    original.getMilliseconds(),
-  );
-
-  return aligned.toISOString();
 }
 
 function formatTimeLabel(value: string) {
@@ -182,9 +164,7 @@ function formatTimeLabel(value: string) {
   return `${hours}:${minutes.toString().padStart(2, "0")}`;
 }
 
-function normalizeStatus(
-  value: TodayScheduleApiItem["status"],
-): StatusDotVariant {
+function normalizeStatus(value: ScheduleItem["status"]): StatusDotVariant {
   const statuses = new Set([
     "default",
     "info",

@@ -10,10 +10,12 @@ import type { CheckedState } from "@radix-ui/react-checkbox";
 import { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
+type Option = string | { label: string; value: string };
+
 interface MultiSelectDropdownProps {
-  options: string[];
+  options: Option[];
   placeholder?: string;
-  value: string[];
+  value: string[]; // store option.value
   onChange: (selected: string[]) => void;
 }
 
@@ -24,11 +26,27 @@ export function MultiSelectDropdown({
   onChange,
 }: MultiSelectDropdownProps) {
   const [open, setOpen] = useState(false);
-  const uniqueOptions = useMemo(() => Array.from(new Set(options)), [options]);
+  const normalized = useMemo(() => {
+    const arr = options.map((o) =>
+      typeof o === "string" ? { label: o, value: o } : o,
+    );
+    // de-duplicate by value while keeping first label
+    const map = new Map<string, { label: string; value: string }>();
+    for (const opt of arr) {
+      if (!map.has(opt.value)) map.set(opt.value, opt);
+    }
+    return Array.from(map.values());
+  }, [options]);
+
+  const labelByValue = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const opt of normalized) m.set(opt.value, opt.label);
+    return m;
+  }, [normalized]);
 
   const MAX_VISIBLE_OPTIONS = 3;
   const ITEM_HEIGHT_PX = 40;
-  const shouldScroll = uniqueOptions.length > MAX_VISIBLE_OPTIONS;
+  const shouldScroll = normalized.length > MAX_VISIBLE_OPTIONS;
   const scrollAreaMaxHeight = shouldScroll
     ? MAX_VISIBLE_OPTIONS * ITEM_HEIGHT_PX
     : undefined;
@@ -60,7 +78,10 @@ export function MultiSelectDropdown({
           <span className="flex-1 min-w-0 truncate text-left">
             {value.length === 0
               ? placeholder || "選択してください"
-              : value.join(", ")}
+              : value
+                  .map((v) => labelByValue.get(v) ?? v)
+                  .filter(Boolean)
+                  .join(", ")}
           </span>
           <ChevronDown
             className={`ml-2 h-4 w-4 shrink-0 transition-transform ${
@@ -80,14 +101,16 @@ export function MultiSelectDropdown({
           }
         >
           <div className="py-1">
-            {uniqueOptions.map((option) => (
+            {normalized.map((option) => (
               <DropdownMenuCheckboxItem
-                key={option}
-                checked={value.includes(option)}
-                onCheckedChange={(checked) => handleTempChange(option, checked)}
+                key={option.value}
+                checked={value.includes(option.value)}
+                onCheckedChange={(checked) =>
+                  handleTempChange(option.value, checked)
+                }
                 onSelect={(e) => e.preventDefault()} // チェック後に閉じないように
               >
-                {option}
+                {option.label}
               </DropdownMenuCheckboxItem>
             ))}
           </div>

@@ -27,6 +27,7 @@ export type TodaySchedulePanelItem = {
   location?: string;
   locationUrl?: string;
   memo?: string;
+  calendarId?: string;
   calendarColor?: string;
   members?: string[];
   calendarName?: string;
