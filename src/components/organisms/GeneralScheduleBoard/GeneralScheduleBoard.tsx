@@ -5,6 +5,7 @@ import { Text } from "@/components/atoms/Text";
 import { CalendarGrid } from "@/components/molecules/CalendarGrid";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
 import { cn } from "@/utils_constants_styles/utils";
+import styles from "./GeneralScheduleBoard.module.css";
 
 export type GeneralScheduleBoardItem = {
   id: string;
@@ -131,7 +132,12 @@ export function GeneralScheduleBoard({
                         ) : null}
                       </div>
 
-                      <div className="mt-0.5 flex min-h-0 w-full flex-1 flex-col gap-px overflow-y-auto pr-px">
+                      <div
+                        className={cn(
+                          "mt-0.5 flex min-h-0 w-full flex-1 flex-col gap-px overflow-y-auto pr-px",
+                          styles.eventsScroll,
+                        )}
+                      >
                         {events.map((event) => {
                           const handleClick = () => {
                             if (onSelectItem) {

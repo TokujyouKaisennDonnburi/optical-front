@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/utils_constants_styles/utils";
-import { useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
+import styles from "./SelectCalendarGrid.module.css";
 
 export type SelectCalendarGridProps = PropsWithChildren<{
   className?: string;
@@ -16,7 +24,7 @@ export function SelectCalendarGrid({
   const [atEnd, setAtEnd] = useState(false);
 
   // Update edge state based on current scroll metrics
-  const updateEdges = () => {
+  const updateEdges = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
@@ -25,7 +33,7 @@ export function SelectCalendarGrid({
     const EPS = 1;
     setAtStart(scrollLeft <= EPS);
     setAtEnd(scrollLeft >= maxScrollLeft - EPS);
-  };
+  }, []);
 
   useEffect(() => {
     updateEdges();
@@ -43,7 +51,7 @@ export function SelectCalendarGrid({
       el.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [updateEdges]);
 
   const maskImage = useMemo(() => {
     const fade = 16; // px
@@ -68,7 +76,8 @@ export function SelectCalendarGrid({
       ref={containerRef}
       className={cn(
         "min-w-0 flex flex-nowrap gap-2.5 overflow-x-auto pb-1",
-        className
+        styles.grid,
+        className,
       )}
       style={{ maskImage, WebkitMaskImage: maskImage }}
     >
