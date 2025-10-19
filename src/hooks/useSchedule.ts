@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { StatusDotVariant } from "@/components/atoms/StatusDot";
-
-import { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
+import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { startMockServiceWorker } from "@/mocks/browser";
 
 export type ScheduleCalendar = {

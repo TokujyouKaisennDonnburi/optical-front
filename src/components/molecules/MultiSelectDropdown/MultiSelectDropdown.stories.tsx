@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { MultiSelectDropdown } from "./MultiSelectDropdown";
 import { useState } from "react";
+import { MultiSelectDropdown } from "./MultiSelectDropdown";
 
 const meta: Meta<typeof MultiSelectDropdown> = {
   title: "Molecules/MultiSelectDropdown",

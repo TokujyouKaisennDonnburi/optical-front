@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from "react";
-
 import {
   HoverCard,
   HoverCardContent,
@@ -7,10 +6,10 @@ import {
 } from "@/components/atoms/HoverCard";
 import { ScrollArea, ScrollBar } from "@/components/atoms/ScrollArea";
 import { Separator } from "@/components/atoms/Separator";
+import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
-import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type TodayScheduleTimelineEvent = {
@@ -48,6 +47,7 @@ export function TodayScheduleTimeline({
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const currentSlotRef = useRef<HTMLDivElement | null>(null);
   const hasAutoScrolledRef = useRef(false);
+  const slotCount = slots.length;
 
   const setCurrentSlotRef = useCallback((node: HTMLDivElement | null) => {
     currentSlotRef.current = node;
@@ -55,10 +55,15 @@ export function TodayScheduleTimeline({
 
   useEffect(() => {
     hasAutoScrolledRef.current = false;
-  }, [slots]);
+    void slotCount;
+  }, [slotCount]);
 
   useEffect(() => {
     if (hasAutoScrolledRef.current) {
+      return;
+    }
+
+    if (!slots.length) {
       return;
     }
 

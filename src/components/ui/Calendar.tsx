@@ -1,4 +1,3 @@
-import * as React from "react";
 import { DayPicker, type DayPickerProps } from "react-day-picker";
 import { cn } from "@/utils_constants_styles/utils";
 
@@ -46,7 +45,7 @@ function Calendar({
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
-        ...(classNames as any),
+        ...(classNames ?? {}),
       }}
       {...props}
     />

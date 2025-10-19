@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarDays } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
@@ -7,15 +8,14 @@ import { Card, CardContent } from "@/components/atoms/Card";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import {
   GeneralScheduleBoard,
-  ScheduleEventDialog,
   type GeneralScheduleBoardItem,
+  ScheduleEventDialog,
 } from "@/components/organisms/GeneralScheduleBoard";
-import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { SearchHeader } from "@/components/organisms/SearchHeader/SearchHeader";
+import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
-import { useSchedule, type ScheduleCalendar } from "@/hooks/useSchedule";
+import { type ScheduleCalendar, useSchedule } from "@/hooks/useSchedule";
 import { cn } from "@/utils_constants_styles/utils";
-import { CalendarDays } from "lucide-react";
 
 export default function Home() {
   const { items, calendars, dateLabel, isLoading, error } = useSchedule();

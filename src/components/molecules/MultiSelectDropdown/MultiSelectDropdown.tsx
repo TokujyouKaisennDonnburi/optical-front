@@ -1,14 +1,14 @@
+import type { CheckedState } from "@radix-ui/react-checkbox";
+import { ChevronDown } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/atoms/Button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
   DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
-import { Button } from "@/components/atoms/Button";
 import { ScrollArea } from "@/components/atoms/ScrollArea";
-import type { CheckedState } from "@radix-ui/react-checkbox";
-import { useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
 
 type Option = string | { label: string; value: string };
 

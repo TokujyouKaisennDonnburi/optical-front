@@ -37,18 +37,24 @@ export const Default: Story = {
               <NavigationMenuLink asChild>
                 <a
                   className="rounded-md bg-accent px-3 py-2 text-accent-foreground"
-                  href="#"
+                  href="/calendars/engineer"
                 >
                   エンジニア
                 </a>
               </NavigationMenuLink>
               <NavigationMenuLink asChild>
-                <a className="rounded-md px-3 py-2 hover:bg-muted" href="#">
+                <a
+                  className="rounded-md px-3 py-2 hover:bg-muted"
+                  href="/calendars/designer"
+                >
                   デザイナー
                 </a>
               </NavigationMenuLink>
               <NavigationMenuLink asChild>
-                <a className="rounded-md px-3 py-2 hover:bg-muted" href="#">
+                <a
+                  className="rounded-md px-3 py-2 hover:bg-muted"
+                  href="/calendars/couple"
+                >
                   カップル
                 </a>
               </NavigationMenuLink>
@@ -60,12 +66,18 @@ export const Default: Story = {
           <NavigationMenuContent className="p-4">
             <div className="grid gap-2 text-sm">
               <NavigationMenuLink asChild>
-                <a className="rounded-md px-3 py-2 hover:bg-muted" href="#">
+                <a
+                  className="rounded-md px-3 py-2 hover:bg-muted"
+                  href="/periods/2029"
+                >
                   2029年
                 </a>
               </NavigationMenuLink>
               <NavigationMenuLink asChild>
-                <a className="rounded-md px-3 py-2 hover:bg-muted" href="#">
+                <a
+                  className="rounded-md px-3 py-2 hover:bg-muted"
+                  href="/periods/2028"
+                >
                   2028年
                 </a>
               </NavigationMenuLink>

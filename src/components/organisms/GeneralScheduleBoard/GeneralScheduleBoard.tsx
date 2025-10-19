@@ -146,25 +146,19 @@ export function GeneralScheduleBoard({
                           };
 
                           return (
-                            <ScheduleEventCard
+                            <button
                               key={event.id}
-                              title={event.title}
-                              calendarColor={event.calendarColor}
-                              variant="compact"
-                              role="button"
-                              tabIndex={0}
+                              type="button"
                               onClick={handleClick}
-                              onKeyDown={(keyboardEvent) => {
-                                if (
-                                  keyboardEvent.key === "Enter" ||
-                                  keyboardEvent.key === " "
-                                ) {
-                                  keyboardEvent.preventDefault();
-                                  handleClick();
-                                }
-                              }}
-                              className="cursor-pointer transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-                            />
+                              className="w-full cursor-pointer rounded-sm border border-transparent text-left transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                            >
+                              <ScheduleEventCard
+                                title={event.title}
+                                calendarColor={event.calendarColor}
+                                variant="compact"
+                                className="w-full"
+                              />
+                            </button>
                           );
                         })}
                       </div>
@@ -300,13 +294,17 @@ function formatTimeLabel(date: Date) {
   }).format(date);
 }
 
+const SKELETON_CELL_KEYS = Array.from(
+  { length: 42 },
+  (_, index) => `skeleton-cell-${index}`,
+);
+
 function CalendarSkeleton() {
   return (
     <div className="absolute inset-0 grid grid-cols-7 grid-rows-6">
-      {Array.from({ length: 42 }).map((_, index) => (
+      {SKELETON_CELL_KEYS.map((cellKey) => (
         <div
-          // eslint-disable-next-line react/no-array-index-key
-          key={index}
+          key={cellKey}
           className="flex min-h-0 flex-col gap-2 border-r border-b border-white/5 bg-slate-950/40 p-2"
         >
           <Skeleton className="h-3.5 w-7" />

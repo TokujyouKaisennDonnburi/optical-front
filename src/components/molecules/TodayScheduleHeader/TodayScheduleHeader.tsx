@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { Text } from "@/components/atoms/Text";
 import { cn } from "@/utils_constants_styles/utils";

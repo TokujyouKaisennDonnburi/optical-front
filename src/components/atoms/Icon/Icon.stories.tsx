@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { Plus, Search, Trash2 } from "lucide-react";
 import { Icon } from "@/components/atoms/Icon";
-import { Plus, Trash2, Search } from "lucide-react";
 
 const meta: Meta<typeof Icon> = {
   title: "Atoms/Icon",

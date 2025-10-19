@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import type {
   AnchorHTMLAttributes,
   HTMLAttributes,
@@ -13,7 +14,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/utils_constants_styles/utils";
 

@@ -1,8 +1,8 @@
 import * as React from "react";
 import {
   Avatar as UIAvatar,
-  AvatarImage as UIAvatarImage,
   AvatarFallback as UIAvatarFallback,
+  AvatarImage as UIAvatarImage,
 } from "@/components/ui/Avatar";
 
 export const Avatar = React.forwardRef<

@@ -1,8 +1,9 @@
 "use client";
 
+import { ChevronDown, Plus } from "lucide-react";
+import Image from "next/image";
 import { Card } from "@/components/atoms/Card";
 import { cn } from "@/utils_constants_styles/utils";
-import { ChevronDown, Plus } from "lucide-react";
 
 export type SelectCalendarCardData = {
   id: string;
@@ -39,11 +40,14 @@ export function SelectCalendarCard({
         aria-label={`${calendar.name} を開く`}
       >
         {calendar.imageUrl ? (
-          <img
+          <Image
             src={calendar.imageUrl}
             alt={calendar.name}
+            fill
+            sizes="200px"
             className="absolute inset-0 h-full w-full object-cover"
             draggable={false}
+            priority={false}
           />
         ) : (
           <div

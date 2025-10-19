@@ -1,15 +1,15 @@
 import * as React from "react";
 import {
   Dialog as UIDialog,
-  DialogTrigger as UIDialogTrigger,
-  DialogPortal as UIDialogPortal,
   DialogClose as UIDialogClose,
-  DialogOverlay as UIDialogOverlay,
   DialogContent as UIDialogContent,
-  DialogHeader as UIDialogHeader,
-  DialogFooter as UIDialogFooter,
-  DialogTitle as UIDialogTitle,
   DialogDescription as UIDialogDescription,
+  DialogFooter as UIDialogFooter,
+  DialogHeader as UIDialogHeader,
+  DialogOverlay as UIDialogOverlay,
+  DialogPortal as UIDialogPortal,
+  DialogTitle as UIDialogTitle,
+  DialogTrigger as UIDialogTrigger,
 } from "@/components/ui/Dialog";
 
 export const Dialog = UIDialog;

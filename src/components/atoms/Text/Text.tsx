@@ -1,8 +1,8 @@
-import * as React from "react";
+import type { HTMLAttributes, JSX, ReactNode } from "react";
 import { cn } from "@/utils_constants_styles/utils";
 
 type TextElement = keyof Pick<
-  React.JSX.IntrinsicElements,
+  JSX.IntrinsicElements,
   "span" | "p" | "div" | "label" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 >;
 
@@ -11,8 +11,8 @@ export type TextProps = {
   size?: "sm" | "md" | "lg";
   weight?: "normal" | "medium" | "semibold" | "bold";
   className?: string;
-  children?: React.ReactNode;
-} & Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
+  children?: ReactNode;
+} & Omit<HTMLAttributes<HTMLElement>, "children"> & {
     htmlFor?: string;
   };
 
@@ -24,7 +24,7 @@ export function Text({
   children,
   ...props
 }: TextProps) {
-  const Comp = as as any;
+  const Component = as;
   const sizeCls =
     size === "sm" ? "text-sm" : size === "lg" ? "text-lg" : "text-base";
   const weightCls =
@@ -37,8 +37,8 @@ export function Text({
           : "font-normal";
 
   return (
-    <Comp className={cn(sizeCls, weightCls, className)} {...props}>
+    <Component className={cn(sizeCls, weightCls, className)} {...props}>
       {children}
-    </Comp>
+    </Component>
   );
 }

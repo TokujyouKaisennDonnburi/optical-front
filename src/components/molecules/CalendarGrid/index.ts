@@ -1,2 +1,2 @@
-export { CalendarGrid } from "./CalendarGrid";
 export type { CalendarGridProps } from "./CalendarGrid";
+export { CalendarGrid } from "./CalendarGrid";

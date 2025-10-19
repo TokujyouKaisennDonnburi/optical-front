@@ -1,8 +1,8 @@
 import * as React from "react";
 import {
   HoverCard as UIHoverCard,
-  HoverCardTrigger as UIHoverCardTrigger,
   HoverCardContent as UIHoverCardContent,
+  HoverCardTrigger as UIHoverCardTrigger,
 } from "@/components/ui/HoverCard";
 
 export const HoverCard = UIHoverCard;

@@ -1,11 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-
-import { Button } from "@/components/atoms/Button";
-import { Icon } from "@/components/atoms/Icon";
-import { Text } from "@/components/atoms/Text";
 import {
   CalendarDays,
   Clock3,
@@ -14,6 +8,12 @@ import {
   UserCircle2,
   X,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+
+import { Button } from "@/components/atoms/Button";
+import { Icon } from "@/components/atoms/Icon";
+import { Text } from "@/components/atoms/Text";
 
 import type { GeneralScheduleBoardItem } from "./GeneralScheduleBoard";
 
@@ -68,10 +68,9 @@ export function ScheduleEventDialog({
   const dateLabel = formatEventDateLabel(startDate, endDate);
   const timeLabel = formatEventTimeLabel(startDate, endDate);
   const members = item.members ?? [];
-  const calendarName =
-    item.calendarName && item.calendarName.trim().length
-      ? item.calendarName
-      : "登録カレンダー";
+  const calendarName = item.calendarName?.trim().length
+    ? item.calendarName
+    : "登録カレンダー";
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur">

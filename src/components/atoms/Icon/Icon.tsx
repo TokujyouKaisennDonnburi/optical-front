@@ -1,5 +1,5 @@
-import * as React from "react";
 import type { LucideIcon } from "lucide-react";
+import type { SVGProps } from "react";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type IconSize = "sm" | "md" | "lg" | number;
@@ -8,7 +8,7 @@ export type IconProps = {
   icon: LucideIcon;
   size?: IconSize;
   className?: string;
-} & React.SVGProps<SVGSVGElement>;
+} & SVGProps<SVGSVGElement>;
 
 export function Icon({
   icon: IconComp,

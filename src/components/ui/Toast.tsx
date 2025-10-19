@@ -1,7 +1,7 @@
-import * as React from "react";
+import type { ComponentProps } from "react";
 import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner";
 
-type ToasterProps = React.ComponentProps<typeof SonnerToaster>;
+type ToasterProps = ComponentProps<typeof SonnerToaster>;
 
 function Toaster(props: ToasterProps) {
   return (

@@ -1,5 +1,5 @@
-import { cn } from "@/utils_constants_styles/utils";
 import { Text } from "@/components/atoms/Text";
+import { cn } from "@/utils_constants_styles/utils";
 
 type TimeLabelProps = {
   time: string;

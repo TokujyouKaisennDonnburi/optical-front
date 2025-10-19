@@ -5,13 +5,13 @@ import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
 import {
   TodayScheduleHeader,
-  TodayScheduleHeaderProps,
+  type TodayScheduleHeaderProps,
 } from "@/components/molecules/TodayScheduleHeader";
-import {
-  TodayScheduleTimeline,
-  TodayScheduleTimelineSlot,
+import type {
   TodayScheduleTimelineEvent,
+  TodayScheduleTimelineSlot,
 } from "@/components/molecules/TodayScheduleTimeline";
+import { TodayScheduleTimeline } from "@/components/molecules/TodayScheduleTimeline";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type TodaySchedulePanelItem = {
