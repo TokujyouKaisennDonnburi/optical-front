@@ -1,0 +1,24 @@
+.grid {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.grid:hover,
+.grid:focus-within {
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+}
+
+.grid::-webkit-scrollbar {
+  height: 6px;
+  background-color: transparent;
+}
+
+.grid::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
+.grid:hover::-webkit-scrollbar-thumb,
+.grid:focus-within::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.35);
+}
