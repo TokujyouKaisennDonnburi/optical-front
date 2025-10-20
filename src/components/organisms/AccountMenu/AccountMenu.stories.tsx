@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import * as React from "react";
-import { AccountMenu } from "./AccountMenu";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
+import { AccountMenu } from "./AccountMenu";
 
 const meta: Meta<typeof AccountMenu> = {
   title: "Organisms/AccountMenu",

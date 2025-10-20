@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { LogOut, Settings, User } from "lucide-react";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
 import { AccountMenuItems } from "./AccountMenuItems";
-import { LogOut, User, Settings } from "lucide-react";
 
 const meta: Meta<typeof AccountMenuItems> = {
   title: "Molecules/AccountMenuItems",
@@ -20,7 +20,9 @@ export const WithAvatar: Story = {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {/* Storybook用の仮ボタン */}
-        <button className="px-4 py-2 border rounded">Open Menu</button>
+        <button type="button" className="px-4 py-2 border rounded">
+          Open Menu
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64">
         <AccountMenuItems
@@ -54,7 +56,9 @@ export const WithoutAvatar: Story = {
   render: () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="px-4 py-2 border rounded">Open Menu</button>
+        <button type="button" className="px-4 py-2 border rounded">
+          Open Menu
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64">
         <AccountMenuItems

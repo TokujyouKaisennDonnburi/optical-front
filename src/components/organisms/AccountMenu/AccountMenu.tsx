@@ -1,14 +1,13 @@
-import * as React from "react";
+import { LogOut } from "lucide-react";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuPortal,
+  DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
-import { cn } from "@/utils_constants_styles/utils";
-import { AccountMenuItems } from "@/components/molecules/AccountMenuItems/AccountMenuItems";
 import { AccountMenuButton } from "@/components/molecules/AccountMenuButton/AccountMenuButton";
-import { LogOut } from "lucide-react";
+import { AccountMenuItems } from "@/components/molecules/AccountMenuItems/AccountMenuItems";
+import { cn } from "@/utils_constants_styles/utils";
 
 // アカウントメニューのプロパティ型
 export interface AccountMenuProps {
@@ -23,7 +22,7 @@ export interface AccountMenuProps {
   menuWidthClass?: string;
   avatarSizeClass?: string;
   onRequestEmailSave: (newEmail: string) => void; // 親に渡す
-  confirmSaveTrigger?: number;  // 保存要求をトリガーするための数値
+  confirmSaveTrigger?: number; // 保存要求をトリガーするための数値
 }
 
 export function AccountMenu({

@@ -1,3 +1,4 @@
+import { Button } from "@/components/atoms/Button";
 import {
   Dialog,
   DialogContent,
@@ -5,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/atoms/Dialog";
-import { Button } from "@/components/atoms/Button";
 
 // 確認モーダルのプロパティ型定義
 type ConfirmModalProps = {

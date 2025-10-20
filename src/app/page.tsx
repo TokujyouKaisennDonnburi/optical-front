@@ -1,11 +1,13 @@
 "use client";
 
 import { CalendarDays } from "lucide-react";
+import * as React from "react";
 import { useMemo, useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
 import { Card, CardContent } from "@/components/atoms/Card";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
+import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
+import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import {
   GeneralScheduleBoard,
   type GeneralScheduleBoardItem,
@@ -15,11 +17,8 @@ import { SearchHeader } from "@/components/organisms/SearchHeader/SearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { type ScheduleCalendar, useSchedule } from "@/hooks/useSchedule";
-import { cn } from "@/utils_constants_styles/utils";
-import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { useUser } from "@/hooks/useUser";
-import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
-import * as React from "react";
+import { cn } from "@/utils_constants_styles/utils";
 
 export default function Home() {
   const { items, calendars, dateLabel, isLoading, error } = useSchedule();
@@ -137,13 +136,8 @@ export default function Home() {
             selectedCalendars={selectedCalendars}
             onCalendarChange={setSelectedCalendars}
           />
-          <Avatar className="ml-auto h-10 w-10 border">
-            <AvatarImage src="https://i.pravatar.cc/100?img=40" alt="User" />
-            <AvatarFallback>YO</AvatarFallback>
-          </Avatar>
 
           {/* アカウントボタンの表示 */}
-          {/*
           <div className="ml-auto h-10 w-10">
             <AccountMenu
               user={user}
@@ -153,7 +147,6 @@ export default function Home() {
               confirmSaveTrigger={confirmSaveTrigger}
             />
           </div>
-          */}
         </div>
       </header>
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-3 overflow-hidden px-2 py-2 lg:grid-cols-[minmax(0,1fr)_clamp(24rem,32vw,32rem)] ">
@@ -204,6 +197,7 @@ export default function Home() {
           console.log("[navigate] 単体スケジュール作成画面へ遷移");
         }}
       />
+      
       {/* メールアドレス変更確認モーダル */}
       <ConfirmModal
         isOpen={isConfirmOpen}

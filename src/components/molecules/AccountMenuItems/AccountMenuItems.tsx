@@ -1,7 +1,7 @@
-import * as React from "react";
-import { DropdownMenuItem } from "@/components/atoms/DropdownMenu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/atoms/Avatar";
 import { Pencil } from "lucide-react";
+import * as React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
+import { DropdownMenuItem } from "@/components/atoms/DropdownMenu";
 
 // バリデーション関数
 const validateEmail = (email: string): boolean => {
@@ -20,7 +20,7 @@ type AccountMenuItemsProps = {
     onSelect: () => void;
   }[];
   onRequestEmailSave?: (newEmail: string) => void; // 親に渡す
-  confirmSaveTrigger?: number;  // 保存要求をトリガーするための数値
+  confirmSaveTrigger?: number; // 保存要求をトリガーするための数値
 };
 
 export function AccountMenuItems({
@@ -47,6 +47,8 @@ export function AccountMenuItems({
   const originalEmailRef = React.useRef(email);
   const originalAvatarRef = React.useRef(avatarUrl ?? "");
 
+  const lastSaveTriggerRef = React.useRef<number | null>(null);
+
   // 編集開始時に元の値を復元
   const handleEdit = (field: "name" | "email" | "icon") => {
     setEditingField(field);
@@ -57,7 +59,6 @@ export function AccountMenuItems({
   const handleCancel = () => {
     setEditedName(originalNameRef.current);
     setEditedEmail(originalEmailRef.current);
-    setEditedAvatar(originalAvatarRef.current);
     setEmailError(null);
     setEditingField(null);
   };
@@ -97,7 +98,7 @@ export function AccountMenuItems({
   };
 
   // 保存処理 (名前やアバターが保存される)
-  const doSave = () => {
+  const doSave = React.useCallback(() => {
     // 保存後に元の値を更新
     originalNameRef.current = editedName;
     originalEmailRef.current = editedEmail;
@@ -108,7 +109,7 @@ export function AccountMenuItems({
 
     // 編集状態を解除
     setEditingField(null);
-  };
+  }, [editedName, editedEmail, editedAvatar]);
 
   // アバター画像変更時の処理
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,10 +124,15 @@ export function AccountMenuItems({
   };
 
   React.useEffect(() => {
-    if (confirmSaveTrigger && editingField === "email") {
+    if (
+      confirmSaveTrigger &&
+      editingField === "email" &&
+      confirmSaveTrigger !== lastSaveTriggerRef.current
+    ) {
+      lastSaveTriggerRef.current = confirmSaveTrigger;
       doSave();
     }
-  }, [confirmSaveTrigger]);
+  }, [confirmSaveTrigger, editingField, doSave]);
 
   return (
     <div className="flex flex-col w-full">
@@ -176,6 +182,7 @@ export function AccountMenuItems({
           )}
           {editingField !== "name" && (
             <button
+              type="button"
               onClick={() => handleEdit("name")}
               className="ml-2 p-1 flex items-center justify-center"
             >
@@ -206,6 +213,7 @@ export function AccountMenuItems({
           )}
           {editingField !== "email" && (
             <button
+              type="button"
               onClick={() => handleEdit("email")}
               className="ml-2 p-1 flex items-center justify-center"
             >
@@ -219,12 +227,14 @@ export function AccountMenuItems({
       {editingField && (
         <div className="flex justify-center gap-2 px-4 pb-2">
           <button
+            type="button"
             onClick={handleSave}
             className="px-2 py-1 text-xs bg-blue-500 text-white rounded"
           >
             保存
           </button>
           <button
+            type="button"
             onClick={handleCancel}
             className="px-2 py-1 text-xs bg-gray-300 rounded"
           >
@@ -237,9 +247,9 @@ export function AccountMenuItems({
       <hr className="my-2" />
 
       {/* メニューアイテム */}
-      {items.map((item, index) => (
+      {items.map((item) => (
         <DropdownMenuItem
-          key={index}
+          key={item.label}
           onSelect={(e) => {
             e.preventDefault();
             item.onSelect?.();
