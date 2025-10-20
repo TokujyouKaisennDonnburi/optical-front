@@ -20,6 +20,7 @@ type AccountMenuItemsProps = {
     onSelect: () => void;
   }[];
   onRequestEmailSave?: (newEmail: string) => void; // 親に渡す
+  confirmSaveTrigger?: number;  // 保存要求をトリガーするための数値
 };
 
 export function AccountMenuItems({
@@ -28,6 +29,7 @@ export function AccountMenuItems({
   avatarUrl,
   items,
   onRequestEmailSave,
+  confirmSaveTrigger,
 }: AccountMenuItemsProps) {
   // 編集中のフィールドを管理（"name", "email", "icon"）
   const [editingField, setEditingField] = React.useState<
@@ -119,6 +121,12 @@ export function AccountMenuItems({
     };
     reader.readAsDataURL(file); // 画像をDataURLとして読み込む
   };
+
+  React.useEffect(() => {
+    if (confirmSaveTrigger && editingField === "email") {
+      doSave();
+    }
+  }, [confirmSaveTrigger]);
 
   return (
     <div className="flex flex-col w-full">

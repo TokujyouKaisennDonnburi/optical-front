@@ -23,6 +23,7 @@ export interface AccountMenuProps {
   menuWidthClass?: string;
   avatarSizeClass?: string;
   onRequestEmailSave: (newEmail: string) => void; // 親に渡す
+  confirmSaveTrigger?: number;  // 保存要求をトリガーするための数値
 }
 
 export function AccountMenu({
@@ -32,6 +33,7 @@ export function AccountMenu({
   menuWidthClass = "w-52",
   avatarSizeClass = "h-10 w-10",
   onRequestEmailSave,
+  confirmSaveTrigger,
 }: AccountMenuProps & { onRequestEmailSave: (newEmail: string) => void }) {
   // メニューアイテムの定義 (必要に応じて追加可能)
   const menuItems = [
@@ -96,6 +98,7 @@ export function AccountMenu({
             avatarUrl={user.iconUrl}
             items={menuItems}
             onRequestEmailSave={onRequestEmailSave} // 親に渡す
+            confirmSaveTrigger={confirmSaveTrigger}
           />
         </DropdownMenuContent>
       </DropdownMenuPortal>

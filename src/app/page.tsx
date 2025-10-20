@@ -102,6 +102,7 @@ export default function Home() {
   // モーダル制御用の state
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [pendingEmail, setPendingEmail] = React.useState<string | null>(null);
+  const [confirmSaveTrigger, setConfirmSaveTrigger] = useState(0);
 
   // メール保存リクエストを受け取るハンドラ
   const handleRequestEmailSave = (newEmail: string) => {
@@ -114,6 +115,7 @@ export default function Home() {
     // ここで実際の保存処理を実装
     console.log("保存:", pendingEmail);
 
+    setConfirmSaveTrigger((prev) => prev + 1);
     setIsConfirmOpen(false);
     setPendingEmail(null);
   };
@@ -148,6 +150,7 @@ export default function Home() {
               isLoading={userLoading}
               error={userError}
               onRequestEmailSave={handleRequestEmailSave}
+              confirmSaveTrigger={confirmSaveTrigger}
             />
           </div>
           */}
