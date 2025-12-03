@@ -1,9 +1,9 @@
 import * as React from "react";
 import {
   Popover as UIPopover,
-  PopoverTrigger as UIPopoverTrigger,
-  PopoverContent as UIPopoverContent,
   PopoverClose as UIPopoverClose,
+  PopoverContent as UIPopoverContent,
+  PopoverTrigger as UIPopoverTrigger,
 } from "@/components/ui/Popover";
 
 export const Popover = UIPopover;
