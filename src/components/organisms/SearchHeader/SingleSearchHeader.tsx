@@ -1,9 +1,9 @@
+import { Badge } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
-import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
-import { Badge } from "lucide-react";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
+import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
 
 type SingleSearchHeaderProps = {
   searchValue?: string;
