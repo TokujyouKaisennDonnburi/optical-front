@@ -1,7 +1,6 @@
 import { Bell } from "lucide-react";
-import React from "react";
-import { Button } from "@/components/atoms/Button";
 import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 
 type BadgeButtonProps = {
