@@ -2,6 +2,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
+import { Badge } from "lucide-react";
+import { BadgeButton } from "@/components/molecules/BadgeButton";
 
 type SingleSearchHeaderProps = {
   searchValue?: string;
@@ -60,6 +62,13 @@ export function SingleSearchHeader({
           <Image src="/optical.png" alt="OptiCal" width={24} height={24} />
         </Button>
       </div>
+
+      {/* 通知バッチ */}
+      <BadgeButton
+        count={0}
+        label="通知"
+        onClick={() => alert("通知クリック")}
+      />
     </div>
   );
 }

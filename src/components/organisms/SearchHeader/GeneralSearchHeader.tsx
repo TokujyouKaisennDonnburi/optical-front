@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { MultiSelectDropdown } from "@/components/molecules/MultiSelectDropdown/MultiSelectDropdown";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
+import { BadgeButton } from "@/components/molecules/BadgeButton";
 
 type LabeledOption = { label: string; value: string };
 
@@ -103,6 +104,13 @@ export function GeneralSearchHeader({
           <div className="flex items-center">
             <Image src="/optical.png" alt="OptiCal" width={24} height={24} />
           </div>
+
+          {/* 通知バッチ */}
+          <BadgeButton
+            count={3}
+            label="通知"
+            onClick={() => alert("通知クリック")}
+          />
         </div>
       </div>
     </div>
