@@ -1,4 +1,3 @@
-import { Badge } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
