@@ -4,6 +4,7 @@ import { Button } from "@/components/atoms/Button";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
 import { MultiSelectDropdown } from "@/components/molecules/MultiSelectDropdown/MultiSelectDropdown";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
+import { BadgeButton } from "@/components/molecules/BadgeButton";
 
 type LabeledOption = { label: string; value: string };
 
