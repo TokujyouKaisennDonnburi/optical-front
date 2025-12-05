@@ -10,7 +10,7 @@
     "lint": "biome check",
     "lint:fix": "biome check --fix",
     "format": "biome format --write",
-    "deploy:pages": "wrangler pages deploy out --project-name=$CLOUDFLARE_PROJECT_NAME",
+    "deploy:pages": "wrangler pages deploy out --project-name=\"${CLOUDFLARE_PROJECT_NAME}\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky"
