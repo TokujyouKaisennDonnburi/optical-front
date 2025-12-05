@@ -56,8 +56,12 @@ jobs:
         env:
           CLOUDFLARE_PAGES: "true"
 
-      - name: Deploy to Cloudflare Pages
-        run: pnpm wrangler pages deploy out --project-name=optical-front
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
         if: github.event_name == 'push'
 
       - name: Add deployment status
