@@ -51,10 +51,8 @@ jobs:
       - name: Run linter
         run: pnpm run lint
 
-      - name: Build project
-        run: pnpm run build
-        env:
-          CLOUDFLARE_PAGES: "true"
+      - name: Build project (Workers bundle)
+        run: pnpm run cf:build
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
