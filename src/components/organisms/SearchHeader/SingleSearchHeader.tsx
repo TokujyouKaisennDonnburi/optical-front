@@ -3,8 +3,6 @@ import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
-import { Badge } from "lucide-react";
-import { BadgeButton } from "@/components/molecules/BadgeButton";
 
 type SingleSearchHeaderProps = {
   searchValue?: string;
