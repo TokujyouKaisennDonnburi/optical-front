@@ -156,7 +156,9 @@ export const scheduleHandlers = [
         userId,
       } as (typeof scheduleMock.items)[number];
 
+      console.log("[MSW] 作成されたアイテム:", newItem);
       (scheduleMock.items as unknown as Array<typeof newItem>).push(newItem);
+      console.log("[MSW] 現在のアイテム数:", scheduleMock.items.length);
 
       return HttpResponse.json({ item: newItem }, { status: 201 });
     } catch (_error) {

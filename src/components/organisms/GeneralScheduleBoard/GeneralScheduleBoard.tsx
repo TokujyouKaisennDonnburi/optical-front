@@ -226,7 +226,7 @@ export function GeneralScheduleBoard({
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           handleLongPressStart(
-                            e as unknown as React.MouseEvent,
+                            e as unknown as React.MouseEvent<HTMLDivElement>,
                           );
                         }
                       }}

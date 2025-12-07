@@ -16,6 +16,8 @@ export function useSchedule() {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
+  // refreshTrigger で再取得させる。依存配列を維持するため lint を無視。
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh trigger to refetch
   useEffect(() => {
     let isMounted = true;
 
@@ -44,7 +46,7 @@ export function useSchedule() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [refreshTrigger]);
 
   const calendars = useMemo(() => data?.calendars ?? [], [data?.calendars]);
 
