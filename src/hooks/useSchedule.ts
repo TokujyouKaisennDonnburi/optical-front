@@ -10,7 +10,7 @@ export function useSchedule() {
   const [data, setData] = useState<ScheduleApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [_refreshTrigger, setRefreshTrigger] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);

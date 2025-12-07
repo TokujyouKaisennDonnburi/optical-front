@@ -12,12 +12,14 @@ import {
   GeneralScheduleBoard,
   type GeneralScheduleBoardItem,
   ScheduleEventDialog,
+  CreateScheduleDialog,
 } from "@/components/organisms/GeneralScheduleBoard";
 import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/GeneralSearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useSchedule } from "@/hooks/useSchedule";
+import { createSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 function HomeContent() {
@@ -199,10 +201,12 @@ function HomeContent() {
         <BoardArea
           className="flex-1 min-h-0 lg:col-start-1"
           items={filteredItems}
+          calendars={calendars}
           isLoading={isLoading}
           error={error}
           viewDate={viewDate}
           onChangeViewDate={handleViewDateChange}
+          onRefresh={refresh}
         />
         <div className="flex h-full w-full min-h-0 lg:col-start-2 lg:w-full lg:max-w-[32rem]">
           <TodaySchedulePanel
@@ -260,20 +264,25 @@ function HomeContent() {
 function BoardArea({
   className,
   items,
+  calendars,
   isLoading,
   error,
   viewDate,
   onChangeViewDate,
+  onRefresh,
 }: {
   className?: string;
   items: ReturnType<typeof useSchedule>["items"];
+  calendars: ReturnType<typeof useSchedule>["calendars"];
   isLoading: boolean;
   error: Error | null;
   viewDate: Date;
   onChangeViewDate: (nextDate: Date) => void;
+  onRefresh: () => void;
 }) {
   const [selectedItem, setSelectedItem] =
     useState<GeneralScheduleBoardItem | null>(null);
+  const [createDate, setCreateDate] = useState<Date | null>(null);
 
   const boardItems = useMemo(() => {
     const viewYear = viewDate.getFullYear();
@@ -357,6 +366,80 @@ function BoardArea({
     setSelectedItem(null);
   };
 
+  const handleCreateItem = (date: Date) => {
+    setCreateDate(date);
+  };
+
+  const handleCloseCreateDialog = () => {
+    setCreateDate(null);
+  };
+
+  const handleConfirmCreate = async ({
+    date,
+    title,
+    startTime,
+    endTime,
+    memo,
+    calendarId,
+    isAllDay,
+    allDayStartDate,
+    allDayEndDate,
+  }: {
+    date: Date;
+    title: string;
+    startTime: string;
+    endTime?: string;
+    memo?: string;
+    calendarId: string | null;
+    isAllDay: boolean;
+    allDayStartDate: Date;
+    allDayEndDate: Date;
+  }) => {
+    const startDate = new Date(date);
+    let endIso: string | undefined;
+    let startIso = "";
+
+    if (isAllDay) {
+      const startDay = new Date(allDayStartDate);
+      startDay.setHours(0, 0, 0, 0);
+      startIso = startDay.toISOString();
+
+      const endDate = new Date(allDayEndDate);
+      endDate.setHours(23, 59, 59, 999);
+      endIso = endDate.toISOString();
+    } else {
+      const [startHour, startMin] = startTime.split(":").map(Number);
+      startDate.setHours(startHour ?? 0, startMin ?? 0, 0, 0);
+      startIso = startDate.toISOString();
+
+      if (endTime) {
+        const endDate = new Date(date);
+        const [endHour, endMin] = endTime.split(":").map(Number);
+        endDate.setHours(endHour ?? 0, endMin ?? 0, 0, 0);
+        endIso = endDate.toISOString();
+      }
+    }
+
+    try {
+      await createSchedule({
+        title,
+        start: startIso,
+        end: endIso,
+        startDate: isAllDay ? startIso : undefined,
+        endDate: isAllDay ? endIso : undefined,
+        memo,
+        calendarId: calendarId ?? undefined,
+        status: "default",
+        isAllDay,
+      });
+      onRefresh();
+    } catch (err) {
+      console.error("Failed to create schedule", err);
+    } finally {
+      handleCloseCreateDialog();
+    }
+  };
+
   return (
     <Card
       className={cn(
@@ -382,6 +465,7 @@ function BoardArea({
           className="flex h-full min-h-0 flex-col"
           baseDate={viewDate}
           onSelectItem={handleSelectItem}
+          onCreateItem={handleCreateItem}
         />
       </CardContent>
       {selectedItem ? (
@@ -389,6 +473,15 @@ function BoardArea({
           item={selectedItem}
           isOpen
           onClose={handleCloseDialog}
+        />
+      ) : null}
+      {createDate ? (
+        <CreateScheduleDialog
+          date={createDate}
+          isOpen
+          onClose={handleCloseCreateDialog}
+          calendars={calendars.map((c) => ({ id: c.id, name: c.name }))}
+          onConfirm={handleConfirmCreate}
         />
       ) : null}
     </Card>

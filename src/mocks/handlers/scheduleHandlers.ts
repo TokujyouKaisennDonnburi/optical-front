@@ -74,6 +74,99 @@ export const scheduleHandlers = [
     }
   }),
 
+  http.post("/api/schedules", async ({ request }) => {
+    console.log("[MSW] POST /api/schedules handler called");
+
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return HttpResponse.json(
+        { error: { code: 401, message: "認証が必要です" } },
+        { status: 401 },
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+
+    try {
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        throw new Error("Invalid token");
+      }
+
+      const payload = JSON.parse(atob(parts[1]));
+      const userId = payload.sub;
+
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        return HttpResponse.json(
+          { error: { code: 401, message: "トークンの有効期限が切れています" } },
+          { status: 401 },
+        );
+      }
+
+      const body = (await request.json()) as {
+        title: string;
+        start: string;
+        end?: string;
+        startDate?: string;
+        endDate?: string;
+        memo?: string;
+        location?: string;
+        locationUrl?: string;
+        members?: string[];
+        calendarId?: string;
+        status?: string;
+        isAllDay?: boolean;
+      };
+
+      const calendar = scheduleMock.calendars.find(
+        (c) => c.id === body.calendarId,
+      );
+
+      const isAllDay = body.isAllDay ?? false;
+
+      const resolveRange = () => {
+        if (isAllDay && body.startDate) {
+          const start = new Date(body.startDate);
+          const end = new Date(body.endDate ?? body.startDate);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(23, 59, 59, 999);
+          return { start: start.toISOString(), end: end.toISOString() };
+        }
+        return { start: body.start, end: body.end };
+      };
+
+      const range = resolveRange();
+
+      const newItem = {
+        id: `schedule-${Date.now()}`,
+        title: body.title,
+        memo: body.memo,
+        location: body.location,
+        locationUrl: body.locationUrl,
+        members: body.members ?? [],
+        calendarId: body.calendarId,
+        calendarName: calendar?.name,
+        calendarColor: calendar?.color,
+        status:
+          (body.status as (typeof scheduleMock.items)[number]["status"]) ??
+          "default",
+        isAllDay,
+        start: range.start,
+        end: range.end,
+        userId,
+      } as (typeof scheduleMock.items)[number];
+
+      (scheduleMock.items as unknown as Array<typeof newItem>).push(newItem);
+
+      return HttpResponse.json({ item: newItem }, { status: 201 });
+    } catch (_error) {
+      return HttpResponse.json(
+        { error: { code: 401, message: "無効なトークンです" } },
+        { status: 401 },
+      );
+    }
+  }),
+
   http.post("/api/calendars", async ({ request }) => {
     console.log("[MSW] POST /api/calendars handler called");
 
