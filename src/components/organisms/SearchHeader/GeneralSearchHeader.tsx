@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
+import { DateSelector } from "@/components/molecules/DateSelector/DateSelector";
 import { MultiSelectDropdown } from "@/components/molecules/MultiSelectDropdown/MultiSelectDropdown";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
 
@@ -13,7 +14,8 @@ type GeneralSearchHeaderProps = {
   calendarOptions?: Array<string | LabeledOption>;
   selectedCalendars?: string[];
   onCalendarChange?: (value: string[]) => void;
-  yearOptions?: number[];
+  onDateChange?: (value: Date | undefined) => void;
+  onClear?: () => void;
 };
 
 /**
@@ -26,11 +28,12 @@ export function GeneralSearchHeader({
   calendarOptions,
   selectedCalendars,
   onCalendarChange,
-  yearOptions,
+  onDateChange,
+  onClear,
 }: GeneralSearchHeaderProps) {
   const [search, setSearch] = useState(searchValue ?? ""); // 検索バーの入力値
   const [calendar, setCalendar] = useState<string[]>(selectedCalendars ?? []); // カレンダーフィルターの選択値
-  const [period, setPeriod] = useState<string[]>([]); // 期間フィルターの選択値
+  const [date, setDate] = useState<Date | undefined>(undefined); // 期間フィルターの選択値
 
   useEffect(() => {
     setSearch(searchValue ?? "");
@@ -54,11 +57,18 @@ export function GeneralSearchHeader({
     onCalendarChange?.(value);
   };
 
+  const handleDateChange = (value: Date | undefined) => {
+    setDate(value);
+    onDateChange?.(value);
+  };
+
   // クリアボタンの処理
   const handleClear = () => {
     handleSearchChange("");
     handleCalendarChange([]);
-    setPeriod([]);
+    setDate(undefined);
+
+    onClear?.();
   };
 
   return (
@@ -85,12 +95,11 @@ export function GeneralSearchHeader({
         </div>
 
         {/* 期間フィルター */}
-        <div className="w-[120px]">
-          <MultiSelectDropdown
-            options={(yearOptions ?? []).map((y) => y.toString())}
-            placeholder="年数の指定"
-            value={period}
-            onChange={setPeriod}
+        <div className="w-[140px]">
+          <DateSelector
+            placeholder="年月の指定"
+            value={date}
+            onChange={handleDateChange}
           />
         </div>
 
