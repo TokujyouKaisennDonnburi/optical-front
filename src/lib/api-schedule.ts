@@ -13,6 +13,14 @@ export async function getTodaySchedule() {
   );
 }
 
+export async function getMonthSchedule(month?: string) {
+  return apiGet<ScheduleApiResponse>(
+    `/events/months?month=${month || ""}`,
+    undefined,
+    OPTICAL_API_URL,
+  );
+}
+
 export async function createSchedule(body: CreateScheduleRequest) {
   return apiPost<CreateScheduleResponse>("/api/schedules", body);
 }

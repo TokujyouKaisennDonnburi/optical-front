@@ -8,15 +8,14 @@ export type ScheduleItem = {
   location: string;
   members?: string[];
   isAllDay: boolean;
-  start: string;
-  end: string;
+  startAt: string;
+  endAt: string;
 };
 
 export type ScheduleCalendar = {
   id: string;
   name: string;
   color: string;
-  description?: string;
   imageUrl?: string;
   customOptions?: string[];
 };
@@ -26,7 +25,6 @@ export type CalendarDetail = ScheduleCalendar;
 export type ScheduleApiResponse = {
   date: string;
   items: ScheduleItem[];
-  calendars: ScheduleCalendar[];
 };
 
 export type CalendarDetailResponse = {
@@ -51,6 +49,8 @@ export type CreateScheduleRequest = {
 export type CreateScheduleResponse = {
   item: ScheduleItem;
 };
+
+export type CalendarListResponse = ScheduleCalendar[];
 
 export type CreateCalendarRequest = {
   name: string;

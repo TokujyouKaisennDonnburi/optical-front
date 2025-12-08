@@ -65,18 +65,7 @@ export function useCalendarSchedule(calendarId: string) {
             (item: ScheduleItem) => item.calendarId === calendarId,
           );
 
-          // カレンダー情報をアイテムに付加
-          const calendarInfo = (json.calendars ?? []).find(
-            (c: CalendarDetail) => c.id === calendarId,
-          );
-
-          const normalizedItems = filteredItems.map((item: ScheduleItem) => ({
-            ...item,
-            calendarName: item.calendarName ?? calendarInfo?.name,
-            calendarColor: item.calendarColor ?? calendarInfo?.color,
-          }));
-
-          setScheduleItems(normalizedItems);
+          setScheduleItems(filteredItems);
         }
       } catch (err) {
         if (isMounted) {
@@ -102,11 +91,11 @@ export function useCalendarSchedule(calendarId: string) {
       id: item.id,
       title: item.title,
       timeRange: {
-        start: formatTimeLabel(item.start),
-        end: item.end ? formatTimeLabel(item.end) : undefined,
+        start: formatTimeLabel(item.startAt),
+        end: item.endAt ? formatTimeLabel(item.endAt) : undefined,
       },
-      startsAt: item.start,
-      endsAt: item.end,
+      startsAt: item.startAt,
+      endsAt: item.endAt,
       calendarId: item.calendarId,
       memo: item.memo,
       location: item.location,

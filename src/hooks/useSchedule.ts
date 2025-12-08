@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
-import { getTodaySchedule } from "@/lib/api-schedule";
-import type { ScheduleApiResponse } from "@/types/schedule";
+import { getCalendarList } from "@/lib/api-calendars";
+import { getMonthSchedule } from "@/lib/api-schedule";
+import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
 export function useSchedule() {
-  const [data, setData] = useState<ScheduleApiResponse | null>(null);
+  const [date, setDate] = useState<string | null>(null);
+  const [calendars, setCalendars] = useState<CalendarDetail[]>([]);
+  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -24,10 +27,29 @@ export function useSchedule() {
       setIsLoading(true);
       setError(null);
       try {
-        const json = await getTodaySchedule();
+        const schedules = await getMonthSchedule();
         if (isMounted) {
-          const normalized = normalizeScheduleResponse(json);
-          setData(normalized);
+          setDate(schedules.date);
+          setSchedules(schedules.items);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err : new Error("Unknown error"));
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    const fetchCalendars = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const calendars = await getCalendarList();
+        if (isMounted) {
+          setCalendars(calendars);
         }
       } catch (err) {
         if (isMounted) {
@@ -41,55 +63,45 @@ export function useSchedule() {
     };
 
     void fetchSchedule();
+    void fetchCalendars();
 
     return () => {
       isMounted = false;
     };
   }, [refreshTrigger]);
 
-  const calendars = useMemo(() => data?.calendars ?? [], [data?.calendars]);
-
-  const calendarIndex = useMemo(() => {
-    return new Map(calendars.map((calendar) => [calendar.id, calendar]));
-  }, [calendars]);
-
   const items: TodaySchedulePanelItem[] = useMemo(() => {
-    if (!data) return [];
+    if (schedules.length === 0) return [];
 
-    return data.items.map((item) => {
-      const calendar = item.calendarId
-        ? calendarIndex.get(item.calendarId)
-        : undefined;
-
+    return schedules.map((item) => {
       return {
         id: item.id,
         title: item.title,
         timeRange: {
-          start: formatTimeLabel(item.start),
-          end: item.end ? formatTimeLabel(item.end) : undefined,
+          start: formatTimeLabel(item.startAt),
+          end: formatTimeLabel(item.endAt),
         },
-        startsAt: item.start,
-        endsAt: item.end,
+        startsAt: item.startAt,
+        endsAt: item.endAt,
         calendarId: item.calendarId,
         memo: item.memo,
         location: item.location,
         members: item.members,
-        calendarName: item.calendarName ?? calendar?.name,
-        calendarColor: item.calendarColor ?? calendar?.color,
+        calendarName: item.calendarName,
+        calendarColor: item.calendarColor,
       };
     });
-  }, [calendarIndex, data]);
+  }, [schedules]);
 
   const dateLabel = useMemo(() => {
-    if (!data) return "";
-    const date = data.date ? new Date(data.date) : new Date();
+    const normalizedDate = date ? new Date(date) : new Date();
     return new Intl.DateTimeFormat("ja-JP", {
       year: "numeric",
       month: "long",
       day: "numeric",
       weekday: "short",
-    }).format(date);
-  }, [data]);
+    }).format(normalizedDate);
+  }, [date]);
 
   return {
     items,
@@ -101,34 +113,14 @@ export function useSchedule() {
   };
 }
 
-function normalizeScheduleResponse(
-  response: ScheduleApiResponse,
-): ScheduleApiResponse {
-  const calendarIndex = new Map(
-    (response.calendars ?? []).map((calendar) => [calendar.id, calendar]),
-  );
-
-  const normalizedItems = response.items.map((item) => ({
-    ...item,
-    calendarName:
-      item.calendarName ?? calendarIndex.get(item.calendarId ?? "")?.name,
-    calendarColor:
-      item.calendarColor ?? calendarIndex.get(item.calendarId ?? "")?.color,
-  }));
-
-  return {
-    date: response.date,
-    items: normalizedItems,
-    calendars: response.calendars ?? [],
-  };
-}
-
 function formatTimeLabel(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
+    console.log("time is NaN");
     return value;
   }
   const hours = date.getHours();
   const minutes = date.getMinutes();
+  console.log("time is NOT NaN");
   return `${hours}:${minutes.toString().padStart(2, "0")}`;
 }
