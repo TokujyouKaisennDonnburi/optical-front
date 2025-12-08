@@ -10,6 +10,7 @@ type SingleSearchHeaderProps = {
   onSearchChange?: (value: string) => void;
   onYearMonthChange?: (period: { year?: number; month?: number }) => void;
   onDateChange?: (date: Date | undefined) => void;
+  date?: Date;
   onClear?: () => void;
   onOptiCalClick?: () => void;
 };
@@ -23,38 +24,24 @@ export function SingleSearchHeader({
   onSearchChange,
   onYearMonthChange,
   onDateChange,
+  date,
   onClear,
   onOptiCalClick,
 }: SingleSearchHeaderProps) {
-  const [search, setSearch] = useState(searchValue ?? "");
-  const [date, setDate] = useState<Date | undefined>(); // 期間フィルターの選択値
-
-  // 期間フィルターの入力値を同期
-  const handleDateChange = (date: Date | undefined) => {
-    setDate(date);
-    onDateChange?.(date);
-
-    if (date) {
-      onYearMonthChange?.({
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-      });
-    } else {
-      onYearMonthChange?.({
-        year: undefined,
-        month: undefined,
-      });
-    }
-  };
+  const [search, setSearch] = useState(searchValue ?? ""); // 検索バーの入力値
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
     onSearchChange?.(value);
   };
 
+  // 期間フィルターの入力値を同期
+  const handleDateChange = (value: Date | undefined) => {
+    onDateChange?.(value);
+  };
+
   const handleClear = () => {
     handleSearchChange("");
-    setDate(undefined);
     onDateChange?.(undefined);
     onYearMonthChange?.({ year: undefined, month: undefined });
     onClear?.();
@@ -75,9 +62,9 @@ export function SingleSearchHeader({
       {/* 期間フィルター */}
       <div className="w-[140px]">
         <DateSelector
+          placeholder="年月の指定"
           value={date}
           onChange={handleDateChange}
-          placeholder="年月の指定"
         />
       </div>
 

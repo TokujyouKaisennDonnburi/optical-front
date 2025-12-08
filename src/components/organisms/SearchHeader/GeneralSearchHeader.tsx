@@ -14,6 +14,7 @@ type GeneralSearchHeaderProps = {
   calendarOptions?: Array<string | LabeledOption>;
   selectedCalendars?: string[];
   onCalendarChange?: (value: string[]) => void;
+  date?: Date | undefined;
   onDateChange?: (value: Date | undefined) => void;
   onClear?: () => void;
 };
@@ -28,12 +29,12 @@ export function GeneralSearchHeader({
   calendarOptions,
   selectedCalendars,
   onCalendarChange,
+  date,
   onDateChange,
   onClear,
 }: GeneralSearchHeaderProps) {
   const [search, setSearch] = useState(searchValue ?? ""); // 検索バーの入力値
   const [calendar, setCalendar] = useState<string[]>(selectedCalendars ?? []); // カレンダーフィルターの選択値
-  const [date, setDate] = useState<Date | undefined>(undefined); // 期間フィルターの選択値
 
   useEffect(() => {
     setSearch(searchValue ?? "");
@@ -58,7 +59,6 @@ export function GeneralSearchHeader({
   };
 
   const handleDateChange = (value: Date | undefined) => {
-    setDate(value);
     onDateChange?.(value);
   };
 
@@ -66,7 +66,7 @@ export function GeneralSearchHeader({
   const handleClear = () => {
     handleSearchChange("");
     handleCalendarChange([]);
-    setDate(undefined);
+    onDateChange?.(undefined);
 
     onClear?.();
   };
