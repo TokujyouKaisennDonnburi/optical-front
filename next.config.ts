@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Cloudflare Pages対応
+  experimental: {
+    // Edge Runtimeでの互換性を向上
+    esmExternals: true,
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);

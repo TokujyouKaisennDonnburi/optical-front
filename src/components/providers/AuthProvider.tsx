@@ -20,7 +20,7 @@ import {
   login as requestLogin,
   logout as requestLogout,
   signup as requestSignup,
-} from "@/api/auth";
+} from "@/lib/api-auth";
 import { ApiClientError } from "@/lib/api-client";
 import { isAuthenticated, removeToken, saveToken } from "@/lib/auth";
 import type { LoginRequest, SignupRequest, User } from "@/types/auth";

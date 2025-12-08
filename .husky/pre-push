@@ -1,0 +1,7 @@
+echo "Running pre-push checks..."
+
+pnpm lint || exit 1
+pnpm typecheck || exit 1
+pnpm exec next-on-pages || exit 1
+
+echo "pre-push checks passed!"

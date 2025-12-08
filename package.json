@@ -4,16 +4,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "biome check",
+    "typecheck": "tsc --noEmit",
     "lint:fix": "biome check --fix",
     "format": "biome format --write",
     "cf:build": "next-on-pages build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -38,7 +40,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
-    "@cloudflare/next-on-pages": "1.12.0",
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
     "@next/bundle-analyzer": "^16.0.7",

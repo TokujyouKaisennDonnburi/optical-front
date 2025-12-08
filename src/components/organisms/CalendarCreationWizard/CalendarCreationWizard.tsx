@@ -4,7 +4,6 @@ import { CheckCircle2, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ChangeEvent, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { createCalendar } from "@/api/calendars";
 import { Button } from "@/components/atoms/Button";
 import {
   Card,
@@ -23,6 +22,7 @@ import {
 import { CalendarWizardStepIndicator } from "@/components/molecules/CalendarWizardStepIndicator";
 import { CalendarWizardSummary } from "@/components/molecules/CalendarWizardSummary";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal";
+import { createCalendar } from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
 import { startMockServiceWorker } from "@/mocks/browser";
 import type { CreateCalendarRequest } from "@/types/schedule";

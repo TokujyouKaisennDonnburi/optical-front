@@ -39,8 +39,8 @@ export const LandingTemplateCard = ({ template, onClick }: Props) => {
 
         {/* 箇条書きオプション */}
         <div className="text-gray-900 leading-relaxed">
-          {template.options?.map((opt) => (
-            <p key={opt}>・{opt}</p>
+          {template.options?.map((opt, index) => (
+            <p key={`${template.id}-option-${index}`}>・{opt}</p>
           ))}
         </div>
         {/* 始めるボタン */}

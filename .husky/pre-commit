@@ -1,2 +1,13 @@
-pnpm exec lint-staged
-pnpm run build
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running pre-commit checks..."
+
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm lint-staged --config package.json || exit 1
+else
+  npx lint-staged --config package.json || exit 1
+fi
+
+# Build step moved to pre-push for heavier checks.
+echo "pre-commit checks passed!"

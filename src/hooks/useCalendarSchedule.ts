@@ -1,11 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getCalendarDetail } from "@/api/calendars";
-import { getTodaySchedule } from "@/api/schedule";
 import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
-import { startMockServiceWorker } from "@/mocks/browser";
+import { getCalendarDetail } from "@/lib/api-calendars";
+import { getTodaySchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
 /**
@@ -28,10 +27,6 @@ export function useCalendarSchedule(calendarId: string) {
 
     const fetchCalendarDetail = async () => {
       if (!calendarId) return;
-
-      if (typeof window !== "undefined") {
-        await startMockServiceWorker();
-      }
 
       try {
         const json = await getCalendarDetail(calendarId);
@@ -58,10 +53,6 @@ export function useCalendarSchedule(calendarId: string) {
 
     const fetchSchedule = async () => {
       if (!calendarId) return;
-
-      if (typeof window !== "undefined") {
-        await startMockServiceWorker();
-      }
 
       setIsLoading(true);
       setError(null);
