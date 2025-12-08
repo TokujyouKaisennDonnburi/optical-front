@@ -1,18 +1,20 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import { CalendarDays } from "lucide-react";
+import { toast } from "@/components/atoms/Toast";
 import { Card, CardContent } from "@/components/atoms/Card";
 import { Loading } from "@/components/atoms/Loading";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import {
+  CreateScheduleDialog,
   GeneralScheduleBoard,
   type GeneralScheduleBoardItem,
   ScheduleEventDialog,
-  CreateScheduleDialog,
 } from "@/components/organisms/GeneralScheduleBoard";
 import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/GeneralSearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
@@ -20,7 +22,6 @@ import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useSchedule } from "@/hooks/useSchedule";
 import { createSchedule } from "@/lib/api-schedule";
-import { toast } from "@/components/atoms/Toast";
 import { cn } from "@/utils_constants_styles/utils";
 
 function HomeContent() {

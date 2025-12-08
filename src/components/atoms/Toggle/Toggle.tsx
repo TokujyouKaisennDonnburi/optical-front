@@ -1,9 +1,9 @@
+import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import {
-  Toggle as UIToggle,
   type toggleVariants,
+  Toggle as UIToggle,
 } from "@/components/ui/Toggle";
-import type { VariantProps } from "class-variance-authority";
 
 export type ToggleProps = React.ComponentPropsWithoutRef<typeof UIToggle> &
   VariantProps<typeof toggleVariants>;
