@@ -69,7 +69,7 @@ export const authHandlers = [
     const token = generateMockToken(newUser.id);
 
     const response: AuthResponse = {
-      token,
+      accessToken: token,
       user: newUser,
     };
 
@@ -133,7 +133,7 @@ export const authHandlers = [
     const token = generateMockToken(user.id);
 
     const response: AuthResponse = {
-      token,
+      accessToken: token,
       user,
     };
 

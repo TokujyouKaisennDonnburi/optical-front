@@ -11,6 +11,8 @@ import type { ApiError } from "@/types/auth";
  * 環境変数から取得、デフォルトは空文字（相対パス）
  */
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+export const OPTICAL_API_URL =
+  process.env.OPICAL_API_URL || "http://localhost:8000";
 
 /**
  * API エラークラス
@@ -44,6 +46,7 @@ interface ApiRequestOptions extends RequestInit {
 export async function apiRequest<T>(
   endpoint: string,
   options: ApiRequestOptions = {},
+  baseUrl?: string,
 ): Promise<T> {
   const { useAuth = true, headers = {}, ...fetchOptions } = options;
 
@@ -67,7 +70,7 @@ export async function apiRequest<T>(
 
   // リクエストの実行
   try {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${baseUrl || API_BASE_URL}${endpoint}`;
     console.log("[API Client] Sending request:", {
       url,
       method: fetchOptions.method || "GET",
@@ -156,11 +159,16 @@ export async function apiRequest<T>(
 export async function apiGet<T>(
   endpoint: string,
   options?: ApiRequestOptions,
+  baseUrl?: string,
 ): Promise<T> {
-  return apiRequest<T>(endpoint, {
-    ...options,
-    method: "GET",
-  });
+  return apiRequest<T>(
+    endpoint,
+    {
+      ...options,
+      method: "GET",
+    },
+    baseUrl,
+  );
 }
 
 /**
@@ -170,10 +178,15 @@ export async function apiPost<T>(
   endpoint: string,
   body?: unknown,
   options?: ApiRequestOptions,
+  baseUrl?: string,
 ): Promise<T> {
-  return apiRequest<T>(endpoint, {
-    ...options,
-    method: "POST",
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  return apiRequest<T>(
+    endpoint,
+    {
+      ...options,
+      method: "POST",
+      body: body ? JSON.stringify(body) : undefined,
+    },
+    baseUrl,
+  );
 }

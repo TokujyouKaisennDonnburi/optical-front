@@ -48,7 +48,7 @@ export interface SignupRequest {
  */
 export interface AuthResponse {
   /** JWT トークン */
-  token: string;
+  accessToken: string;
   /** ユーザー情報 */
   user: User;
 }

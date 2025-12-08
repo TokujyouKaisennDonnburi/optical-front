@@ -122,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const response = await requestLogin(credentials);
 
         // トークンとユーザー情報を保存
-        saveToken(response.token);
+        saveToken(response.accessToken);
         setUser(response.user);
 
         toast.success("ログインしました");
@@ -152,7 +152,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const response = await requestSignup(data);
 
         // トークンとユーザー情報を保存
-        saveToken(response.token);
+        saveToken(response.accessToken);
         setUser(response.user);
 
         toast.success("アカウントを作成しました");
