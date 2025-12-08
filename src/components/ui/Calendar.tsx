@@ -26,7 +26,7 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames();
 
-  // デフォルトの YearsDropdown を用意（呼び出し側で components で上書き可能） */
+  // デフォルトの YearsDropdown を用意（呼び出し側で components で上書き可能）
   const DefaultYearsDropdown = (
     dropdownProps: React.SelectHTMLAttributes<HTMLSelectElement> & {
       classNames?: Record<string, string>;
