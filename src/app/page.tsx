@@ -168,6 +168,7 @@ function HomeContent() {
             calendarOptions={calendarOptions}
             selectedCalendars={selectedCalendars}
             onCalendarChange={setSelectedCalendars}
+            date={viewDate}
             onDateChange={(value) => {
               if (value) {
                 // 入力した年に移動

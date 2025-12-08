@@ -173,8 +173,12 @@ export function CalendarDetailClient({
             <SingleSearchHeader
               searchValue={searchTerm}
               onSearchChange={setSearchTerm}
-              onDateChange={(date) => {
-                if (date) handleViewDateChange(date);
+              date={viewDate}
+              onDateChange={(value) => {
+                if (value) {
+                  // 入力した年に移動
+                  setViewDate(startOfDay(value));
+                }
               }}
               onClear={handleClear}
               onOptiCalClick={() => setIsPreviewOpen(true)}
