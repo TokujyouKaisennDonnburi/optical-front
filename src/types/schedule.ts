@@ -1,13 +1,13 @@
 export type ScheduleItem = {
-  calendarId?: string;
-  calendarName?: string;
-  calendarColor?: string;
+  calendarId: string;
+  calendarName: string;
+  calendarColor: string;
   id: string;
   title: string;
-  memo?: string;
-  location?: string;
+  memo: string;
+  location: string;
   members?: string[];
-  isAllDay?: boolean;
+  isAllDay: boolean;
   start: string;
   end: string;
 };
@@ -24,9 +24,9 @@ export type ScheduleCalendar = {
 export type CalendarDetail = ScheduleCalendar;
 
 export type ScheduleApiResponse = {
-  date?: string;
+  date: string;
   items: ScheduleItem[];
-  calendars?: ScheduleCalendar[];
+  calendars: ScheduleCalendar[];
 };
 
 export type CalendarDetailResponse = {
