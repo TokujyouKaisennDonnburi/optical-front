@@ -7,7 +7,7 @@ const meta: Meta<typeof DateSelector> = {
   component: DateSelector,
   tags: ["autodocs"],
   args: {
-    placeholder: "年月の指定",
+    placeholder: "期間を選択",
   },
 };
 export default meta;
