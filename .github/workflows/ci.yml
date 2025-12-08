@@ -1,0 +1,127 @@
+name: CI
+
+on:
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main, develop]
+
+jobs:
+    lint:
+        name: Lint with Biome
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Lint with Biome
+              run: pnpm biome check
+
+    typecheck:
+        name: TypeScript Type Check
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Type check
+              run: pnpm typecheck
+
+    build:
+        name: Next.js Build
+        runs-on: ubuntu-latest
+        needs: [lint, typecheck]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Next.js build
+              run: pnpm next build
+
+            - name: Cloudflare build
+              run: pnpm exec next-on-pages
+              continue-on-error: true
+
+    bundle-analysis:
+        name: Bundle Size Analysis
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        needs: [build]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build with bundle analysis
+              run: |
+                  ANALYZE=true pnpm run build 2>&1 | tee build-output.txt || true
+
+            - name: Upload bundle analysis
+              uses: actions/upload-artifact@v4
+              with:
+                  name: bundle-analysis
+                  path: |
+                      .next/static
+                      build-output.txt
+                  retention-days: 30
+
+            - name: Check bundle size warnings
+              run: |
+                  if grep -q "exceeds" build-output.txt || grep -q "warning" build-output.txt; then
+                    echo "⚠️ Build warnings detected - review bundle size"
+                  fi
