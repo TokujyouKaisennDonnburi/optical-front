@@ -1,24 +1,15 @@
-export type ScheduleStatus =
-  | "default"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
-
 export type ScheduleItem = {
+  calendarId?: string;
+  calendarName?: string;
+  calendarColor?: string;
   id: string;
   title: string;
   memo?: string;
   location?: string;
-  locationUrl?: string;
   members?: string[];
-  calendarId?: string;
-  calendarName?: string;
-  status: ScheduleStatus;
   isAllDay?: boolean;
   start: string;
-  end?: string;
-  calendarColor?: string;
+  end: string;
 };
 
 export type ScheduleCalendar = {
@@ -65,7 +56,6 @@ export type CreateCalendarRequest = {
   name: string;
   color: string;
   members: string[];
-  template: string;
   customOptions: string[];
   imageFileName: string | null;
 };

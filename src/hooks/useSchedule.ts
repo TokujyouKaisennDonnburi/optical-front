@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { getTodaySchedule } from "@/lib/api-schedule";
-import type { ScheduleApiResponse, ScheduleItem } from "@/types/schedule";
+import type { ScheduleApiResponse } from "@/types/schedule";
 
 export function useSchedule() {
   const [data, setData] = useState<ScheduleApiResponse | null>(null);
@@ -72,10 +71,8 @@ export function useSchedule() {
         startsAt: item.start,
         endsAt: item.end,
         calendarId: item.calendarId,
-        statusVariant: normalizeStatus(item.status),
         memo: item.memo,
         location: item.location,
-        locationUrl: item.locationUrl,
         members: item.members,
         calendarName: item.calendarName ?? calendar?.name,
         calendarColor: item.calendarColor ?? calendar?.color,
@@ -134,16 +131,4 @@ function formatTimeLabel(value: string) {
   const hours = date.getHours();
   const minutes = date.getMinutes();
   return `${hours}:${minutes.toString().padStart(2, "0")}`;
-}
-
-function normalizeStatus(value: ScheduleItem["status"]): StatusDotVariant {
-  const statuses = new Set([
-    "default",
-    "info",
-    "success",
-    "warning",
-    "danger",
-  ] satisfies StatusDotVariant[]);
-
-  return statuses.has(value as StatusDotVariant) ? value : "default";
 }
