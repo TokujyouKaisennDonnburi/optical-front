@@ -28,6 +28,7 @@ export type CreateScheduleDialogProps = {
     startTime: string;
     endTime?: string;
     memo?: string;
+    location?: string;
     calendarId: string | null;
     isAllDay: boolean;
     allDayStartDate: Date;
@@ -59,6 +60,7 @@ export function CreateScheduleDialog({
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [memo, setMemo] = useState("");
+  const [location, setLocation] = useState("");
   const [calendarId, setCalendarId] = useState<string | null>(null);
   const [isAllDay, setIsAllDay] = useState(false);
   const [allDayStartDate, setAllDayStartDate] = useState<Date>(date);
@@ -71,6 +73,7 @@ export function CreateScheduleDialog({
       setStartTime("09:00");
       setEndTime("10:00");
       setMemo("");
+      setLocation("");
       setCalendarId(calendars[0]?.id ?? null);
       setIsAllDay(false);
       setAllDayStartDate(date);
@@ -167,6 +170,7 @@ export function CreateScheduleDialog({
       startTime,
       endTime,
       memo,
+      location,
       calendarId,
       isAllDay,
       allDayStartDate,
@@ -192,10 +196,10 @@ export function CreateScheduleDialog({
           </div>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={onClose}
-            className="absolute right-3 top-3 h-8 w-8 rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:bg-black/40"
+            className="absolute right-3 top-3 h-8 w-8 rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:bg-white hover:text-black"
           >
             <Icon icon={X} size="sm" />
           </Button>
@@ -340,6 +344,19 @@ export function CreateScheduleDialog({
               placeholder="メモを入力"
               rows={3}
               className="w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/40"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Text as="label" size="sm" className="block text-white/90">
+              場所 (任意)
+            </Text>
+            <Input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="会議室やURLなど"
+              className="h-10 border-white/15 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
             />
           </div>
         </div>

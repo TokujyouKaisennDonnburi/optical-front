@@ -20,6 +20,7 @@ import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useSchedule } from "@/hooks/useSchedule";
 import { createSchedule } from "@/lib/api-schedule";
+import { toast } from "@/components/atoms/Toast";
 import { cn } from "@/utils_constants_styles/utils";
 
 function HomeContent() {
@@ -380,6 +381,7 @@ function BoardArea({
     startTime,
     endTime,
     memo,
+    location,
     calendarId,
     isAllDay,
     allDayStartDate,
@@ -390,6 +392,7 @@ function BoardArea({
     startTime: string;
     endTime?: string;
     memo?: string;
+    location?: string;
     calendarId: string | null;
     isAllDay: boolean;
     allDayStartDate: Date;
@@ -428,12 +431,17 @@ function BoardArea({
         startDate: isAllDay ? startIso : undefined,
         endDate: isAllDay ? endIso : undefined,
         memo,
+        location,
         calendarId: calendarId ?? undefined,
         status: "default",
         isAllDay,
       });
+      toast.success("予定を追加しました", {
+        description: title || "新規予定",
+      });
       onRefresh();
     } catch (err) {
+      toast.error("予定の作成に失敗しました");
       console.error("Failed to create schedule", err);
     } finally {
       handleCloseCreateDialog();
