@@ -1,6 +1,3 @@
-"use client";
-
-import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { Calendar } from "@/components/ui/Calendar";
@@ -34,6 +31,16 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       onChange?.(date);
     };
 
+    // 日付のフォーマット処理
+    const formatDate = (date: Date) => {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      return formatter.format(date);
+    };
+
     return (
       <div ref={ref} className={cn("grid gap-2", className)} {...props}>
         <Popover>
@@ -45,7 +52,7 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 !selected && "text-muted-foreground",
               )}
             >
-              {selected ? format(selected, "PPP") : <span>{placeholder}</span>}
+              {selected ? formatDate(selected) : <span>{placeholder}</span>}
               <CalendarIcon className="h-4 w-4 opacity-50" />
             </button>
           </PopoverTrigger>
