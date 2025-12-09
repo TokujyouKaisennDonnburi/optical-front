@@ -6,7 +6,7 @@ type ToasterProps = ComponentProps<typeof SonnerToaster>;
 function Toaster(props: ToasterProps) {
   return (
     <SonnerToaster
-      position="top-right"
+      position="bottom-right"
       richColors
       theme="system"
       toastOptions={{

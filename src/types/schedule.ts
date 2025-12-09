@@ -15,6 +15,7 @@ export type ScheduleItem = {
   calendarId?: string;
   calendarName?: string;
   status: ScheduleStatus;
+  isAllDay?: boolean;
   start: string;
   end?: string;
   calendarColor?: string;
@@ -39,6 +40,25 @@ export type ScheduleApiResponse = {
 
 export type CalendarDetailResponse = {
   calendar: CalendarDetail;
+};
+
+export type CreateScheduleRequest = {
+  title: string;
+  start: string; // ISO string (timed event) or day start (all-day)
+  end?: string; // ISO string (timed event) or day end (all-day)
+  startDate?: string; // optional day-only for all-day UX
+  endDate?: string; // optional day-only for all-day UX
+  memo?: string;
+  location?: string;
+  locationUrl?: string;
+  members?: string[];
+  calendarId?: string;
+  status?: ScheduleStatus;
+  isAllDay?: boolean;
+};
+
+export type CreateScheduleResponse = {
+  item: ScheduleItem;
 };
 
 export type CreateCalendarRequest = {
