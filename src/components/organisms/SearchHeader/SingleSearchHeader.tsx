@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
+import { BadgeButton } from "@/components/molecules/BadgeButton";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
 
 type SingleSearchHeaderProps = {
@@ -60,6 +61,13 @@ export function SingleSearchHeader({
           <Image src="/optical.png" alt="OptiCal" width={24} height={24} />
         </Button>
       </div>
+
+      {/* 通知バッチ */}
+      <BadgeButton
+        count={0}
+        label="通知"
+        onClick={() => alert("通知クリック")}
+      />
     </div>
   );
 }
