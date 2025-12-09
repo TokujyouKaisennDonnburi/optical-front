@@ -22,7 +22,7 @@ import {
 import { CalendarWizardStepIndicator } from "@/components/molecules/CalendarWizardStepIndicator";
 import { CalendarWizardSummary } from "@/components/molecules/CalendarWizardSummary";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal";
-import { createCalendar } from "@/lib/api-calendars";
+import { createCalendar, uploadCalendarImage } from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
 import { startMockServiceWorker } from "@/mocks/browser";
 import type { CreateCalendarRequest } from "@/types/schedule";
@@ -37,7 +37,7 @@ type MemberInvite = {
 type CalendarCreationState = {
   name: string;
   color: string;
-  imageFile: File | null;
+  imageId: string | null;
   members: MemberInvite[];
   selectedTemplateId: string;
   customOptions: Record<string, boolean>;
@@ -172,7 +172,7 @@ const createMemberInvite = (email = ""): MemberInvite => ({
 const createInitialState = (): CalendarCreationState => ({
   name: "",
   color: COLOR_OPTIONS[0],
-  imageFile: null,
+  imageId: null,
   members: [createMemberInvite()],
   selectedTemplateId: TEMPLATE_OPTIONS[0]?.id ?? "collaboration",
   customOptions: CUSTOM_OPTIONS_WITH_DEFAULT.reduce<Record<string, boolean>>(
@@ -210,7 +210,7 @@ export function CalendarCreationWizard() {
     }));
   };
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -222,29 +222,14 @@ export function CalendarCreationWizard() {
       }
       return;
     }
-    setImageError(null);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== "string") {
-        setImagePreviewUrl(null);
-        setImageError("プレビューの読み込みに失敗しました。");
-        setState((prev) => ({
-          ...prev,
-          imageFile: null,
-        }));
-        if (imageInputRef.current) {
-          imageInputRef.current.value = "";
-        }
-        return;
-      }
-      setImagePreviewUrl(result);
+    try {
+      const image = await uploadCalendarImage(file);
+      setImagePreviewUrl(image.url);
       setState((prev) => ({
         ...prev,
-        imageFile: file,
+        imageId: image.id,
       }));
-    };
-    reader.onerror = () => {
+    } catch (_) {
       setImagePreviewUrl(null);
       setImageError("プレビューの読み込みに失敗しました。");
       setState((prev) => ({
@@ -254,8 +239,7 @@ export function CalendarCreationWizard() {
       if (imageInputRef.current) {
         imageInputRef.current.value = "";
       }
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleRemoveImage = () => {

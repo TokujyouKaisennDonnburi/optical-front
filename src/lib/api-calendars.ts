@@ -1,4 +1,4 @@
-import { apiGet, apiPost, OPTICAL_API_URL } from "@/lib/api-client";
+import { apiGet, apiPost, apiRequest, OPTICAL_API_URL } from "@/lib/api-client";
 import type {
   CalendarDetailResponse,
   CalendarListResponse,
@@ -14,10 +14,13 @@ export async function getCalendarList() {
 export async function uploadCalendarImage(file: File) {
   const formData = new FormData();
   formData.append("image", file);
-  return apiPost<ImageUploadResponse>(
-    "/calendars/images/",
-    formData,
-    undefined,
+  return apiRequest<ImageUploadResponse>(
+    "/calendars/images",
+    {
+      method: "POST",
+      body: formData,
+      isMultipart: true,
+    },
     OPTICAL_API_URL,
   );
 }

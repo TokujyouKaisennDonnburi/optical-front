@@ -33,6 +33,7 @@ export class ApiClientError extends Error {
 interface ApiRequestOptions extends RequestInit {
   /** 認証トークンを自動で付与するか (デフォルト: true) */
   useAuth?: boolean;
+  isMultipart?: boolean;
 }
 
 /**
@@ -51,9 +52,10 @@ export async function apiRequest<T>(
   const { useAuth = true, headers = {}, ...fetchOptions } = options;
 
   // ヘッダーの構築
-  const requestHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const requestHeaders: Record<string, string> = {};
+  if (!options?.isMultipart) {
+    requestHeaders["Content-Type"] = "application/json";
+  }
 
   // 追加のヘッダーをマージ
   if (headers) {
