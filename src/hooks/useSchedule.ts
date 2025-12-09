@@ -116,11 +116,9 @@ export function useSchedule() {
 function formatTimeLabel(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    console.log("time is NaN");
     return value;
   }
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  console.log("time is NOT NaN");
   return `${hours}:${minutes.toString().padStart(2, "0")}`;
 }

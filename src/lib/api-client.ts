@@ -12,7 +12,7 @@ import type { ApiError } from "@/types/auth";
  */
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 export const OPTICAL_API_URL =
-  process.env.OPICAL_API_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_OPITCAL_API_URL || "http://localhost:8000";
 
 /**
  * API エラークラス

@@ -31,6 +31,11 @@ export type CalendarDetailResponse = {
   calendar: CalendarDetail;
 };
 
+export type ImageUploadResponse = {
+  id: string;
+  url: string;
+};
+
 export type CreateScheduleRequest = {
   title: string;
   start: string; // ISO string (timed event) or day start (all-day)
