@@ -400,10 +400,10 @@ export function CalendarCreationWizard() {
           : state.members
               .map((member) => member.email.trim())
               .filter((email) => email.length > 0),
-        customOptions: Object.entries(state.customOptions)
+        options: Object.entries(state.customOptions)
           .filter(([, enabled]) => enabled)
           .map(([key]) => key),
-        imageFileName: state.imageFile?.name ?? null,
+        imageId: state.imageId,
       };
 
       console.log(

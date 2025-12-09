@@ -30,5 +30,10 @@ export async function getCalendarDetail(calendarId: string) {
 }
 
 export async function createCalendar(payload: CreateCalendarRequest) {
-  return apiPost<CreateCalendarResponse>("/api/calendars", payload);
+  return apiPost<CreateCalendarResponse>(
+    "/calendars",
+    payload,
+    undefined,
+    OPTICAL_API_URL,
+  );
 }

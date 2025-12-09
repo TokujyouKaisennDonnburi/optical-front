@@ -60,8 +60,8 @@ export type CreateCalendarRequest = {
   name: string;
   color: string;
   members: string[];
-  customOptions: string[];
-  imageFileName: string | null;
+  options: string[];
+  imageId: string | null;
 };
 
 export type CreateCalendarResponse = {
