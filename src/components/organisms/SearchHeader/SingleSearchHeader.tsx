@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
-import { DateSelector } from "@/components/molecules/DateSelector/DateSelector";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
+import { DateSelector } from "@/components/molecules/DateSelector/DateSelector";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
 
 type SingleSearchHeaderProps = {
