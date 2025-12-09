@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
@@ -29,6 +29,7 @@ export type GeneralScheduleBoardProps = {
   className?: string;
   baseDate?: Date;
   onSelectItem?: (item: GeneralScheduleBoardItem) => void;
+  onCreateItem?: (date: Date) => void;
 };
 
 type CalendarCell = {
@@ -64,7 +65,14 @@ export function GeneralScheduleBoard({
   className,
   baseDate,
   onSelectItem,
+  onCreateItem,
 }: GeneralScheduleBoardProps) {
+  // 長押し判定用の参照
+  const longPressTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const longPressStartPosRef = useRef<Map<string, { x: number; y: number }>>(
+    new Map(),
+  );
+
   const effectiveBaseDate = useMemo(() => {
     if (baseDate) {
       return normalizeDate(baseDate);
@@ -100,11 +108,130 @@ export function GeneralScheduleBoard({
                   const events = eventsByDay.get(cell.key) ?? [];
                   const isWeekend = cell.weekday >= 5;
 
+                  const handleLongPressStart = (
+                    e:
+                      | React.MouseEvent<HTMLDivElement>
+                      | React.TouchEvent<HTMLDivElement>,
+                  ) => {
+                    // イベントカード（button要素）をクリックした場合は長押し判定をキャンセル
+                    if (e.target instanceof HTMLElement) {
+                      if (e.target.closest("button[type='button']")) {
+                        return;
+                      }
+                    }
+
+                    const pos =
+                      "touches" in e
+                        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                        : {
+                            x: (e as React.MouseEvent).clientX,
+                            y: (e as React.MouseEvent).clientY,
+                          };
+
+                    longPressStartPosRef.current.set(cell.key, pos);
+
+                    const timeoutId = setTimeout(() => {
+                      const startPos = longPressStartPosRef.current.get(
+                        cell.key,
+                      );
+                      if (!startPos) return;
+
+                      // 移動距離チェック
+                      const currentPos =
+                        "touches" in e
+                          ? {
+                              x: e.touches[0]?.clientX ?? 0,
+                              y: e.touches[0]?.clientY ?? 0,
+                            }
+                          : {
+                              x: (e as React.MouseEvent).clientX,
+                              y: (e as React.MouseEvent).clientY,
+                            };
+
+                      const movedDistance = Math.hypot(
+                        currentPos.x - startPos.x,
+                        currentPos.y - startPos.y,
+                      );
+
+                      // 移動距離が10px以下なら長押し判定
+                      if (
+                        movedDistance <= 10 &&
+                        onCreateItem &&
+                        cell.isCurrentMonth
+                      ) {
+                        onCreateItem(cell.date);
+                      }
+                    }, 600);
+
+                    longPressTimeoutsRef.current.set(cell.key, timeoutId);
+                  };
+
+                  const handleLongPressEnd = () => {
+                    const timeoutId = longPressTimeoutsRef.current.get(
+                      cell.key,
+                    );
+                    if (timeoutId) {
+                      clearTimeout(timeoutId);
+                      longPressTimeoutsRef.current.delete(cell.key);
+                    }
+                    longPressStartPosRef.current.delete(cell.key);
+                  };
+
+                  const handleLongPressMove = (
+                    e:
+                      | React.MouseEvent<HTMLDivElement>
+                      | React.TouchEvent<HTMLDivElement>,
+                  ) => {
+                    const startPos = longPressStartPosRef.current.get(cell.key);
+                    if (!startPos) return;
+
+                    const currentPos =
+                      "touches" in e
+                        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                        : {
+                            x: (e as React.MouseEvent).clientX,
+                            y: (e as React.MouseEvent).clientY,
+                          };
+
+                    const movedDistance = Math.hypot(
+                      currentPos.x - startPos.x,
+                      currentPos.y - startPos.y,
+                    );
+
+                    // 移動距離が10pxを超えたらタイマーをキャンセル（スクロール判定）
+                    if (movedDistance > 10) {
+                      const timeoutId = longPressTimeoutsRef.current.get(
+                        cell.key,
+                      );
+                      if (timeoutId) {
+                        clearTimeout(timeoutId);
+                        longPressTimeoutsRef.current.delete(cell.key);
+                      }
+                    }
+                  };
+
                   return (
                     <div
                       key={cell.key}
+                      role="button"
+                      tabIndex={0}
+                      onMouseDown={handleLongPressStart}
+                      onMouseUp={handleLongPressEnd}
+                      onMouseLeave={handleLongPressEnd}
+                      onMouseMove={handleLongPressMove}
+                      onTouchStart={handleLongPressStart}
+                      onTouchEnd={handleLongPressEnd}
+                      onTouchMove={handleLongPressMove}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleLongPressStart(
+                            e as unknown as React.MouseEvent<HTMLDivElement>,
+                          );
+                        }
+                      }}
                       className={cn(
-                        "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden bg-slate-950/40 p-0.5 transition-colors",
+                        "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden bg-slate-950/40 p-0.5 transition-colors cursor-pointer",
                         !cell.isCurrentMonth &&
                           "bg-slate-950/10 text-muted-foreground/70",
                         isWeekend && cell.isCurrentMonth && "bg-slate-950/55",

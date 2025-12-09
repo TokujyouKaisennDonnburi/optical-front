@@ -10,12 +10,14 @@ export function useSchedule() {
   const [data, setData] = useState<ScheduleApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [_refreshTrigger, setRefreshTrigger] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
+  // refreshTrigger で再取得させる。依存配列を維持するため lint を無視。
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh trigger to refetch
   useEffect(() => {
     let isMounted = true;
 
@@ -44,7 +46,7 @@ export function useSchedule() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [refreshTrigger]);
 
   const calendars = useMemo(() => data?.calendars ?? [], [data?.calendars]);
 
