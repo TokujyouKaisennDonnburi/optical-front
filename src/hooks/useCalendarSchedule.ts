@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { getCalendarDetail } from "@/lib/api-calendars";
-import { getTodaySchedule } from "@/lib/api-schedule";
+import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
 /**
@@ -57,7 +57,7 @@ export function useCalendarSchedule(calendarId: string) {
       setError(null);
 
       try {
-        const json = await getTodaySchedule();
+        const json = await getMonthSchedule();
 
         if (isMounted) {
           // このカレンダーのスケジュールのみをフィルタリング
