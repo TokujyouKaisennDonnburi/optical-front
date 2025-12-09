@@ -42,7 +42,6 @@ export type CreateScheduleRequest = {
   locationUrl?: string;
   members?: string[];
   calendarId?: string;
-  status?: ScheduleStatus;
   isAllDay?: boolean;
 };
 

@@ -325,7 +325,7 @@ function BoardArea({
           location: item.location,
           locationUrl: item.locationUrl,
           members: item.members ?? [],
-          calendarName: item.calendarName ?? "",
+          calendarName: item.calendarName,
           calendarColor: item.calendarColor,
         };
       })
@@ -434,7 +434,6 @@ function BoardArea({
         memo,
         location,
         calendarId: calendarId ?? undefined,
-        status: "default",
         isAllDay,
       });
       toast.success("予定を追加しました", {
