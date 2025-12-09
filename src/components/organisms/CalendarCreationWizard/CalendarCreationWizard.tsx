@@ -416,7 +416,6 @@ export function CalendarCreationWizard() {
           : state.members
               .map((member) => member.email.trim())
               .filter((email) => email.length > 0),
-        template: state.selectedTemplateId,
         customOptions: Object.entries(state.customOptions)
           .filter(([, enabled]) => enabled)
           .map(([key]) => key),

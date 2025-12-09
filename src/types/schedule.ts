@@ -1,31 +1,21 @@
-export type ScheduleStatus =
-  | "default"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
-
 export type ScheduleItem = {
+  calendarId: string;
+  calendarName: string;
+  calendarColor: string;
   id: string;
   title: string;
-  memo?: string;
-  location?: string;
-  locationUrl?: string;
+  memo: string;
+  location: string;
   members?: string[];
-  calendarId?: string;
-  calendarName?: string;
-  status: ScheduleStatus;
-  isAllDay?: boolean;
-  start: string;
-  end?: string;
-  calendarColor?: string;
+  isAllDay: boolean;
+  startAt: string;
+  endAt: string;
 };
 
 export type ScheduleCalendar = {
   id: string;
   name: string;
   color: string;
-  description?: string;
   imageUrl?: string;
   customOptions?: string[];
 };
@@ -33,9 +23,8 @@ export type ScheduleCalendar = {
 export type CalendarDetail = ScheduleCalendar;
 
 export type ScheduleApiResponse = {
-  date?: string;
+  date: string;
   items: ScheduleItem[];
-  calendars?: ScheduleCalendar[];
 };
 
 export type CalendarDetailResponse = {
@@ -53,7 +42,6 @@ export type CreateScheduleRequest = {
   locationUrl?: string;
   members?: string[];
   calendarId?: string;
-  status?: ScheduleStatus;
   isAllDay?: boolean;
 };
 
@@ -61,11 +49,12 @@ export type CreateScheduleResponse = {
   item: ScheduleItem;
 };
 
+export type CalendarListResponse = ScheduleCalendar[];
+
 export type CreateCalendarRequest = {
   name: string;
   color: string;
   members: string[];
-  template: string;
   customOptions: string[];
   imageFileName: string | null;
 };
