@@ -38,16 +38,11 @@ export type ImageUploadResponse = {
 
 export type CreateScheduleRequest = {
   title: string;
-  start: string; // ISO string (timed event) or day start (all-day)
-  end?: string; // ISO string (timed event) or day end (all-day)
-  startDate?: string; // optional day-only for all-day UX
-  endDate?: string; // optional day-only for all-day UX
-  memo?: string;
-  location?: string;
-  locationUrl?: string;
-  members?: string[];
-  calendarId?: string;
-  isAllDay?: boolean;
+  startTime: string; // ISO string (timed event) or day start (all-day)
+  endTime: string; // ISO string (timed event) or day end (all-day)
+  memo: string;
+  location: string;
+  isAllDay: boolean;
 };
 
 export type CreateScheduleResponse = {
