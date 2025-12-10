@@ -147,22 +147,6 @@ function HomeContent() {
     setPendingEmail(null);
   };
 
-  // 年数の抽出
-  const years = useMemo(() => {
-    return Array.from(
-      new Set(
-        items
-          .map((item) => {
-            if (!item.startsAt) return null;
-            const date = new Date(item.startsAt);
-            if (Number.isNaN(date.getTime())) return null;
-            return date.getFullYear();
-          })
-          .filter((year): year is number => year !== null),
-      ),
-    ).sort((a, b) => b - a);
-  }, [items]);
-
   // 認証中またはリダイレクト中はローディング表示
   if (authLoading || !user) {
     return (
@@ -184,7 +168,17 @@ function HomeContent() {
             calendarOptions={calendarOptions}
             selectedCalendars={selectedCalendars}
             onCalendarChange={setSelectedCalendars}
-            yearOptions={years}
+            date={viewDate}
+            onDateChange={(value) => {
+              if (value) {
+                // 入力した年に移動
+                setViewDate(startOfDay(value));
+              }
+            }}
+            onClear={() => {
+              // クリア時に今日の年月に戻す！
+              setViewDate(startOfDay(new Date()));
+            }}
           />
 
           {/* アカウントボタンの表示 */}

@@ -125,6 +125,8 @@ export function CalendarDetailClient({
 
   const handleClear = () => {
     setSearchTerm("");
+    const today = startOfDay(new Date());
+    setViewDate(today);
   };
 
   // 認証中またはリダイレクト中はローディング表示
@@ -171,6 +173,13 @@ export function CalendarDetailClient({
             <SingleSearchHeader
               searchValue={searchTerm}
               onSearchChange={setSearchTerm}
+              date={viewDate}
+              onDateChange={(value) => {
+                if (value) {
+                  // 入力した年に移動
+                  setViewDate(startOfDay(value));
+                }
+              }}
               onClear={handleClear}
               onOptiCalClick={() => setIsPreviewOpen(true)}
             />
