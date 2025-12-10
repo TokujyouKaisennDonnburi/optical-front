@@ -8,8 +8,10 @@ import { scheduleMock } from "@/mocks/data/schedule";
  */
 export const scheduleHandlers = [
   http.get("http://localhost:8000/events/months", ({ request }) => {
-    console.log("[MSW] GET /events/months - returning all mock data for debugging");
-    
+    console.log(
+      "[MSW] GET /events/months - returning all mock data for debugging",
+    );
+
     // Authorization ヘッダーからトークンを取得
     const authHeader = request.headers.get("Authorization");
     console.log("[MSW] Auth header:", authHeader ? "present" : "missing");
@@ -23,7 +25,10 @@ export const scheduleHandlers = [
       const userItems = scheduleMock.items.filter(
         (item) => item.userId === "user-1",
       );
-      console.log("[MSW] Returning:", { calendars: userCalendars.length, items: userItems.length });
+      console.log("[MSW] Returning:", {
+        calendars: userCalendars.length,
+        items: userItems.length,
+      });
       return HttpResponse.json({
         date: new Date().toISOString(),
         calendars: userCalendars,
@@ -65,7 +70,10 @@ export const scheduleHandlers = [
       const userItems = scheduleMock.items.filter(
         (item) => item.userId === userId,
       );
-      console.log("[MSW] Returning:", { calendars: userCalendars.length, items: userItems.length });
+      console.log("[MSW] Returning:", {
+        calendars: userCalendars.length,
+        items: userItems.length,
+      });
 
       return HttpResponse.json({
         date: new Date().toISOString(),
@@ -185,7 +193,7 @@ export const scheduleHandlers = [
 
   http.get("http://localhost:8000/calendars", ({ request }) => {
     console.log("[MSW] GET /calendars - returning all mock data for debugging");
-    
+
     // Authorization ヘッダーからトークンを取得
     const authHeader = request.headers.get("Authorization");
     console.log("[MSW] Auth header:", authHeader ? "present" : "missing");
@@ -234,7 +242,9 @@ export const scheduleHandlers = [
       console.log("[MSW] Returning calendars:", userCalendars.length);
       return HttpResponse.json(userCalendars);
     } catch (_error) {
-      console.log("[MSW] Token parse error, returning all calendars for user-1");
+      console.log(
+        "[MSW] Token parse error, returning all calendars for user-1",
+      );
       const userCalendars = scheduleMock.calendars.filter(
         (calendar) => calendar.userId === "user-1",
       );
