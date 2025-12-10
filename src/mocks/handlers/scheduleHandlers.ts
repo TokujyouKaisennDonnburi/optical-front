@@ -7,21 +7,28 @@ import { scheduleMock } from "@/mocks/data/schedule";
  * ログインユーザーのスケジュールのみを返却
  */
 export const scheduleHandlers = [
-  http.get("/api/events/months", ({ request }) => {
+  http.get("http://localhost:8000/events/months", ({ request }) => {
+    console.log("[MSW] GET /events/months - returning all mock data for debugging");
+    
     // Authorization ヘッダーからトークンを取得
     const authHeader = request.headers.get("Authorization");
+    console.log("[MSW] Auth header:", authHeader ? "present" : "missing");
 
-    // 認証されていない場合は401エラー
+    // デバッグ用: 認証なしでも全データを返す
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: 401,
-            message: "認証が必要です",
-          },
-        },
-        { status: 401 },
+      console.log("[MSW] No auth - returning all data for user-1");
+      const userCalendars = scheduleMock.calendars.filter(
+        (calendar) => calendar.userId === "user-1",
       );
+      const userItems = scheduleMock.items.filter(
+        (item) => item.userId === "user-1",
+      );
+      console.log("[MSW] Returning:", { calendars: userCalendars.length, items: userItems.length });
+      return HttpResponse.json({
+        date: new Date().toISOString(),
+        calendars: userCalendars,
+        items: userItems,
+      });
     }
 
     const token = authHeader.replace("Bearer ", "");
@@ -35,9 +42,11 @@ export const scheduleHandlers = [
 
       const payload = JSON.parse(atob(parts[1]));
       const userId = payload.sub;
+      console.log("[MSW] User ID from token:", userId);
 
       // トークンの有効期限チェック
       if (payload.exp && payload.exp * 1000 < Date.now()) {
+        console.log("[MSW] Token expired");
         return HttpResponse.json(
           {
             error: {
@@ -56,25 +65,30 @@ export const scheduleHandlers = [
       const userItems = scheduleMock.items.filter(
         (item) => item.userId === userId,
       );
+      console.log("[MSW] Returning:", { calendars: userCalendars.length, items: userItems.length });
 
       return HttpResponse.json({
+        date: new Date().toISOString(),
         calendars: userCalendars,
         items: userItems,
       });
     } catch (_error) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: 401,
-            message: "無効なトークンです",
-          },
-        },
-        { status: 401 },
+      console.log("[MSW] Token parse error, returning all data for user-1");
+      const userCalendars = scheduleMock.calendars.filter(
+        (calendar) => calendar.userId === "user-1",
       );
+      const userItems = scheduleMock.items.filter(
+        (item) => item.userId === "user-1",
+      );
+      return HttpResponse.json({
+        date: new Date().toISOString(),
+        calendars: userCalendars,
+        items: userItems,
+      });
     }
   }),
 
-  http.post("/api/schedules", async ({ request }) => {
+  http.post("http://localhost:8000/schedules", async ({ request }) => {
     console.log("[MSW] POST /api/schedules handler called");
 
     const authHeader = request.headers.get("Authorization");
@@ -169,21 +183,21 @@ export const scheduleHandlers = [
     }
   }),
 
-  http.get("/api/calendars", ({ request }) => {
+  http.get("http://localhost:8000/calendars", ({ request }) => {
+    console.log("[MSW] GET /calendars - returning all mock data for debugging");
+    
     // Authorization ヘッダーからトークンを取得
     const authHeader = request.headers.get("Authorization");
+    console.log("[MSW] Auth header:", authHeader ? "present" : "missing");
 
-    // 認証されていない場合は401エラー
+    // デバッグ用: 認証なしでも全データを返す
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: 401,
-            message: "認証が必要です",
-          },
-        },
-        { status: 401 },
+      console.log("[MSW] No auth - returning all calendars for user-1");
+      const userCalendars = scheduleMock.calendars.filter(
+        (calendar) => calendar.userId === "user-1",
       );
+      console.log("[MSW] Returning calendars:", userCalendars.length);
+      return HttpResponse.json(userCalendars);
     }
 
     const token = authHeader.replace("Bearer ", "");
@@ -197,9 +211,11 @@ export const scheduleHandlers = [
 
       const payload = JSON.parse(atob(parts[1]));
       const userId = payload.sub;
+      console.log("[MSW] User ID from token:", userId);
 
       // トークンの有効期限チェック
       if (payload.exp && payload.exp * 1000 < Date.now()) {
+        console.log("[MSW] Token expired");
         return HttpResponse.json(
           {
             error: {
@@ -215,21 +231,18 @@ export const scheduleHandlers = [
       const userCalendars = scheduleMock.calendars.filter(
         (calendar) => calendar.userId === userId,
       );
+      console.log("[MSW] Returning calendars:", userCalendars.length);
       return HttpResponse.json(userCalendars);
     } catch (_error) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: 401,
-            message: "無効なトークンです",
-          },
-        },
-        { status: 401 },
+      console.log("[MSW] Token parse error, returning all calendars for user-1");
+      const userCalendars = scheduleMock.calendars.filter(
+        (calendar) => calendar.userId === "user-1",
       );
+      return HttpResponse.json(userCalendars);
     }
   }),
 
-  http.post("/api/calendars", async ({ request }) => {
+  http.post("http://localhost:8000/calendars", async ({ request }) => {
     console.log("[MSW] POST /api/calendars handler called");
 
     // Authorization ヘッダーからトークンを取得
@@ -319,7 +332,7 @@ export const scheduleHandlers = [
   }),
 
   // GET /api/calendars/:id - カレンダー詳細取得
-  http.get("/api/calendars/:id", ({ params }) => {
+  http.get("http://localhost:8000/calendars/:id", ({ params }) => {
     const { id } = params;
     const calendar = scheduleMock.calendars.find((c) => c.id === id);
 

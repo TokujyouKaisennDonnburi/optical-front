@@ -83,7 +83,8 @@ export const authHandlers = [
    * POST /api/auth/login
    * ログイン
    */
-  http.post("/api/login", async ({ request }) => {
+  http.post("http://localhost:8000/login", async ({ request }) => {
+    console.log("[MSW] POST /login handler called");
     const body = (await request.json()) as LoginRequest;
     const { email, password } = body;
 
