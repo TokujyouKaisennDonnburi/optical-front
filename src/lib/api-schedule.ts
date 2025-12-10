@@ -21,6 +21,14 @@ export async function getMonthSchedule(month?: string) {
   );
 }
 
-export async function createSchedule(body: CreateScheduleRequest) {
-  return apiPost<CreateScheduleResponse>("/api/schedules", body);
+export async function createSchedule(
+  calendarId: string,
+  body: CreateScheduleRequest,
+) {
+  return apiPost<CreateScheduleResponse>(
+    `/calendars/${calendarId}/events`,
+    body,
+    undefined,
+    OPTICAL_API_URL,
+  );
 }

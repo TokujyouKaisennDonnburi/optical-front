@@ -26,10 +26,10 @@ export type CreateScheduleDialogProps = {
     date: Date;
     title: string;
     startTime: string;
-    endTime?: string;
-    memo?: string;
-    location?: string;
-    calendarId: string | null;
+    endTime: string;
+    memo: string;
+    location: string;
+    calendarId: string;
     isAllDay: boolean;
     allDayStartDate: Date;
     allDayEndDate: Date;
@@ -171,7 +171,7 @@ export function CreateScheduleDialog({
       endTime,
       memo,
       location,
-      calendarId,
+      calendarId: calendarId || "",
       isAllDay,
       allDayStartDate,
       allDayEndDate,

@@ -21,7 +21,7 @@ export const authHandlers = [
    * POST /api/auth/signup
    * サインアップ
    */
-  http.post("/api/auth/signup", async ({ request }) => {
+  http.post("/api/auth/register", async ({ request }) => {
     const body = (await request.json()) as SignupRequest;
     const { name, email, password } = body;
 
@@ -83,7 +83,7 @@ export const authHandlers = [
    * POST /api/auth/login
    * ログイン
    */
-  http.post("/api/auth/login", async ({ request }) => {
+  http.post("/api/login", async ({ request }) => {
     const body = (await request.json()) as LoginRequest;
     const { email, password } = body;
 
@@ -147,7 +147,7 @@ export const authHandlers = [
    * GET /api/auth/me
    * 現在のユーザー情報を取得
    */
-  http.get("/api/auth/me", ({ request }) => {
+  http.get("/api/users/@me", ({ request }) => {
     // Authorization ヘッダーからトークンを取得
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

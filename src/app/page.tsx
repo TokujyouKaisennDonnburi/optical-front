@@ -391,16 +391,16 @@ function BoardArea({
     date: Date;
     title: string;
     startTime: string;
-    endTime?: string;
-    memo?: string;
-    location?: string;
-    calendarId: string | null;
+    endTime: string;
+    memo: string;
+    location: string;
+    calendarId: string;
     isAllDay: boolean;
     allDayStartDate: Date;
     allDayEndDate: Date;
   }) => {
     const startDate = new Date(date);
-    let endIso: string | undefined;
+    let endIso = "";
     let startIso = "";
 
     if (isAllDay) {
@@ -425,15 +425,12 @@ function BoardArea({
     }
 
     try {
-      await createSchedule({
+      await createSchedule(calendarId, {
         title,
-        start: startIso,
-        end: endIso,
-        startDate: isAllDay ? startIso : undefined,
-        endDate: isAllDay ? endIso : undefined,
+        startTime: startIso,
+        endTime: endIso,
         memo,
         location,
-        calendarId: calendarId ?? undefined,
         isAllDay,
       });
       toast.success("予定を追加しました", {
