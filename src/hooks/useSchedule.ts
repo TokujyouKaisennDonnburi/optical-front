@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { getCalendarList } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
@@ -11,9 +11,10 @@ export function useSchedule(viewDate?: Date) {
   const [calendars, setCalendars] = useState<CalendarDetail[]>([]);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  // useRefを使って初回ロードを追跡（依存配列に含めなくてよい）
+  const isInitialLoadRef = useRef(true);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -30,40 +31,29 @@ export function useSchedule(viewDate?: Date) {
     let isMounted = true;
 
     const fetchSchedule = async () => {
-      // 初回ロード時のみスケルトンを表示
-      if (isInitialLoad) {
-        setIsLoading(true);
-      }
-      setError(null);
-      try {
-        const schedules = await getMonthSchedule(monthParam);
-        if (isMounted) {
-          setDate(schedules.date);
-          setSchedules(schedules.items);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err : new Error("Unknown error"));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-          setIsInitialLoad(false);
-        }
+      const schedules = await getMonthSchedule(monthParam);
+      if (isMounted) {
+        setDate(schedules.date);
+        setSchedules(schedules.items);
       }
     };
 
     const fetchCalendars = async () => {
+      const calendars = await getCalendarList();
+      if (isMounted) {
+        setCalendars(calendars);
+      }
+    };
+
+    const fetchAll = async () => {
       // 初回ロード時のみスケルトンを表示
-      if (isInitialLoad) {
+      if (isInitialLoadRef.current) {
         setIsLoading(true);
       }
       setError(null);
+
       try {
-        const calendars = await getCalendarList();
-        if (isMounted) {
-          setCalendars(calendars);
-        }
+        await Promise.all([fetchSchedule(), fetchCalendars()]);
       } catch (err) {
         if (isMounted) {
           setError(err instanceof Error ? err : new Error("Unknown error"));
@@ -71,18 +61,17 @@ export function useSchedule(viewDate?: Date) {
       } finally {
         if (isMounted) {
           setIsLoading(false);
-          setIsInitialLoad(false);
+          isInitialLoadRef.current = false;
         }
       }
     };
 
-    void fetchSchedule();
-    void fetchCalendars();
+    void fetchAll();
 
     return () => {
       isMounted = false;
     };
-  }, [refreshTrigger, monthParam, isInitialLoad]);
+  }, [refreshTrigger, monthParam]);
 
   const items: TodaySchedulePanelItem[] = useMemo(() => {
     if (schedules.length === 0) return [];
