@@ -1,56 +1,59 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
 import { getCalendarList } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
-export function useSchedule() {
+export function useSchedule(viewDate?: Date) {
   const [date, setDate] = useState<string | null>(null);
   const [calendars, setCalendars] = useState<CalendarDetail[]>([]);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  // useRefを使って初回ロードを追跡（依存配列に含めなくてよい）
+  const isInitialLoadRef = useRef(true);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
-  // refreshTrigger で再取得させる。依存配列を維持するため lint を無視。
+  // viewDateから月のパラメータを生成
+  const monthParam = viewDate
+    ? `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`
+    : undefined;
+
+  // refreshTrigger または monthParam で再取得させる。
   // biome-ignore lint/correctness/useExhaustiveDependencies: refresh trigger to refetch
   useEffect(() => {
     let isMounted = true;
 
     const fetchSchedule = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const schedules = await getMonthSchedule();
-        if (isMounted) {
-          setDate(schedules.date);
-          setSchedules(schedules.items);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err : new Error("Unknown error"));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      const schedules = await getMonthSchedule(monthParam);
+      if (isMounted) {
+        setDate(schedules.date);
+        setSchedules(schedules.items);
       }
     };
 
     const fetchCalendars = async () => {
-      setIsLoading(true);
+      const calendars = await getCalendarList();
+      if (isMounted) {
+        setCalendars(calendars);
+      }
+    };
+
+    const fetchAll = async () => {
+      // 初回ロード時のみスケルトンを表示
+      if (isInitialLoadRef.current) {
+        setIsLoading(true);
+      }
       setError(null);
+
       try {
-        const calendars = await getCalendarList();
-        if (isMounted) {
-          setCalendars(calendars);
-        }
+        await Promise.all([fetchSchedule(), fetchCalendars()]);
       } catch (err) {
         if (isMounted) {
           setError(err instanceof Error ? err : new Error("Unknown error"));
@@ -58,17 +61,17 @@ export function useSchedule() {
       } finally {
         if (isMounted) {
           setIsLoading(false);
+          isInitialLoadRef.current = false;
         }
       }
     };
 
-    void fetchSchedule();
-    void fetchCalendars();
+    void fetchAll();
 
     return () => {
       isMounted = false;
     };
-  }, [refreshTrigger]);
+  }, [refreshTrigger, monthParam]);
 
   const items: TodaySchedulePanelItem[] = useMemo(() => {
     if (schedules.length === 0) return [];

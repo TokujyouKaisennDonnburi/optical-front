@@ -242,15 +242,17 @@ export function CreateScheduleDialog({
               </SelectTrigger>
               <SelectContent className="border-white/15 bg-slate-900 text-white">
                 {calendars.length === 0 ? (
-                  <SelectItem value="" disabled>
+                  <div className="px-2 py-1.5 text-sm text-white/50">
                     カレンダーがありません
-                  </SelectItem>
+                  </div>
                 ) : (
-                  calendars.map((cal) => (
-                    <SelectItem key={cal.id} value={cal.id}>
-                      {cal.name}
-                    </SelectItem>
-                  ))
+                  calendars
+                    .filter((cal) => cal.id)
+                    .map((cal) => (
+                      <SelectItem key={cal.id} value={cal.id}>
+                        {cal.name}
+                      </SelectItem>
+                    ))
                 )}
               </SelectContent>
             </Select>
