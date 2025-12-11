@@ -71,6 +71,6 @@ export function MilestoneProgressOption() {
       </CardContent>
     </Card>
   );
-}
+};
 
 export default MilestoneProgressOption;
