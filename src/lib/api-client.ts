@@ -10,8 +10,7 @@ import type { ApiError } from "@/types/auth";
  * API のベース URL
  * 環境変数から取得、デフォルトは空文字（相対パス）
  */
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-export const OPTICAL_API_URL =
+export const API_BASE_URL =
   process.env.NEXT_PUBLIC_OPITCAL_API_URL || "http://localhost:8000";
 
 /**

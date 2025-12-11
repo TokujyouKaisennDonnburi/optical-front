@@ -1,4 +1,4 @@
-import { apiGet, apiPost, OPTICAL_API_URL } from "@/lib/api-client";
+import { apiGet, apiPost } from "@/lib/api-client";
 import type {
   ChangeReviewerRequest,
   GitHubReviewOptionsResponse,
@@ -6,7 +6,7 @@ import type {
 } from "@/types/github";
 
 export async function postGithubOauth(payload: GithubOauthRequest) {
-  return apiPost("/auth/github/link", payload, undefined, OPTICAL_API_URL);
+  return apiPost("/auth/github/link", payload);
 }
 
 export async function getGitHubReviewOptions() {
