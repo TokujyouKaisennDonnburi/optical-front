@@ -26,7 +26,11 @@ export async function uploadCalendarImage(file: File) {
 }
 
 export async function getCalendarDetail(calendarId: string) {
-  return apiGet<CalendarDetailResponse>(`/api/calendars/${calendarId}`);
+  return apiGet<CalendarDetailResponse>(
+    `/calendars/${calendarId}`,
+    undefined,
+    OPTICAL_API_URL,
+  );
 }
 
 export async function createCalendar(payload: CreateCalendarRequest) {

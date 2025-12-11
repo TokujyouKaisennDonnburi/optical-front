@@ -3,6 +3,7 @@
 import { ArrowLeft, CalendarDays } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent } from "@/components/atoms/Card";
 import {
@@ -22,11 +23,13 @@ import { SingleSearchHeader } from "@/components/organisms/SearchHeader/SingleSe
 import {
   SingleCalendarBoard,
   type SingleCalendarBoardItem,
+  SingleCreateScheduleDialog,
   SingleScheduleEventDialog,
 } from "@/components/organisms/SingleCalendarBoard";
 import { useAuth } from "@/hooks/useAuth";
 import { useCalendarSchedule } from "@/hooks/useCalendarSchedule";
 import { getGitHubReviewOptions } from "@/lib/api-github";
+import { createSchedule } from "@/lib/api-schedule";
 import type {
   ChangeReviewerRequest,
   GitHubPullRequest,
@@ -61,6 +64,7 @@ export function CalendarDetailClient({
     hasGitHubOptions,
     showPrReviewOption,
     showTeamReviewLoadOption,
+    refresh,
   } = useCalendarSchedule(calendarId);
 
   // 検索機能
@@ -202,6 +206,7 @@ export function CalendarDetailClient({
         {/* スケジュールボード（画面いっぱいに表示） */}
         <BoardArea
           className="min-h-0 flex-1 w-full"
+          calendarId={calendarId}
           items={filteredItems}
           isLoading={isLoading}
           error={error}
@@ -209,6 +214,7 @@ export function CalendarDetailClient({
           onChangeViewDate={handleViewDateChange}
           calendarName={calendar?.name}
           calendarColor={calendar?.color}
+          onScheduleCreated={refresh}
         />
       </main>
 
@@ -285,6 +291,7 @@ export function CalendarDetailClient({
 
 function BoardArea({
   className,
+  calendarId,
   items,
   isLoading,
   error,
@@ -292,8 +299,10 @@ function BoardArea({
   onChangeViewDate,
   calendarName,
   calendarColor,
+  onScheduleCreated,
 }: {
   className?: string;
+  calendarId: string;
   items: ReturnType<typeof useCalendarSchedule>["items"];
   isLoading: boolean;
   error: Error | null;
@@ -301,9 +310,11 @@ function BoardArea({
   onChangeViewDate: (nextDate: Date) => void;
   calendarName?: string;
   calendarColor?: string;
+  onScheduleCreated?: () => void;
 }) {
   const [selectedItem, setSelectedItem] =
     useState<SingleCalendarBoardItem | null>(null);
+  const [createDialogDate, setCreateDialogDate] = useState<Date | null>(null);
 
   const boardItems = useMemo(() => {
     const viewYear = viewDate.getFullYear();
@@ -387,6 +398,72 @@ function BoardArea({
     setSelectedItem(null);
   };
 
+  const handleCreateItem = (date: Date) => {
+    setCreateDialogDate(date);
+  };
+
+  const handleCloseCreateDialog = () => {
+    setCreateDialogDate(null);
+  };
+
+  const handleCreateConfirm = async (payload: {
+    date: Date;
+    title: string;
+    startTime: string;
+    endTime: string;
+    memo: string;
+    location: string;
+    calendarId: string;
+    isAllDay: boolean;
+    allDayStartDate: Date;
+    allDayEndDate: Date;
+  }) => {
+    const startDate = new Date(payload.date);
+    let endIso = "";
+    let startIso = "";
+
+    if (payload.isAllDay) {
+      // 終日イベント: 日付のみを使用
+      const allDayStart = new Date(payload.allDayStartDate);
+      allDayStart.setHours(0, 0, 0, 0);
+      startIso = allDayStart.toISOString();
+
+      const allDayEnd = new Date(payload.allDayEndDate);
+      allDayEnd.setHours(23, 59, 59, 999);
+      endIso = allDayEnd.toISOString();
+    } else {
+      // 時刻イベント
+      const [startHour, startMinute] = payload.startTime.split(":").map(Number);
+      startDate.setHours(startHour ?? 0, startMinute ?? 0, 0, 0);
+      startIso = startDate.toISOString();
+
+      if (payload.endTime) {
+        const endDate = new Date(payload.date);
+        const [endHour, endMinute] = payload.endTime.split(":").map(Number);
+        endDate.setHours(endHour ?? 0, endMinute ?? 0, 0, 0);
+        endIso = endDate.toISOString();
+      }
+    }
+
+    try {
+      await createSchedule(calendarId, {
+        title: payload.title,
+        startTime: startIso,
+        endTime: endIso,
+        memo: payload.memo,
+        location: payload.location,
+        isAllDay: payload.isAllDay,
+      });
+      toast.success("予定を追加しました", {
+        description: payload.title,
+      });
+      onScheduleCreated?.();
+    } catch (err) {
+      console.error("Failed to create schedule:", err);
+      toast.error("予定の追加に失敗しました");
+    }
+  };
+
   return (
     <Card
       className={cn(
@@ -409,10 +486,11 @@ function BoardArea({
           items={boardItems}
           isLoading={isLoading}
           errorMessage={error ? "予定を取得できませんでした" : undefined}
-          emptyMessage="予定がありません。"
+          emptyMessage="予定がありません。セルをダブルクリックして追加できます。"
           className="flex h-full min-h-0 flex-col"
           baseDate={viewDate}
           onSelectItem={handleSelectItem}
+          onCreateItem={handleCreateItem}
         />
       </CardContent>
       {selectedItem ? (
@@ -420,6 +498,17 @@ function BoardArea({
           item={selectedItem}
           isOpen
           onClose={handleCloseDialog}
+        />
+      ) : null}
+      {createDialogDate ? (
+        <SingleCreateScheduleDialog
+          date={createDialogDate}
+          isOpen
+          onClose={handleCloseCreateDialog}
+          calendarId={calendarId}
+          calendarName={calendarName}
+          calendarColor={calendarColor}
+          onConfirm={handleCreateConfirm}
         />
       ) : null}
     </Card>

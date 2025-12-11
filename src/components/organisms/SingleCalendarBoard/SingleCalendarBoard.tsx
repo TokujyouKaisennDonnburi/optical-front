@@ -39,6 +39,8 @@ export type SingleCalendarBoardProps = {
   baseDate?: Date;
   /** アイテム選択時のコールバック */
   onSelectItem?: (item: SingleCalendarBoardItem) => void;
+  /** 新規予定作成時のコールバック (日付セルクリック時) */
+  onCreateItem?: (date: Date) => void;
 };
 
 type CalendarCell = {
@@ -81,6 +83,7 @@ export function SingleCalendarBoard({
   className,
   baseDate,
   onSelectItem,
+  onCreateItem,
 }: SingleCalendarBoardProps) {
   const effectiveBaseDate = useMemo(() => {
     if (baseDate) {
@@ -120,15 +123,34 @@ export function SingleCalendarBoard({
                   const events = eventsByDay.get(cell.key) ?? [];
                   const isWeekend = cell.weekday >= 5;
 
+                  const handleCellDoubleClick = () => {
+                    if (onCreateItem && cell.isCurrentMonth) {
+                      onCreateItem(cell.date);
+                    }
+                  };
+
                   return (
+                    // biome-ignore lint/a11y/noStaticElementInteractions: カレンダーセルはダブルクリックで予定作成が可能
                     <div
                       key={cell.key}
+                      role={
+                        onCreateItem && cell.isCurrentMonth
+                          ? "button"
+                          : undefined
+                      }
+                      tabIndex={
+                        onCreateItem && cell.isCurrentMonth ? 0 : undefined
+                      }
                       className={cn(
                         "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden bg-slate-950/40 p-0.5 transition-colors",
                         !cell.isCurrentMonth &&
                           "bg-slate-950/10 text-muted-foreground/70",
                         isWeekend && cell.isCurrentMonth && "bg-slate-950/55",
+                        onCreateItem &&
+                          cell.isCurrentMonth &&
+                          "cursor-pointer hover:bg-slate-800/50",
                       )}
+                      onDoubleClick={handleCellDoubleClick}
                     >
                       {cell.isToday ? (
                         <span
