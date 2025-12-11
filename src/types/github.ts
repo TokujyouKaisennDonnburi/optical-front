@@ -142,3 +142,8 @@ export type TeamReviewLoadOptionProps = {
   /** レビュアー変更時のコールバック */
   onReviewerChange?: (payload: ChangeReviewerRequest) => void;
 };
+
+export type GithubOauthRequest = {
+  code: string;
+  state: string;
+};
