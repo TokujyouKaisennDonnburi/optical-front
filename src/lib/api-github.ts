@@ -2,11 +2,16 @@ import { apiGet, apiPost } from "@/lib/api-client";
 import type {
   ChangeReviewerRequest,
   GitHubReviewOptionsResponse,
+  GithubAppInstallRequest,
   GithubOauthRequest,
 } from "@/types/github";
 
 export async function postGithubOauth(payload: GithubOauthRequest) {
-  return apiPost("/auth/github/link", payload);
+  return apiPost("/github/oauth/link", payload);
+}
+
+export async function postGithubAppInstall(payload: GithubAppInstallRequest) {
+  return apiPost("/github/apps/install", payload);
 }
 
 export async function getGitHubReviewOptions() {
