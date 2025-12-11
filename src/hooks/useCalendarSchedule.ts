@@ -14,10 +14,10 @@ export function useCalendarSchedule(calendarId: string) {
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const refresh = useCallback(() => {
-    setIsLoading(true);
-    setError(null);
+    setRefreshTrigger((prev) => prev + 1);
   }, []);
 
   // カレンダー詳細と customOptions を取得
@@ -47,6 +47,7 @@ export function useCalendarSchedule(calendarId: string) {
   }, [calendarId]);
 
   // スケジュールを取得してカレンダーIDでフィルタリング
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refreshTriggerの変更で再取得をトリガーする
   useEffect(() => {
     let isMounted = true;
 
@@ -83,7 +84,7 @@ export function useCalendarSchedule(calendarId: string) {
     return () => {
       isMounted = false;
     };
-  }, [calendarId]);
+  }, [calendarId, refreshTrigger]);
 
   // TodaySchedulePanelItem 形式に変換
   const items: TodaySchedulePanelItem[] = useMemo(() => {
