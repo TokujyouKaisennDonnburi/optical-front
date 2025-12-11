@@ -36,8 +36,10 @@ function HomeContent() {
     }
   }, [user, authLoading, router]);
 
+  const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
+
   const { items, calendars, dateLabel, isLoading, error, refresh } =
-    useSchedule();
+    useSchedule(viewDate);
 
   // URLパラメータでrefresh=trueが指定されている場合、データを再取得
   useEffect(() => {
@@ -54,7 +56,6 @@ function HomeContent() {
     router.replace,
   ]);
 
-  const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -363,6 +364,12 @@ function BoardArea({
   };
 
   const handleCreateItem = (date: Date) => {
+    if (calendars.length === 0) {
+      toast.info("まずはカレンダーを作成しましょう", {
+        description: "予定を追加するにはカレンダーが必要です",
+      });
+      return;
+    }
     setCreateDate(date);
   };
 

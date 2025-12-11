@@ -494,7 +494,7 @@ function CalendarSkeleton({ weeksCount = 5 }: { weeksCount?: number }) {
 
 function OverlayMessage({ message }: { message: string }) {
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <Text
         as="span"
         size="sm"

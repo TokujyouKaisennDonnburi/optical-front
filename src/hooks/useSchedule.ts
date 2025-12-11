@@ -6,11 +6,12 @@ import { getCalendarList } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
-export function useSchedule() {
+export function useSchedule(viewDate?: Date) {
   const [date, setDate] = useState<string | null>(null);
   const [calendars, setCalendars] = useState<CalendarDetail[]>([]);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -18,16 +19,24 @@ export function useSchedule() {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
-  // refreshTrigger で再取得させる。依存配列を維持するため lint を無視。
+  // viewDateから月のパラメータを生成
+  const monthParam = viewDate
+    ? `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`
+    : undefined;
+
+  // refreshTrigger または monthParam で再取得させる。
   // biome-ignore lint/correctness/useExhaustiveDependencies: refresh trigger to refetch
   useEffect(() => {
     let isMounted = true;
 
     const fetchSchedule = async () => {
-      setIsLoading(true);
+      // 初回ロード時のみスケルトンを表示
+      if (isInitialLoad) {
+        setIsLoading(true);
+      }
       setError(null);
       try {
-        const schedules = await getMonthSchedule();
+        const schedules = await getMonthSchedule(monthParam);
         if (isMounted) {
           setDate(schedules.date);
           setSchedules(schedules.items);
@@ -39,12 +48,16 @@ export function useSchedule() {
       } finally {
         if (isMounted) {
           setIsLoading(false);
+          setIsInitialLoad(false);
         }
       }
     };
 
     const fetchCalendars = async () => {
-      setIsLoading(true);
+      // 初回ロード時のみスケルトンを表示
+      if (isInitialLoad) {
+        setIsLoading(true);
+      }
       setError(null);
       try {
         const calendars = await getCalendarList();
@@ -58,6 +71,7 @@ export function useSchedule() {
       } finally {
         if (isMounted) {
           setIsLoading(false);
+          setIsInitialLoad(false);
         }
       }
     };
@@ -68,7 +82,7 @@ export function useSchedule() {
     return () => {
       isMounted = false;
     };
-  }, [refreshTrigger]);
+  }, [refreshTrigger, monthParam, isInitialLoad]);
 
   const items: TodaySchedulePanelItem[] = useMemo(() => {
     if (schedules.length === 0) return [];
