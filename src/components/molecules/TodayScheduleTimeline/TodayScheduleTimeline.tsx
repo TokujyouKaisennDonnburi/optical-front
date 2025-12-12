@@ -9,6 +9,10 @@ import { Separator } from "@/components/atoms/Separator";
 import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
+import {
+  AllDayEventCard,
+  isAllDayEvent,
+} from "@/components/molecules/AllDayEventCard";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
 import { cn } from "@/utils_constants_styles/utils";
 
@@ -117,23 +121,38 @@ export function TodayScheduleTimeline({
                     <HoverCardTrigger asChild>
                       <button
                         type="button"
-                        className="flex w-full min-w-0 items-center gap-2.5 rounded-md border border-border bg-background px-3 py-1.5 text-left text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className={cn(
+                          "flex w-full min-w-0 items-center gap-2.5 rounded-md px-0 py-0 text-left text-sm shadow-none hover:bg-transparent focus-visible:outline-none focus-visible:ring-0 border-0",
+                          isAllDayEvent(event.timeRange)
+                            ? "bg-transparent"
+                            : "bg-background border border-border px-3 py-1.5 shadow-sm hover:bg-accent",
+                        )}
                       >
-                        <ScheduleEventCard
-                          title={event.title}
-                          subtitle={
-                            event.timeRange
-                              ? event.timeRange.end
-                                ? `${event.timeRange.start} - ${event.timeRange.end}`
-                                : `${event.timeRange.start} 開始`
-                              : undefined
-                          }
-                          calendarColor={event.calendarColor}
-                          statusVariant={event.statusVariant}
-                          variant="timeline"
-                          className="flex-1"
-                          indicatorClassName="mt-0.5"
-                        />
+                        {isAllDayEvent(event.timeRange) ? (
+                          <AllDayEventCard
+                            title={event.title}
+                            subtitle="終日"
+                            calendarColor={event.calendarColor}
+                            variant="timeline"
+                            className="flex-1"
+                          />
+                        ) : (
+                          <ScheduleEventCard
+                            title={event.title}
+                            subtitle={
+                              event.timeRange
+                                ? event.timeRange.end
+                                  ? `${event.timeRange.start} - ${event.timeRange.end}`
+                                  : `${event.timeRange.start} 開始`
+                                : undefined
+                            }
+                            calendarColor={event.calendarColor}
+                            statusVariant={event.statusVariant}
+                            variant="timeline"
+                            className="flex-1"
+                            indicatorClassName="mt-0.5"
+                          />
+                        )}
                       </button>
                     </HoverCardTrigger>
                     <HoverCardContent
