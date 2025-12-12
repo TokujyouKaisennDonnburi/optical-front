@@ -2,6 +2,10 @@ import { useMemo } from "react";
 
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
+import {
+  AllDayEventCard,
+  isAllDayEventISO,
+} from "@/components/molecules/AllDayEventCard";
 import { CalendarGrid } from "@/components/molecules/CalendarGrid";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
 import { cn } from "@/utils_constants_styles/utils";
@@ -193,6 +197,12 @@ export function SingleCalendarBoard({
                             }
                           };
 
+                          // 終日イベントかどうか判定
+                          const isAllDay = isAllDayEventISO(
+                            event.item.start,
+                            event.item.end,
+                          );
+
                           return (
                             <button
                               key={event.id}
@@ -200,12 +210,21 @@ export function SingleCalendarBoard({
                               onClick={handleClick}
                               className="w-full cursor-pointer rounded-sm border border-transparent text-left transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                             >
-                              <ScheduleEventCard
-                                title={event.title}
-                                calendarColor={event.calendarColor}
-                                variant="compact"
-                                className="w-full"
-                              />
+                              {isAllDay ? (
+                                <AllDayEventCard
+                                  title={event.title}
+                                  calendarColor={event.calendarColor}
+                                  variant="compact"
+                                  className="w-full"
+                                />
+                              ) : (
+                                <ScheduleEventCard
+                                  title={event.title}
+                                  calendarColor={event.calendarColor}
+                                  variant="compact"
+                                  className="w-full"
+                                />
+                              )}
                             </button>
                           );
                         })}
