@@ -115,7 +115,7 @@ function CallbackPageContent() {
             </svg>
             <h2 className="text-2xl font-bold text-gray-900">認証中...</h2>
             <p className="text-gray-600">
-              Google認証を処理しています。しばらくお待ちください。
+              Githubアカウント認証を処理しています。しばらくお待ちください。
             </p>
           </>
         )}

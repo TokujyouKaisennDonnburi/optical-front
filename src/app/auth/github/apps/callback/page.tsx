@@ -48,7 +48,7 @@ function CallbackPageContent() {
           installationId: installationId,
           state: state,
         });
-        toast.success("GitHubでログインしました");
+        toast.success("GitHubをカレンダーに紐づけました");
         router.push("/");
       } catch (_) {
         toast.error("認証に失敗しました");
@@ -115,7 +115,7 @@ function CallbackPageContent() {
             </svg>
             <h2 className="text-2xl font-bold text-gray-900">認証中...</h2>
             <p className="text-gray-600">
-              Google認証を処理しています。しばらくお待ちください。
+              Github Appの認証を処理しています。しばらくお待ちください。
             </p>
           </>
         )}
