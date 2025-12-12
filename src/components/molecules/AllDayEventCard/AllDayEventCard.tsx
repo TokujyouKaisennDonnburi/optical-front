@@ -100,6 +100,7 @@ export const AllDayEventCard = forwardRef<HTMLDivElement, AllDayEventCardProps>(
             "px-2 py-1 text-sm border border-white/20 shadow-sm",
           roundedClass,
           className,
+          "transition-colors hover:brightness-110",
         )}
         style={{
           backgroundColor: calendarColor,
