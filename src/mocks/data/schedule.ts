@@ -481,7 +481,12 @@ function generateScheduleMockItems() {
       year += 1;
     }
 
-    items.push(...generateMonthlyItems(year, month));
+    items.push(
+      ...generateMonthlyItems(year, month).map((item) => ({
+        ...item,
+        isAllDay: false,
+      })),
+    );
   }
 
   return items;
@@ -497,8 +502,9 @@ const staticItems = [
     memo: "開発スプリント期間",
     location: "オンライン",
     status: "info" as const,
-    start: "2025-12-01T00:00:00+09:00",
-    end: "2025-12-14T23:59:59+09:00",
+    startAt: "2025-12-01T00:00:00+09:00",
+    endAt: "2025-12-14T23:59:59+09:00",
+    isAllDay: true,
     members: ["開発チーム"],
     calendarName: "開発チームカレンダー",
     calendarColor: "#22c55e",
@@ -510,9 +516,11 @@ const staticItems = [
     userId: "user-1",
     title: "年末年始休暇",
     memo: "全社休業",
+    location: "",
     status: "default" as const,
-    start: "2025-12-27T00:00:00+09:00",
-    end: "2026-01-06T23:59:59+09:00",
+    startAt: "2025-12-27T00:00:00+09:00",
+    endAt: "2026-01-06T23:59:59+09:00",
+    isAllDay: true,
     members: ["全社"],
     calendarName: "全社カレンダー",
     calendarColor: "#0ea5e9",
@@ -526,8 +534,9 @@ const staticItems = [
     memo: "海外出張",
     location: "サンフランシスコ",
     status: "warning" as const,
-    start: "2025-12-16T00:00:00+09:00",
-    end: "2025-12-20T23:59:59+09:00",
+    startAt: "2025-12-16T00:00:00+09:00",
+    endAt: "2025-12-20T23:59:59+09:00",
+    isAllDay: true,
     members: ["デザインチーム"],
     calendarName: "デザインチームカレンダー",
     calendarColor: "#f97316",

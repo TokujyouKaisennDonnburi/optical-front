@@ -46,7 +46,7 @@ export type CreateScheduleRequest = {
 };
 
 export type CreateScheduleResponse = {
-  item: ScheduleItem;
+  id: string;
 };
 
 export type CalendarListResponse = ScheduleCalendar[];
