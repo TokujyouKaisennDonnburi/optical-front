@@ -8,7 +8,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { postGithubOauth } from "@/lib/api-github";
+import { postGithubAppInstall, postGithubOauth } from "@/lib/api-github";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -22,6 +22,7 @@ function CallbackPageContent() {
     const handleCallback = async () => {
       const code = searchParams.get("code");
       const state = searchParams.get("state");
+      const installationId = searchParams.get("installation_id");
 
       if (!code) {
         const errorMessage = "認証コードが見つかりません";
@@ -43,16 +44,31 @@ function CallbackPageContent() {
         return;
       }
 
-      try {
-        await postGithubOauth({
-          code: code,
-          state: state,
-        });
-        toast.success("GitHubでログインしました");
-        router.push("/");
-      } catch (_) {
-        toast.error("認証に失敗しました");
-        router.push("/auth/login");
+      if (installationId) {
+        try {
+          await postGithubAppInstall({
+            code: code,
+            state: state,
+            installationId: installationId,
+          });
+          toast.success("カレンダーにGitHub組織を紐づけました");
+          router.push("/");
+        } catch (_) {
+          toast.error("認証に失敗しました");
+          router.push("/auth/login");
+        }
+      } else {
+        try {
+          await postGithubOauth({
+            code: code,
+            state: state,
+          });
+          toast.success("GitHubでログインしました");
+          router.push("/");
+        } catch (_) {
+          toast.error("認証に失敗しました");
+          router.push("/auth/login");
+        }
       }
     };
 

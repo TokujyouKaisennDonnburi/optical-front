@@ -149,6 +149,7 @@ export type GithubOauthRequest = {
 };
 
 export type GithubAppInstallRequest = {
-  installationId: string;
+  code: string;
   state: string;
+  installationId: string;
 };
