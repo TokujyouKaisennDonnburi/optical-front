@@ -32,6 +32,8 @@ function HomeContent() {
   // 認証チェック: 未認証の場合はランディングページにリダイレクト
   useEffect(() => {
     if (!authLoading && !user) {
+      console.log(authLoading);
+      console.log(user);
       router.push("/landing");
     }
   }, [user, authLoading, router]);

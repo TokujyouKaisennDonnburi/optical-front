@@ -3,8 +3,9 @@
  * JWT トークンの自動注入とエラーハンドリングを提供
  */
 
-import { getToken } from "@/lib/auth";
+import { getRefreshToken, getToken, saveToken } from "@/lib/auth";
 import type { ApiError } from "@/types/auth";
+import { postRefreshToken } from "./api-auth";
 
 /**
  * API のベース URL
@@ -47,6 +48,7 @@ export async function apiRequest<T>(
   endpoint: string,
   options: ApiRequestOptions = {},
   baseUrl?: string,
+  once?: boolean,
 ): Promise<T> {
   const { useAuth = true, headers = {}, ...fetchOptions } = options;
 
@@ -135,7 +137,19 @@ export async function apiRequest<T>(
   } catch (error) {
     // ネットワークエラーまたはその他のエラー
     if (error instanceof ApiClientError) {
-      throw error;
+      const refreshToken = getRefreshToken();
+      // 401のときにトークンをリフレッシュして再実行
+      if (!once && refreshToken && error.code === 401) {
+        try {
+          const refreshResponse = await postRefreshToken({
+            refreshToken: refreshToken,
+          });
+          saveToken(refreshResponse.accessToken);
+          return await apiRequest(endpoint, options, baseUrl, true);
+        } catch (e) {
+          console.log("refresh failed", e);
+        }
+      }
     }
 
     if (error instanceof TypeError) {

@@ -1,8 +1,10 @@
-import { apiGet, apiPost } from "@/lib/api-client";
+import { apiGet, apiPost, apiRequest, OPTICAL_API_URL } from "@/lib/api-client";
 import type {
   AuthResponse,
   LoginRequest,
   SignupRequest,
+  TokenRefreshRequest,
+  TokenRefreshResponse,
   User,
 } from "@/types/auth";
 
@@ -25,6 +27,19 @@ interface GitHubCallbackRequest {
 
 export async function fetchCurrentUser() {
   return apiGet<User>("/users/@me");
+}
+
+export async function postRefreshToken(credentials: TokenRefreshRequest) {
+  return apiRequest<TokenRefreshResponse>(
+    "/refresh",
+    {
+      useAuth: false,
+      method: "POST",
+      body: JSON.stringify(credentials),
+    },
+    OPTICAL_API_URL,
+    true,
+  );
 }
 
 export async function login(credentials: LoginRequest) {

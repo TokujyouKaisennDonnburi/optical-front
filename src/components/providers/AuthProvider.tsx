@@ -23,7 +23,12 @@ import {
   signup as requestSignup,
 } from "@/lib/api-auth";
 import { ApiClientError } from "@/lib/api-client";
-import { isAuthenticated, removeToken, saveToken } from "@/lib/auth";
+import {
+  isAuthenticated,
+  removeToken,
+  saveRefreshToken,
+  saveToken,
+} from "@/lib/auth";
 import type { LoginRequest, SignupRequest, User } from "@/types/auth";
 
 /**
@@ -126,6 +131,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // トークンとユーザー情報を保存
         saveToken(response.accessToken);
+        saveRefreshToken(response.refreshToken);
         setUser(response.user);
 
         toast.success("ログインしました");
