@@ -70,6 +70,7 @@ export const authHandlers = [
 
     const response: AuthResponse = {
       accessToken: token,
+      refreshToken: token,
       user: newUser,
     };
 
@@ -135,6 +136,7 @@ export const authHandlers = [
 
     const response: AuthResponse = {
       accessToken: token,
+      refreshToken: token,
       user,
     };
 
