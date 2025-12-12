@@ -53,7 +53,7 @@ export const LandingHeroV2 = () => {
             repeat: Number.POSITIVE_INFINITY,
             ease: "easeInOut",
           }}
-          className="absolute -top-[10%] -right-[10%] w-[50rem] h-[50rem] rounded-full bg-gradient-to-br from-primary/30 to-purple-500/30 blur-[7.5rem]"
+          className="absolute -top-[10%] -right-[10%] w-[50rem] h-[50rem] rounded-full bg-gradient-to-br from-primary/30 to-purple-500/30 blur-[120px]"
         />
         <motion.div
           animate={{
@@ -69,7 +69,7 @@ export const LandingHeroV2 = () => {
             ease: "easeInOut",
             delay: 2,
           }}
-          className="absolute top-[20%] -left-[10%] w-[37.5rem] h-[37.5rem] rounded-full bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 blur-[6.25rem]"
+          className="absolute top-[20%] -left-[10%] w-[37.5rem] h-[37.5rem] rounded-full bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 blur-[100px]"
         />
       </div>
 
