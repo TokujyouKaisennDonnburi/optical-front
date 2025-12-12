@@ -102,9 +102,6 @@ export const scheduleHandlers = [
       });
     } catch (_error) {
       console.log("[MSW] Token parse error, returning all data for user-1");
-      const userCalendars = scheduleMock.calendars.filter(
-        (calendar) => calendar.userId === "user-1",
-      );
       const userItems = scheduleMock.items.filter(
         (item) => item.userId === "user-1",
       );
@@ -125,7 +122,6 @@ export const scheduleHandlers = [
       });
     }
   }),
-
 
   http.get("http://localhost:8000/calendars", ({ request }) => {
     console.log("[MSW] GET /calendars - returning all mock data for debugging");
@@ -305,7 +301,9 @@ export const scheduleHandlers = [
 
         if (payload.exp && payload.exp * 1000 < Date.now()) {
           return HttpResponse.json(
-            { error: { code: 401, message: "トークンの有効期限が切れています" } },
+            {
+              error: { code: 401, message: "トークンの有効期限が切れています" },
+            },
             { status: 401 },
           );
         }
