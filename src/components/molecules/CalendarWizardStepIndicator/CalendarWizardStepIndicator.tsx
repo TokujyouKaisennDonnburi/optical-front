@@ -25,7 +25,7 @@ export function CalendarWizardStepIndicator({
           <li
             key={step.label}
             className={cn(
-              "flex min-w-[180px] flex-1 items-center gap-2 rounded-lg px-3 py-2",
+              "flex min-w-[11.25rem] flex-1 items-center gap-2 rounded-lg px-3 py-2",
               isCompleted
                 ? "bg-primary/5 text-foreground"
                 : isActive

@@ -75,7 +75,7 @@ export function GeneralSearchHeader({
     <div className="space-y-4">
       <div className="flex gap-2 items-center">
         {/* 検索バー */}
-        <div className="w-[500px]">
+        <div className="w-[31.25rem]">
           <SearchInput
             value={search}
             onChange={handleSearchChange}
@@ -85,7 +85,7 @@ export function GeneralSearchHeader({
         </div>
 
         {/* カレンダーフィルター */}
-        <div className="w-[190px]">
+        <div className="w-[11.875rem]">
           <MultiSelectDropdown
             options={availableCalendars}
             placeholder="カレンダーの指定"
@@ -95,7 +95,7 @@ export function GeneralSearchHeader({
         </div>
 
         {/* 期間フィルター */}
-        <div className="w-[140px]">
+        <div className="w-[8.75rem]">
           <DateSelector
             placeholder="年月の指定"
             value={date}

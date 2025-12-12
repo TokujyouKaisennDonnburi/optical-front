@@ -162,7 +162,7 @@ export function PullRequestReviewOption({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <div
-                        className="overflow-hidden max-w-[160px]"
+                        className="overflow-hidden max-w-[10rem]"
                         ref={(el) => registerElement(pr.id, el)}
                       >
                         <span className="marquee-text inline-block text-sm font-medium whitespace-nowrap text-white">

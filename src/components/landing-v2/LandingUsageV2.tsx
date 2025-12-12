@@ -38,7 +38,7 @@ export const LandingUsageV2 = () => {
       className="py-32 relative overflow-hidden bg-background"
     >
       {/* Connecting Line */}
-      <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-border to-transparent hidden md:block" />
+      <div className="absolute left-1/2 top-0 bottom-0 w-[0.125rem] bg-gradient-to-b from-transparent via-border to-transparent hidden md:block" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-24">

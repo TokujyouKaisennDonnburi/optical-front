@@ -84,7 +84,7 @@ export function SelectCalendarCard({
       onClick={onClick}
       disabled={onClick == null}
       className={cn(
-        "group relative min-w-[160px] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-background/90 p-0 text-left shadow-sm transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-default",
+        "group relative min-w-[10rem] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-background/90 p-0 text-left shadow-sm transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-default",
         className,
       )}
       style={{ borderColor: accentBorder }}
@@ -151,7 +151,7 @@ export function SelectCalendarAddCard({
   return (
     <Card
       className={cn(
-        "relative min-w-[160px] flex-shrink-0 overflow-hidden rounded-lg border bg-muted/50 p-0 transition-colors hover:border-primary/50",
+        "relative min-w-[10rem] flex-shrink-0 overflow-hidden rounded-lg border bg-muted/50 p-0 transition-colors hover:border-primary/50",
         className,
       )}
     >

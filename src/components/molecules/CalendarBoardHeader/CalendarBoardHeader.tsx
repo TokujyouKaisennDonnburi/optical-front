@@ -40,7 +40,7 @@ export function CalendarBoardHeader({
         >
           <Icon icon={ChevronLeft} size="sm" />
         </Button>
-        <span className="min-w-[92px] text-center font-medium">
+        <span className="min-w-[5.75rem] text-center font-medium">
           {monthLabel}
         </span>
         <Button

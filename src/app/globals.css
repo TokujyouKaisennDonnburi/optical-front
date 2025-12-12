@@ -116,7 +116,19 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* 
+   * 1024px以上の画面幅でレスポンシブなフォントスケーリングを適用
+   * 基準: 1440px幅で16pxとなるようにし、画面幅に比例してスケール
+   * clamp()により最小14px、最大20pxに制限してアクセシビリティを確保
+   */
+  @media (min-width: 1024px) {
+    html {
+      font-size: clamp(0.875rem, calc(100vw * 16 / 1440), 1.25rem);
+    }
   }
 }

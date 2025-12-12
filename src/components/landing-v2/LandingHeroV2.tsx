@@ -53,7 +53,7 @@ export const LandingHeroV2 = () => {
             repeat: Number.POSITIVE_INFINITY,
             ease: "easeInOut",
           }}
-          className="absolute -top-[10%] -right-[10%] w-[800px] h-[800px] rounded-full bg-gradient-to-br from-primary/30 to-purple-500/30 blur-[120px]"
+          className="absolute -top-[10%] -right-[10%] w-[50rem] h-[50rem] rounded-full bg-gradient-to-br from-primary/30 to-purple-500/30 blur-[120px]"
         />
         <motion.div
           animate={{
@@ -69,7 +69,7 @@ export const LandingHeroV2 = () => {
             ease: "easeInOut",
             delay: 2,
           }}
-          className="absolute top-[20%] -left-[10%] w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 blur-[100px]"
+          className="absolute top-[20%] -left-[10%] w-[37.5rem] h-[37.5rem] rounded-full bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 blur-[100px]"
         />
       </div>
 
@@ -138,7 +138,7 @@ export const LandingHeroV2 = () => {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground/50"
       >
         <span className="text-xs uppercase tracking-[0.2em]">Scroll</span>
-        <div className="w-[1px] h-12 bg-gradient-to-b from-muted-foreground/50 to-transparent"></div>
+        <div className="w-px h-12 bg-gradient-to-b from-muted-foreground/50 to-transparent"></div>
       </motion.div>
 
       <DemoVideoModal

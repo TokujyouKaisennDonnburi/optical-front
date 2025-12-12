@@ -62,9 +62,9 @@ export const ScheduleEventCard = forwardRef<
         className={cn(
           "flex w-full min-w-0 items-center gap-0.5",
           isCompact &&
-            "border border-white/10 bg-white/[0.08] px-1 py-[1px] text-[9px] leading-tight text-white shadow-sm",
+            "border border-white/10 bg-white/[0.08] px-1 py-px text-[0.5625rem] leading-tight text-white shadow-sm",
           isSpan &&
-            "border-y border-white/10 bg-white/[0.08] px-1 py-[1px] text-[9px] leading-tight text-white shadow-sm",
+            "border-y border-white/10 bg-white/[0.08] px-1 py-px text-[0.5625rem] leading-tight text-white shadow-sm",
           !isCompact && !isSpan && "text-sm text-foreground",
           roundedClass,
           className,
@@ -98,7 +98,7 @@ export const ScheduleEventCard = forwardRef<
             className={cn(
               "block truncate",
               isCompact || isSpan
-                ? "text-[9px] leading-[1.2] text-white"
+                ? "text-[0.5625rem] leading-[1.2] text-white"
                 : "text-foreground",
               titleClassName,
             )}
@@ -110,7 +110,7 @@ export const ScheduleEventCard = forwardRef<
               as="span"
               size="sm"
               className={cn(
-                "block truncate text-[8px] leading-tight",
+                "block truncate text-[0.5rem] leading-tight",
                 isCompact || isSpan ? "text-white/70" : "text-muted-foreground",
                 subtitleClassName,
               )}

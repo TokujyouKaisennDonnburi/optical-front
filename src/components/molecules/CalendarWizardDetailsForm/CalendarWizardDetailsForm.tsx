@@ -140,11 +140,11 @@ export function CalendarWizardDetailsForm({
             className="sr-only"
             aria-describedby="calendar-image-hint"
           />
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)] lg:items-start">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(13.75rem,17.5rem)] lg:items-start">
             <div className="flex flex-col gap-3">
               <div
                 className={cn(
-                  "relative flex min-h-[220px] w-full overflow-hidden rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 text-center transition hover:border-primary/70 hover:bg-primary/5",
+                  "relative flex min-h-[13.75rem] w-full overflow-hidden rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 text-center transition hover:border-primary/70 hover:bg-primary/5",
                   imagePreviewUrl ? "border-primary/60 bg-background" : "",
                 )}
               >

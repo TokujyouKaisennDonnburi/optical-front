@@ -50,7 +50,7 @@ export function SingleSearchHeader({
   return (
     <div className="flex gap-2 items-center flex-1">
       {/* 検索バー */}
-      <div className="w-[400px]">
+      <div className="w-[25rem]">
         <SearchInput
           value={search}
           onChange={handleSearchChange}
@@ -60,7 +60,7 @@ export function SingleSearchHeader({
       </div>
 
       {/* 期間フィルター */}
-      <div className="w-[140px]">
+      <div className="w-[8.75rem]">
         <DateSelector
           placeholder="年月の指定"
           value={date}

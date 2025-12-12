@@ -10,7 +10,7 @@ interface DemoVideoModalProps {
 export const DemoVideoModal = ({ isOpen, onClose }: DemoVideoModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] p-0 bg-black/90 border-white/10 overflow-hidden">
+      <DialogContent className="sm:max-w-[50rem] p-0 bg-black/90 border-white/10 overflow-hidden">
         <div className="aspect-video w-full relative">
           {/* Placeholder for actual video source */}
           <div className="absolute inset-0 flex items-center justify-center text-white/50">

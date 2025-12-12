@@ -162,7 +162,7 @@ export function SingleCalendarBoard({
                           }}
                         />
                       ) : null}
-                      <div className="flex items-center justify-between text-[10px]">
+                      <div className="flex items-center justify-between text-[0.625rem]">
                         <span
                           className={cn(
                             "font-medium text-white/90",
@@ -176,7 +176,7 @@ export function SingleCalendarBoard({
                           {cell.date.getDate()}
                         </span>
                         {events.length ? (
-                          <span className="text-[10px] text-white/60">{`${events.length} 件`}</span>
+                          <span className="text-[0.625rem] text-white/60">{`${events.length} 件`}</span>
                         ) : null}
                       </div>
 
