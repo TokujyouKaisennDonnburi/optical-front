@@ -240,7 +240,7 @@ export function GeneralScheduleBoard({
                       {cell.isToday ? (
                         <span className="pointer-events-none absolute inset-0 rounded-sm bg-white/10" />
                       ) : null}
-                      <div className="flex items-center justify-between text-[10px]">
+                      <div className="flex items-center justify-between text-[0.625rem]">
                         <span
                           className={cn(
                             "font-medium text-white/90",
@@ -255,7 +255,7 @@ export function GeneralScheduleBoard({
                           )}
                         </span>
                         {events.length ? (
-                          <span className="text-[10px] text-white/60">{`${events.length} 件`}</span>
+                          <span className="text-[0.625rem] text-white/60">{`${events.length} 件`}</span>
                         ) : null}
                       </div>
 

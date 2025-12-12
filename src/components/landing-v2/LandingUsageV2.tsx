@@ -38,7 +38,7 @@ export const LandingUsageV2 = () => {
       className="py-32 relative overflow-hidden bg-background"
     >
       {/* Connecting Line */}
-      <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-border to-transparent hidden md:block" />
+      <div className="absolute left-1/2 top-0 bottom-0 w-[0.125rem] bg-gradient-to-b from-transparent via-border to-transparent hidden md:block" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-24">
@@ -92,7 +92,7 @@ export const LandingUsageV2 = () => {
                 {/* Icon/Visual Side */}
                 <div className="relative flex-shrink-0 z-10 group">
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${step.color} blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full`}
+                    className={`absolute inset-0 bg-gradient-to-br ${step.color} blur-[2.5rem] opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full`}
                   />
                   <div className="w-24 h-24 rounded-3xl bg-background border border-border flex items-center justify-center shadow-2xl relative z-10 group-hover:scale-110 transition-transform duration-500 ease-out">
                     <step.icon className={`w-10 h-10 text-primary`} />

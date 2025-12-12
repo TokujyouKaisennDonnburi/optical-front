@@ -17,7 +17,7 @@ export function CalendarGrid({ children, className }: CalendarGridProps) {
         className,
       )}
     >
-      <div className="grid grid-cols-7 border-b border-white/10 bg-white/5 text-[12px] uppercase tracking-wide text-muted-foreground">
+      <div className="grid grid-cols-7 border-b border-white/10 bg-white/5 text-xs uppercase tracking-wide text-muted-foreground">
         {WEEKDAYS.map((label, index) => (
           <div
             key={`weekday-${label}`}

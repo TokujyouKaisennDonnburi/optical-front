@@ -105,8 +105,8 @@ export const LandingFeatureV2 = () => {
       id="features"
     >
       {/* Decorative background blobs */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-400/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[31.25rem] h-[31.25rem] bg-blue-400/5 rounded-full blur-[6.25rem] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[31.25rem] h-[31.25rem] bg-purple-400/5 rounded-full blur-[6.25rem] pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-24">

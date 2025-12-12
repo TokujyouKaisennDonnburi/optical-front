@@ -201,7 +201,7 @@ export function AccountMenuItems({
                 className="w-full border rounded px-2 text-xs"
               />
               {emailError && (
-                <div className="mt-1 text-red-500 text-[10px] leading-none whitespace-nowrap">
+                <div className="mt-1 text-red-500 text-[0.625rem] leading-none whitespace-nowrap">
                   {emailError}
                 </div>
               )}
