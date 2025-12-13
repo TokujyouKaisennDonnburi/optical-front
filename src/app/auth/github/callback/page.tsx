@@ -10,7 +10,7 @@ import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { postGitHubCallback } from "@/lib/api-auth";
 import { postGithubAppInstall } from "@/lib/api-github";
-import { saveToken } from "@/lib/auth";
+import { saveRefreshToken, saveToken } from "@/lib/auth";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -67,8 +67,8 @@ function CallbackPageContent() {
             code: code,
             state: state,
           });
-          // トークンを保存
           saveToken(response.accessToken);
+          saveRefreshToken(response.refreshToken);
           toast.success("GitHubでログインしました");
           router.push("/");
         } catch (_) {
