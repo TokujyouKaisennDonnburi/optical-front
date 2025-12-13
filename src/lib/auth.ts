@@ -77,6 +77,14 @@ export function removeToken(): void {
 }
 
 /**
+ * localStorage から リフレッシュトークンを削除する
+ */
+export function removeRefreshToken(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
+/**
  * 現在のトークンが有効かチェックする
  *
  * @returns トークンが有効な場合は true
@@ -84,7 +92,7 @@ export function removeToken(): void {
 export function isAuthenticated(): boolean {
   const token = getToken();
   const refreshToken = getRefreshToken();
-  return isExpired(token) && isExpired(refreshToken);
+  return !isExpired(token) || !isExpired(refreshToken);
 }
 
 function isExpired(token: string | null): boolean {

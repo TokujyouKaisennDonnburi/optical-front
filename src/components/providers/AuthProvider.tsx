@@ -25,6 +25,7 @@ import {
 import { ApiClientError } from "@/lib/api-client";
 import {
   isAuthenticated,
+  removeRefreshToken,
   removeToken,
   saveRefreshToken,
   saveToken,
@@ -223,6 +224,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       // ローカルの認証状態をクリア
       removeToken();
+      removeRefreshToken();
       setUser(null);
       setIsLoading(false);
 

@@ -11,12 +11,14 @@ import { toast } from "sonner";
 import { postGitHubCallback } from "@/lib/api-auth";
 import { postGithubAppInstall } from "@/lib/api-github";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * OAuth コールバックページコンポーネント
  */
 function CallbackPageContent() {
   const router = useRouter();
+  const { refreshAuth } = useAuth();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +69,21 @@ function CallbackPageContent() {
             code: code,
             state: state,
           });
-          saveToken(response.accessToken);
-          saveRefreshToken(response.refreshToken);
-          toast.success("GitHubでログインしました");
-          router.push("/");
+          if (
+            response.accessToken.length === 0 ||
+            response.refreshToken.length === 0
+          ) {
+            // 既存ユーザーに紐づけ
+            toast.success("GitHubアカウントを紐づけました");
+            router.push("/");
+          } else {
+            // OAuthでログイン
+            saveToken(response.accessToken);
+            saveRefreshToken(response.refreshToken);
+            await refreshAuth();
+            toast.success("GitHubでログインしました");
+            router.push("/");
+          }
         } catch (_) {
           toast.error("認証に失敗しました");
           router.push("/auth/login");

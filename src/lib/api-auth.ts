@@ -63,7 +63,7 @@ export async function logout() {
  * @returns GitHub認証用のURL
  */
 export async function getGitHubAuthState() {
-  return apiPost<GitHubStateResponse>("/auth/github/state", undefined, {
+  return apiPost<GitHubStateResponse>("/github/oauth/create", undefined, {
     useAuth: false,
   });
 }
@@ -74,7 +74,7 @@ export async function getGitHubAuthState() {
  * @returns アクセストークンとリフレッシュトークン
  */
 export async function postGitHubCallback(payload: GitHubCallbackRequest) {
-  return apiPost<AuthResponse>("/auth/github/callback", payload, {
+  return apiPost<AuthResponse>("/github/oauth/link", payload, {
     useAuth: false,
   });
 }
