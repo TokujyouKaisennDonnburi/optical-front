@@ -1,4 +1,4 @@
-import { apiGet, apiPost, OPTICAL_API_URL } from "@/lib/api-client";
+import { apiGet, apiPost } from "@/lib/api-client";
 import type {
   CreateScheduleRequest,
   CreateScheduleResponse,
@@ -6,19 +6,11 @@ import type {
 } from "@/types/schedule";
 
 export async function getTodaySchedule() {
-  return apiGet<ScheduleApiResponse>(
-    "/events/todays",
-    undefined,
-    OPTICAL_API_URL,
-  );
+  return apiGet<ScheduleApiResponse>("/events/todays");
 }
 
 export async function getMonthSchedule(month?: string) {
-  return apiGet<ScheduleApiResponse>(
-    `/events/months?month=${month || ""}`,
-    undefined,
-    OPTICAL_API_URL,
-  );
+  return apiGet<ScheduleApiResponse>(`/events/months?month=${month || ""}`);
 }
 
 export async function createSchedule(
@@ -28,7 +20,5 @@ export async function createSchedule(
   return apiPost<CreateScheduleResponse>(
     `/calendars/${calendarId}/events`,
     body,
-    undefined,
-    OPTICAL_API_URL,
   );
 }
