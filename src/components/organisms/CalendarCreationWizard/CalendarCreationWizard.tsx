@@ -248,7 +248,7 @@ const createInitialState = (): CalendarCreationState => ({
   color: COLOR_OPTIONS[0],
   imageId: null,
   members: [createMemberInvite()],
-  selectedTemplateId: "engineer",
+  selectedTemplateId: null,
   customOptions: CUSTOM_OPTIONS_WITH_DEFAULT.reduce<Record<string, boolean>>(
     (acc, option) => {
       acc[option.id] = Boolean(option.defaultChecked);

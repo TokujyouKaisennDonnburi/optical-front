@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   CloudSun,
   Code2,
-  FileText,
   GitBranch,
   GitCommit,
   GitPullRequest,
@@ -18,7 +17,6 @@ import {
   HeartHandshake,
   Home,
   Image,
-  Inbox,
   Mail,
   MapPin,
   Rocket,
@@ -27,7 +25,7 @@ import {
   Timer,
   Trash2,
   UserCircle2,
-  Webhook,
+  Users,
   Zap,
 } from "@/components/ui/icons";
 import { cn } from "@/utils_constants_styles/utils";
@@ -61,20 +59,10 @@ export type CalendarWizardOptionsFormProps = {
 };
 
 const getOptionIcon = (id: string, category: string) => {
-  // Category specific defaults
-  if (category === "family") return UserCircle2;
-  if (category === "couple") return Heart;
-
-  // ID specific overrides
+  // ID specific icons take priority
   switch (id) {
     case "reminder_digest":
       return Mail;
-    case "task_inbox":
-      return Inbox;
-    case "weekly_report":
-      return FileText;
-    case "webhook":
-      return Webhook;
     case "git_integration":
       return GitBranch;
     case "pull_request_review_wait_count":
@@ -96,7 +84,7 @@ const getOptionIcon = (id: string, category: string) => {
     case "location_sharing":
       return MapPin;
     case "kids_schedule":
-      return CalendarDays;
+      return Users;
     case "anniversary_countdown":
       return Timer;
     case "date_suggestion":
@@ -108,6 +96,9 @@ const getOptionIcon = (id: string, category: string) => {
     case "weather_forecast":
       return CloudSun;
     default:
+      // Category-specific fallback
+      if (category === "family") return UserCircle2;
+      if (category === "couple") return Heart;
       return Zap;
   }
 };
@@ -164,12 +155,8 @@ export function CalendarWizardOptionsForm({
           <h2 className="text-xl font-bold tracking-tight">
             テンプレートを選択
           </h2>
-          <p className="text-muted-foreground">
-            チームやプロジェクトの目的に最適なプリセットを選んでください（任意）。
-            <br />
-            <span className="text-xs text-muted-foreground/80">
-              ※クリックで選択・解除できます。選択しない場合はゼロからカスタマイズ可能です。
-            </span>
+          <p className="text-muted-foreground text-sm">
+            チームやプロジェクトの目的に最適なプリセットを選んでください（任意）。クリックで選択・解除できます。
           </p>
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
