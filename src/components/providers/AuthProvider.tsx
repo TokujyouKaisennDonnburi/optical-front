@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import {
   AUTH_GOOGLE_LOGIN_URL,
   fetchCurrentUser,
+  getGitHubAuthState,
   login as requestLogin,
   logout as requestLogout,
   signup as requestSignup,
@@ -41,6 +42,8 @@ interface AuthContextType {
   signup: (data: SignupRequest) => Promise<void>;
   /** Google ログイン（リダイレクト） */
   loginWithGoogle: () => void;
+  /** GitHub ログイン（リダイレクト） */
+  loginWithGitHub: () => Promise<void>;
   /** ログアウト */
   logout: () => Promise<void>;
   /** 認証状態を再読み込み */
@@ -179,6 +182,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   /**
+   * GitHub ログイン（リダイレクト）
+   */
+  const loginWithGitHub = useCallback(async () => {
+    try {
+      // バックエンドからGitHub認証URLを取得
+      const response = await getGitHubAuthState();
+      // GitHub OAuth ページにリダイレクト
+      window.location.href = response.url;
+    } catch (err) {
+      console.error("GitHub認証URLの取得に失敗しました:", err);
+      toast.error("GitHub認証の開始に失敗しました");
+      // エラーを再スローして呼び出し側でキャッチできるようにする
+      throw err;
+    }
+  }, []);
+
+  /**
    * ログアウト処理
    */
   const logout = useCallback(async () => {
@@ -230,6 +250,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     signup,
     loginWithGoogle,
+    loginWithGitHub,
     logout,
     refreshAuth,
   };

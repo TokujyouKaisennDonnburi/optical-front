@@ -8,6 +8,7 @@ import { Calendar } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { GitHubLoginButton } from "@/components/atoms/GitHubLoginButton";
 import { GoogleLoginButton } from "@/components/atoms/GoogleLoginButton";
 import { Loading } from "@/components/atoms/Loading";
 import { LoginForm } from "@/components/molecules/LoginForm";
@@ -70,6 +71,9 @@ export default function LoginPage() {
 
           {/* Google ログイン */}
           <GoogleLoginButton />
+
+          {/* GitHub ログイン */}
+          <GitHubLoginButton />
 
           {/* フッター */}
           <p className="text-center text-sm text-gray-600">
