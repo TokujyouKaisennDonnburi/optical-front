@@ -39,7 +39,7 @@ type CalendarCreationState = {
   color: string;
   imageId: string | null;
   members: MemberInvite[];
-  selectedTemplateId: string;
+  selectedTemplateId: string | null;
   customOptions: Record<string, boolean>;
   useSolo: boolean;
 };
@@ -65,42 +65,42 @@ const COLOR_OPTIONS = [
 
 const TEMPLATE_OPTIONS: CalendarWizardTemplate[] = [
   {
-    id: "collaboration",
-    name: "コラボ",
-    badge: "チーム用",
-    description:
-      "共同で予定を作成し、コメントで調整できるスタート用テンプレート。",
+    id: "engineer",
+    name: "エンジニア",
+    badge: "Tech",
+    description: "開発サイクルとリリース管理に最適化されたテンプレート。",
     accentColor: "#a855f7",
     features: [
-      { label: "リアルタイム共同編集", included: true },
-      { label: "コメント・レビュー", included: true },
-      { label: "アクセス権限レベル", included: true },
-      { label: "高度な分析レポート", included: false },
-    ],
-  },
-  {
-    id: "dev",
-    name: "Dev",
-    description: "開発タスクとリリース予定を管理するチーム向け。",
-    accentColor: "#22c55e",
-    features: [
-      { label: "スプリントビュー", included: true },
       { label: "Git連携", included: true },
-      { label: "ベロシティレポート", included: false },
-      { label: "ステークホルダー共有", included: true },
+      { label: "レビュー負荷可視化", included: true },
+      { label: "スプリント管理", included: true },
+      { label: "リリース通知", included: true },
     ],
   },
   {
-    id: "full",
-    name: "フル",
-    badge: "推奨",
-    description: "ビジネス全体を一括で管理できるフル機能パック。",
-    accentColor: "#0ea5e9",
+    id: "family",
+    name: "ファミリー",
+    badge: "Home",
+    description: "家族の予定共有と家事分担をスムーズにするテンプレート。",
+    accentColor: "#f472b6",
     features: [
-      { label: "エグゼクティブダッシュボード", included: true },
-      { label: "マルチチーム権限", included: true },
-      { label: "外部顧客ポータル", included: true },
-      { label: "AI予測支援", included: true },
+      { label: "ゴミ出しリマインダー", included: true },
+      { label: "買い物リスト共有", included: true },
+      { label: "位置情報共有", included: true },
+      { label: "子供の予定管理", included: true },
+    ],
+  },
+  {
+    id: "couple",
+    name: "カップル",
+    badge: "Love",
+    description: "二人の大切な時間と思い出を共有するためのテンプレート。",
+    accentColor: "#ef4444",
+    features: [
+      { label: "デート調整", included: true },
+      { label: "記念日カウントダウン", included: true },
+      { label: "交換日記", included: true },
+      { label: "アルバム共有", included: true },
     ],
   },
 ];
@@ -108,41 +108,115 @@ const TEMPLATE_OPTIONS: CalendarWizardTemplate[] = [
 const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   CalendarWizardCustomOption & { defaultChecked?: boolean }
 > = [
+  // Generic
   {
     id: "reminder_digest",
-    label: "リマインダーサマリメール",
-    description:
-      "前日の夜に翌日の予定とタスクをまとめたサマリを自動送信します。",
+    label: "リマインダーサマリ",
+    description: "翌日の予定を毎晩通知します。",
+    category: "general",
     defaultChecked: true,
   },
   {
-    id: "task_inbox",
-    label: "インボックス連携",
-    description: "メールで受信したタスクを自動でカレンダーに追加します。",
+    id: "weather_forecast",
+    label: "天気予報連携",
+    description: "カレンダーに週間天気予報を表示します。",
+    category: "general",
   },
+
+  // Engineer
   {
-    id: "weekly_report",
-    label: "週次レポート",
-    description:
-      "チームメンバーの予定投入状況と主要な変更点を週に一度配信します。",
-  },
-  {
-    id: "webhook",
-    label: "Webhook連携",
-    description:
-      "他サービスとの自動連携用にカスタムWebhookを設定できるようにします。",
+    id: "git_integration",
+    label: "Git連携",
+    description: "GitHub/GitLabのコミット・PRをカレンダーに表示。",
+    category: "engineer",
   },
   {
     id: "pull_request_review_wait_count",
     label: "PRレビュー待ち件数",
-    description:
-      "GitHub連携により、あなたがレビュー待ちのPull Request件数をプレビューに表示します。",
+    description: "自分のレビュー待ちPR数を表示します。",
+    category: "engineer",
   },
   {
     id: "team_review_load",
     label: "チームレビュー負荷",
-    description:
-      "GitHub連携により、チームメンバーのレビュー負荷状況をプレビューに表示します。",
+    description: "チーム全体のレビュー状況を可視化します。",
+    category: "engineer",
+  },
+  {
+    id: "github_issues",
+    label: "Issue期限管理",
+    description: "担当Issueの期限をカレンダーに表示します。",
+    category: "engineer",
+  },
+  {
+    id: "sprint_management",
+    label: "スプリント管理",
+    description: "スプリントの開始・終了をカレンダーで管理。",
+    category: "engineer",
+  },
+  {
+    id: "release_notification",
+    label: "リリース通知",
+    description: "リリース予定日をチームに通知します。",
+    category: "engineer",
+  },
+
+  // Family
+  {
+    id: "garbage_reminder",
+    label: "ゴミ出し通知",
+    description: "燃えるゴミ・資源ゴミの日を前日に通知。",
+    category: "family",
+  },
+  {
+    id: "shopping_list",
+    label: "買い物リスト",
+    description: "切らした食材や日用品を家族で共有。",
+    category: "family",
+  },
+  {
+    id: "kids_pickup",
+    label: "送迎分担",
+    description: "保育園や習い事の送迎担当を管理。",
+    category: "family",
+  },
+  {
+    id: "location_sharing",
+    label: "位置情報共有",
+    description: "家族の現在地をリアルタイムで共有。",
+    category: "family",
+  },
+  {
+    id: "kids_schedule",
+    label: "子供の予定管理",
+    description: "子供の学校行事や習い事を一元管理。",
+    category: "family",
+  },
+
+  // Couple
+  {
+    id: "anniversary_countdown",
+    label: "記念日カウント",
+    description: "付き合ってからの日数を表示します。",
+    category: "couple",
+  },
+  {
+    id: "date_suggestion",
+    label: "デートプラン提案",
+    description: "週末のデートスポットをAIが提案。",
+    category: "couple",
+  },
+  {
+    id: "exchange_diary",
+    label: "交換日記",
+    description: "1日1言、お互いへのメッセージを記録。",
+    category: "couple",
+  },
+  {
+    id: "album_sharing",
+    label: "アルバム共有",
+    description: "二人の写真を共有アルバムで管理。",
+    category: "couple",
   },
 ];
 
@@ -174,7 +248,7 @@ const createInitialState = (): CalendarCreationState => ({
   color: COLOR_OPTIONS[0],
   imageId: null,
   members: [createMemberInvite()],
-  selectedTemplateId: TEMPLATE_OPTIONS[0]?.id ?? "collaboration",
+  selectedTemplateId: "engineer",
   customOptions: CUSTOM_OPTIONS_WITH_DEFAULT.reduce<Record<string, boolean>>(
     (acc, option) => {
       acc[option.id] = Boolean(option.defaultChecked);
@@ -283,7 +357,7 @@ export function CalendarCreationWizard() {
     }));
   };
 
-  const handleSelectTemplate = (templateId: string) => {
+  const handleSelectTemplate = (templateId: string | null) => {
     setState((prev) => ({
       ...prev,
       selectedTemplateId: templateId,
@@ -343,9 +417,9 @@ export function CalendarCreationWizard() {
           member.email.trim() && EMAIL_REGEX.test(member.email.trim()),
       );
 
-    const templateExists = TEMPLATE_OPTIONS.some(
-      (item) => item.id === state.selectedTemplateId,
-    );
+    const templateExists =
+      state.selectedTemplateId === null ||
+      TEMPLATE_OPTIONS.some((item) => item.id === state.selectedTemplateId);
 
     return {
       0: hasValidName && hasColor,
