@@ -8,7 +8,9 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { postGithubAppInstall, postGithubOauth } from "@/lib/api-github";
+import { postGitHubCallback } from "@/lib/api-auth";
+import { postGithubAppInstall } from "@/lib/api-github";
+import { saveToken } from "@/lib/auth";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -44,6 +46,7 @@ function CallbackPageContent() {
         return;
       }
 
+      // GitHub App インストール（既存ユーザーがGitHub組織を連携する場合）
       if (installationId) {
         try {
           await postGithubAppInstall({
@@ -58,11 +61,14 @@ function CallbackPageContent() {
           router.push("/auth/login");
         }
       } else {
+        // GitHub OAuth ログイン/登録
         try {
-          await postGithubOauth({
+          const response = await postGitHubCallback({
             code: code,
             state: state,
           });
+          // トークンを保存
+          saveToken(response.accessToken);
           toast.success("GitHubでログインしました");
           router.push("/");
         } catch (_) {
