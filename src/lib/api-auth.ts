@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiRequest, OPTICAL_API_URL } from "@/lib/api-client";
+import { apiGet, apiPost, apiRequest } from "@/lib/api-client";
 import type {
   AuthResponse,
   LoginRequest,
@@ -37,7 +37,6 @@ export async function postRefreshToken(credentials: TokenRefreshRequest) {
       method: "POST",
       body: JSON.stringify(credentials),
     },
-    OPTICAL_API_URL,
     true,
   );
 }

@@ -47,7 +47,6 @@ interface ApiRequestOptions extends RequestInit {
 export async function apiRequest<T>(
   endpoint: string,
   options: ApiRequestOptions = {},
-  baseUrl?: string,
   once?: boolean,
 ): Promise<T> {
   const { useAuth = true, headers = {}, ...fetchOptions } = options;
@@ -73,7 +72,7 @@ export async function apiRequest<T>(
 
   // リクエストの実行
   try {
-    const url = `${baseUrl || API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     console.log("[API Client] Sending request:", {
       url,
       method: fetchOptions.method || "GET",
@@ -145,7 +144,7 @@ export async function apiRequest<T>(
             refreshToken: refreshToken,
           });
           saveToken(refreshResponse.accessToken);
-          return await apiRequest(endpoint, options, baseUrl, true);
+          return await apiRequest(endpoint, options, true);
         } catch (e) {
           console.log("refresh failed", e);
         }
@@ -174,16 +173,11 @@ export async function apiRequest<T>(
 export async function apiGet<T>(
   endpoint: string,
   options?: ApiRequestOptions,
-  baseUrl?: string,
 ): Promise<T> {
-  return apiRequest<T>(
-    endpoint,
-    {
-      ...options,
-      method: "GET",
-    },
-    baseUrl,
-  );
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "GET",
+  });
 }
 
 /**
@@ -193,15 +187,10 @@ export async function apiPost<T>(
   endpoint: string,
   body?: unknown,
   options?: ApiRequestOptions,
-  baseUrl?: string,
 ): Promise<T> {
-  return apiRequest<T>(
-    endpoint,
-    {
-      ...options,
-      method: "POST",
-      body: body ? JSON.stringify(body) : undefined,
-    },
-    baseUrl,
-  );
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "POST",
+    body: body ? JSON.stringify(body) : undefined,
+  });
 }

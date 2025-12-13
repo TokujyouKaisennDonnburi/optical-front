@@ -8,10 +8,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import { postGitHubCallback } from "@/lib/api-auth";
 import { postGithubAppInstall } from "@/lib/api-github";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
-import { useAuth } from "@/hooks/useAuth";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -92,7 +92,7 @@ function CallbackPageContent() {
     };
 
     void handleCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, refreshAuth]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
