@@ -27,8 +27,13 @@ export function GitHubLoginButton({
 
   const handleClick = async () => {
     setIsLoading(true);
-    await loginWithGitHub();
-    // リダイレクトされるので、ローディング状態はそのまま
+    try {
+      await loginWithGitHub();
+      // リダイレクトされるので、ローディング状態はそのまま
+    } catch {
+      // エラー時はローディング状態をリセット
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -193,6 +193,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (err) {
       console.error("GitHub認証URLの取得に失敗しました:", err);
       toast.error("GitHub認証の開始に失敗しました");
+      // エラーを再スローして呼び出し側でキャッチできるようにする
+      throw err;
     }
   }, []);
 
