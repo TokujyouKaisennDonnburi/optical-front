@@ -2,11 +2,11 @@ import { useMemo } from "react";
 
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
-import {
-  AllDayEventCard,
-  isAllDayEventISO,
-} from "@/components/molecules/AllDayEventCard";
 import { CalendarGrid } from "@/components/molecules/CalendarGrid";
+import {
+  CalendarFullDayEventCard,
+  isFullDayEventISO,
+} from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
 import { cn } from "@/utils_constants_styles/utils";
 import styles from "./SingleCalendarBoard.module.css";
@@ -198,7 +198,7 @@ export function SingleCalendarBoard({
                           };
 
                           // 終日イベントかどうか判定
-                          const isAllDay = isAllDayEventISO(
+                          const isAllDay = isFullDayEventISO(
                             event.item.start,
                             event.item.end,
                           );
@@ -211,10 +211,9 @@ export function SingleCalendarBoard({
                               className="w-full cursor-pointer rounded-sm border border-transparent text-left transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                             >
                               {isAllDay ? (
-                                <AllDayEventCard
+                                <CalendarFullDayEventCard
                                   title={event.title}
                                   calendarColor={event.calendarColor}
-                                  variant="compact"
                                   className="w-full"
                                 />
                               ) : (

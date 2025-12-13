@@ -10,9 +10,9 @@ import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
 import {
-  AllDayEventCard,
-  isAllDayEvent,
-} from "@/components/molecules/AllDayEventCard";
+  isFullDayEvent,
+  TimelineFullDayEventCard,
+} from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
 import { cn } from "@/utils_constants_styles/utils";
 
@@ -123,17 +123,16 @@ export function TodayScheduleTimeline({
                         type="button"
                         className={cn(
                           "flex w-full min-w-0 items-center gap-2.5 rounded-md px-0 py-0 text-left text-sm shadow-none hover:bg-transparent focus-visible:outline-none focus-visible:ring-0 border-0",
-                          isAllDayEvent(event.timeRange)
+                          isFullDayEvent(event.timeRange)
                             ? "bg-transparent"
                             : "bg-background border border-border px-3 py-1.5 shadow-sm hover:bg-accent",
                         )}
                       >
-                        {isAllDayEvent(event.timeRange) ? (
-                          <AllDayEventCard
+                        {isFullDayEvent(event.timeRange) ? (
+                          <TimelineFullDayEventCard
                             title={event.title}
                             subtitle="終日"
                             calendarColor={event.calendarColor}
-                            variant="timeline"
                             className="flex-1"
                           />
                         ) : (
