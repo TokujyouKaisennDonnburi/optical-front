@@ -1,5 +1,3 @@
-"use client";
-
 import { Check } from "lucide-react";
 
 import { cn } from "@/utils_constants_styles/utils";

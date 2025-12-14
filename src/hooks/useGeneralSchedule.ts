@@ -6,8 +6,7 @@ import { getCalendarList } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
-export function useSchedule(viewDate?: Date) {
-  const [date, setDate] = useState<string | null>(null);
+export function useGeneralSchedule(viewDate?: Date) {
   const [calendars, setCalendars] = useState<CalendarDetail[]>([]);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +32,6 @@ export function useSchedule(viewDate?: Date) {
     const fetchSchedule = async () => {
       const schedules = await getMonthSchedule(monthParam);
       if (isMounted) {
-        setDate(schedules.date);
         setSchedules(schedules.items);
       }
     };
@@ -96,15 +94,12 @@ export function useSchedule(viewDate?: Date) {
     });
   }, [schedules]);
 
-  const dateLabel = useMemo(() => {
-    const normalizedDate = date ? new Date(date) : new Date();
-    return new Intl.DateTimeFormat("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-    }).format(normalizedDate);
-  }, [date]);
+  const dateLabel = new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(new Date());
 
   return {
     items,
