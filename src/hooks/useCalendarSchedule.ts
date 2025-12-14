@@ -6,6 +6,14 @@ import { getCalendarDetail } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
+// 今日の日付ラベル（フック外で定義 - 毎回同じ値のためメモ化不要）
+const TODAY_DATE_LABEL = new Intl.DateTimeFormat("ja-JP", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  weekday: "short",
+}).format(new Date());
+
 /**
  * 単体カレンダーのスケジュールとオプションを取得するフック
  */
@@ -106,35 +114,21 @@ export function useCalendarSchedule(calendarId: string) {
     }));
   }, [scheduleItems]);
 
-  const dateLabel = useMemo(() => {
-    const date = new Date();
-    return new Intl.DateTimeFormat("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-    }).format(date);
-  }, []);
+  // 今日の日付ラベル（定数として定義済み）
+  const dateLabel = TODAY_DATE_LABEL;
 
-  // GitHub オプションの有無を判定
-  const hasGitHubOptions = useMemo(() => {
-    if (!calendar?.customOptions) return false;
-    return (
-      calendar.customOptions.includes("pull_request_review_wait_count") ||
-      calendar.customOptions.includes("team_review_load")
-    );
-  }, [calendar]);
+  // GitHub オプションの有無を判定（単純なincludes()なのでメモ化不要）
+  const hasGitHubOptions =
+    calendar?.customOptions?.includes("pull_request_review_wait_count") ||
+    calendar?.customOptions?.includes("team_review_load") ||
+    false;
 
-  const showPrReviewOption = useMemo(() => {
-    return (
-      calendar?.customOptions?.includes("pull_request_review_wait_count") ??
-      false
-    );
-  }, [calendar]);
+  const showPrReviewOption =
+    calendar?.customOptions?.includes("pull_request_review_wait_count") ??
+    false;
 
-  const showTeamReviewLoadOption = useMemo(() => {
-    return calendar?.customOptions?.includes("team_review_load") ?? false;
-  }, [calendar]);
+  const showTeamReviewLoadOption =
+    calendar?.customOptions?.includes("team_review_load") ?? false;
 
   return {
     calendar,

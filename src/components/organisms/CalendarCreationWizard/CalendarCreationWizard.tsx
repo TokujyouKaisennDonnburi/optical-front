@@ -429,24 +429,20 @@ export function CalendarCreationWizard() {
     setIsConfirmModalOpen(true);
   };
 
-  const selectedTemplate = useMemo(() => {
-    return TEMPLATE_OPTIONS.find(
-      (item) => item.id === state.selectedTemplateId,
-    );
-  }, [state.selectedTemplateId]);
+  // 小さな固定配列の検索なのでメモ化不要
+  const selectedTemplate = TEMPLATE_OPTIONS.find(
+    (item) => item.id === state.selectedTemplateId,
+  );
 
-  const activeCustomOptions = useMemo(() => {
-    return CUSTOM_OPTIONS_WITH_DEFAULT.filter(
-      (option) => state.customOptions[option.id],
-    ).map(({ id, label }) => ({ id, label }));
-  }, [state.customOptions]);
+  // 固定配列のフィルタリングなのでメモ化不要
+  const activeCustomOptions = CUSTOM_OPTIONS_WITH_DEFAULT.filter(
+    (option) => state.customOptions[option.id],
+  ).map(({ id, label }) => ({ id, label }));
 
-  const invitedMembersCount = useMemo(() => {
-    if (state.useSolo) {
-      return 0;
-    }
-    return state.members.filter((member) => member.email.trim()).length;
-  }, [state.members, state.useSolo]);
+  // 単純なカウントなのでメモ化不要
+  const invitedMembersCount = state.useSolo
+    ? 0
+    : state.members.filter((member) => member.email.trim()).length;
 
   if (isComplete) {
     return (
