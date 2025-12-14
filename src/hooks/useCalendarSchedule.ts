@@ -106,35 +106,27 @@ export function useCalendarSchedule(calendarId: string) {
     }));
   }, [scheduleItems]);
 
-  const dateLabel = useMemo(() => {
-    const date = new Date();
-    return new Intl.DateTimeFormat("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-    }).format(date);
-  }, []);
+  // 今日の日付ラベル（フック呼び出し時に現在の日付を取得）
+  const dateLabel = new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(new Date());
 
-  // GitHub オプションの有無を判定
-  const hasGitHubOptions = useMemo(() => {
-    if (!calendar?.customOptions) return false;
-    return (
-      calendar.customOptions.includes("pull_request_review_wait_count") ||
-      calendar.customOptions.includes("team_review_load")
-    );
-  }, [calendar]);
+  // GitHub オプションの有無を判定（単純なincludes()なのでメモ化不要）
+  // customOptionsを一時変数に格納して重複したプロパティアクセスを避ける
+  const customOptions = calendar?.customOptions;
+  const hasGitHubOptions =
+    customOptions?.includes("pull_request_review_wait_count") ||
+    customOptions?.includes("team_review_load") ||
+    false;
 
-  const showPrReviewOption = useMemo(() => {
-    return (
-      calendar?.customOptions?.includes("pull_request_review_wait_count") ??
-      false
-    );
-  }, [calendar]);
+  const showPrReviewOption =
+    customOptions?.includes("pull_request_review_wait_count") ?? false;
 
-  const showTeamReviewLoadOption = useMemo(() => {
-    return calendar?.customOptions?.includes("team_review_load") ?? false;
-  }, [calendar]);
+  const showTeamReviewLoadOption =
+    customOptions?.includes("team_review_load") ?? false;
 
   return {
     calendar,
