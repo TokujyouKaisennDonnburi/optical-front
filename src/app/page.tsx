@@ -20,7 +20,7 @@ import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/General
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useAuth } from "@/hooks/useAuth";
-import { useSchedule } from "@/hooks/useSchedule";
+import { useGeneralSchedule } from "@/hooks/useGeneralSchedule";
 import { createSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
@@ -40,8 +40,16 @@ function HomeContent() {
 
   const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
 
-  const { items, calendars, dateLabel, isLoading, error, refresh } =
-    useSchedule(viewDate);
+  // カレンダーグリッド用のスケジュール（viewDateに基づく）
+  const { items, calendars, isLoading, error, refresh } =
+    useGeneralSchedule(viewDate);
+
+  // 今日の予定パネル用のスケジュール（常に今日の月）
+  const {
+    items: todayMonthItems,
+    dateLabel,
+    isLoading: isTodayLoading,
+  } = useGeneralSchedule();
 
   // URLパラメータでrefresh=trueが指定されている場合、データを再取得
   useEffect(() => {
@@ -88,7 +96,8 @@ function HomeContent() {
     const todayEnd = new Date(todayStart);
     todayEnd.setDate(todayEnd.getDate() + 1);
 
-    return filteredItems.filter((item) => {
+    // 今日用のスケジュールからフィルタリング（カレンダーグリッドの月移動に影響されない）
+    return todayMonthItems.filter((item) => {
       const startsAt = item.startsAt ? new Date(item.startsAt) : null;
       const endsAt = item.endsAt ? new Date(item.endsAt) : null;
 
@@ -102,7 +111,7 @@ function HomeContent() {
 
       return rangeStart < todayEnd && rangeEnd >= todayStart;
     });
-  }, [filteredItems]);
+  }, [todayMonthItems]);
 
   const calendarOptions = useMemo(() => {
     return calendars.map((calendar) => ({
@@ -211,7 +220,7 @@ function HomeContent() {
           <TodaySchedulePanel
             header={boardHeader}
             items={todayItems}
-            isLoading={isLoading}
+            isLoading={isTodayLoading}
             emptyMessage={
               error ? "予定を取得できませんでした" : "今日の予定はありません。"
             }
@@ -271,8 +280,8 @@ function BoardArea({
   onRefresh,
 }: {
   className?: string;
-  items: ReturnType<typeof useSchedule>["items"];
-  calendars: ReturnType<typeof useSchedule>["calendars"];
+  items: ReturnType<typeof useGeneralSchedule>["items"];
+  calendars: ReturnType<typeof useGeneralSchedule>["calendars"];
   isLoading: boolean;
   error: Error | null;
   viewDate: Date;

@@ -27,7 +27,7 @@ import {
   SingleScheduleEventDialog,
 } from "@/components/organisms/SingleCalendarBoard";
 import { useAuth } from "@/hooks/useAuth";
-import { useCalendarSchedule } from "@/hooks/useCalendarSchedule";
+import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
 import { getGitHubReviewOptions } from "@/lib/api-github";
 import { createSchedule } from "@/lib/api-schedule";
 import type {
@@ -65,7 +65,7 @@ export function CalendarDetailClient({
     showPrReviewOption,
     showTeamReviewLoadOption,
     refresh,
-  } = useCalendarSchedule(calendarId);
+  } = useSingleCalendarSchedule(calendarId);
 
   // 検索機能
   const [searchTerm, setSearchTerm] = useState("");
@@ -303,7 +303,7 @@ function BoardArea({
 }: {
   className?: string;
   calendarId: string;
-  items: ReturnType<typeof useCalendarSchedule>["items"];
+  items: ReturnType<typeof useSingleCalendarSchedule>["items"];
   isLoading: boolean;
   error: Error | null;
   viewDate: Date;

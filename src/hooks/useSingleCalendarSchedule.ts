@@ -9,7 +9,7 @@ import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 /**
  * 単体カレンダーのスケジュールとオプションを取得するフック
  */
-export function useCalendarSchedule(calendarId: string) {
+export function useSingleCalendarSchedule(calendarId: string) {
   const [calendar, setCalendar] = useState<CalendarDetail | null>(null);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,8 +114,7 @@ export function useCalendarSchedule(calendarId: string) {
     weekday: "short",
   }).format(new Date());
 
-  // GitHub オプションの有無を判定（単純なincludes()なのでメモ化不要）
-  // customOptionsを一時変数に格納して重複したプロパティアクセスを避ける
+  // GitHub オプションの有無を判定
   const customOptions = calendar?.customOptions;
   const hasGitHubOptions =
     customOptions?.includes("pull_request_review_wait_count") ||
