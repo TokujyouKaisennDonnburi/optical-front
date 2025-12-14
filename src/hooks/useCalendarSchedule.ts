@@ -6,14 +6,6 @@ import { getCalendarDetail } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
-// 今日の日付ラベル（フック外で定義 - 毎回同じ値のためメモ化不要）
-const TODAY_DATE_LABEL = new Intl.DateTimeFormat("ja-JP", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  weekday: "short",
-}).format(new Date());
-
 /**
  * 単体カレンダーのスケジュールとオプションを取得するフック
  */
@@ -114,21 +106,27 @@ export function useCalendarSchedule(calendarId: string) {
     }));
   }, [scheduleItems]);
 
-  // 今日の日付ラベル（定数として定義済み）
-  const dateLabel = TODAY_DATE_LABEL;
+  // 今日の日付ラベル（フック呼び出し時に現在の日付を取得）
+  const dateLabel = new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(new Date());
 
   // GitHub オプションの有無を判定（単純なincludes()なのでメモ化不要）
+  // customOptionsを一時変数に格納して重複したプロパティアクセスを避ける
+  const customOptions = calendar?.customOptions;
   const hasGitHubOptions =
-    calendar?.customOptions?.includes("pull_request_review_wait_count") ||
-    calendar?.customOptions?.includes("team_review_load") ||
+    customOptions?.includes("pull_request_review_wait_count") ||
+    customOptions?.includes("team_review_load") ||
     false;
 
   const showPrReviewOption =
-    calendar?.customOptions?.includes("pull_request_review_wait_count") ??
-    false;
+    customOptions?.includes("pull_request_review_wait_count") ?? false;
 
   const showTeamReviewLoadOption =
-    calendar?.customOptions?.includes("team_review_load") ?? false;
+    customOptions?.includes("team_review_load") ?? false;
 
   return {
     calendar,
