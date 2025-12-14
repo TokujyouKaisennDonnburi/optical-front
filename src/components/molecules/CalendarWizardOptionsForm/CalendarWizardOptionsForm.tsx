@@ -1,7 +1,33 @@
 "use client";
 
-import { Check, Circle } from "lucide-react";
-
+import { Icon } from "@/components/atoms/Icon";
+import {
+  Activity,
+  Baby,
+  Calendar,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  CloudSun,
+  Code2,
+  GitBranch,
+  GitCommit,
+  GitPullRequest,
+  Heart,
+  HeartHandshake,
+  Home,
+  Image,
+  Mail,
+  MapPin,
+  Rocket,
+  ShoppingCart,
+  Star,
+  Timer,
+  Trash2,
+  UserCircle2,
+  Users,
+  Zap,
+} from "@/components/ui/icons";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type CalendarWizardTemplate = {
@@ -20,15 +46,81 @@ export type CalendarWizardCustomOption = {
   id: string;
   label: string;
   description: string;
+  category: "engineer" | "family" | "couple" | "general";
 };
 
 export type CalendarWizardOptionsFormProps = {
   templates: CalendarWizardTemplate[];
-  selectedTemplateId: string;
-  onSelectTemplate: (templateId: string) => void;
+  selectedTemplateId: string | null;
+  onSelectTemplate: (templateId: string | null) => void;
   customOptions: CalendarWizardCustomOption[];
   selectedCustomOptions: Record<string, boolean>;
   onToggleCustomOption: (optionId: string) => void;
+};
+
+const getOptionIcon = (id: string, category: string) => {
+  // ID specific icons take priority
+  switch (id) {
+    case "reminder_digest":
+      return Mail;
+    case "git_integration":
+      return GitBranch;
+    case "pull_request_review_wait_count":
+      return GitPullRequest;
+    case "team_review_load":
+      return Activity;
+    case "github_issues":
+      return GitCommit;
+    case "sprint_management":
+      return CalendarDays;
+    case "release_notification":
+      return Rocket;
+    case "garbage_reminder":
+      return Trash2;
+    case "shopping_list":
+      return ShoppingCart;
+    case "kids_pickup":
+      return Baby;
+    case "location_sharing":
+      return MapPin;
+    case "kids_schedule":
+      return Users;
+    case "anniversary_countdown":
+      return Timer;
+    case "date_suggestion":
+      return Star;
+    case "exchange_diary":
+      return HeartHandshake;
+    case "album_sharing":
+      return Image;
+    case "weather_forecast":
+      return CloudSun;
+    default:
+      // Category-specific fallback
+      if (category === "family") return UserCircle2;
+      if (category === "couple") return Heart;
+      return Zap;
+  }
+};
+
+const getTemplateIcon = (id: string) => {
+  switch (id) {
+    case "engineer":
+      return Code2;
+    case "family":
+      return Home;
+    case "couple":
+      return Heart;
+    default:
+      return Calendar;
+  }
+};
+
+const CATEGORY_LABELS = {
+  engineer: "エンジニア・開発",
+  family: "ファミリー・生活",
+  couple: "カップル・パートナー",
+  general: "一般・便利機能",
 };
 
 export function CalendarWizardOptionsForm({
@@ -39,117 +131,234 @@ export function CalendarWizardOptionsForm({
   selectedCustomOptions,
   onToggleCustomOption,
 }: CalendarWizardOptionsFormProps) {
+  // Group options by category
+  const groupedOptions = customOptions.reduce(
+    (acc, option) => {
+      const category = option.category || "general";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(option);
+      return acc;
+    },
+    {} as Record<string, CalendarWizardCustomOption[]>,
+  );
+
+  // Order of categories to display
+  const categoryOrder = ["engineer", "family", "couple", "general"];
+
   return (
-    <section className="space-y-6">
-      <header className="space-y-1">
-        <h2 className="text-lg font-semibold">オプション</h2>
-        <p className="text-sm text-muted-foreground">
-          テンプレートを選び、必要に応じて追加機能を選択します。
-        </p>
-      </header>
-      <div className="grid gap-3 lg:grid-cols-3">
-        {templates.map((template) => {
-          const isSelected = template.id === selectedTemplateId;
-          return (
-            <button
-              key={template.id}
-              type="button"
-              onClick={() => onSelectTemplate(template.id)}
-              className={cn(
-                "flex h-full flex-col gap-3 rounded-lg border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                isSelected
-                  ? "border-primary bg-primary/10"
-                  : "border-border hover:border-primary/40 hover:bg-primary/5",
-              )}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: template.accentColor }}
-                  />
-                  <span className="text-base font-semibold">
-                    {template.name}
-                  </span>
-                </div>
-                {template.badge ? (
-                  <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
-                    {template.badge}
-                  </span>
-                ) : null}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {template.description}
-              </p>
-              <ul className="space-y-1 text-sm">
-                {template.features.map((feature) => (
-                  <li
-                    key={`${template.id}-${feature.label}`}
-                    className="flex items-center gap-2"
-                  >
-                    {feature.included ? (
-                      <Check className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Circle className="h-4 w-4 text-muted-foreground" />
-                    )}
-                    <span
-                      className={
-                        feature.included
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      {feature.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </button>
-          );
-        })}
-      </div>
-      <div className="space-y-3 rounded-lg border border-border/70 bg-card p-4">
-        <div>
-          <h3 className="text-base font-semibold">カスタムオプション</h3>
-          <p className="text-sm text-muted-foreground">
-            必要な機能だけを選択できます。選択内容はいつでも変更できます。
+    <div className="space-y-10">
+      {/* Template Section */}
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">
+            テンプレートを選択
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            チームやプロジェクトの目的に最適なプリセットを選んでください（任意）。クリックで選択・解除できます。
           </p>
         </div>
-        <div className="space-y-2">
-          {customOptions.map((option) => {
-            const checked = Boolean(selectedCustomOptions[option.id]);
+        <div className="grid gap-4 lg:grid-cols-3">
+          {templates.map((template) => {
+            const isSelected = template.id === selectedTemplateId;
+            const TemplateIcon = getTemplateIcon(template.id);
+
             return (
               <button
-                key={option.id}
+                key={template.id}
                 type="button"
-                onClick={() => onToggleCustomOption(option.id)}
+                onClick={() =>
+                  onSelectTemplate(isSelected ? null : template.id)
+                }
                 className={cn(
-                  "flex w-full items-start gap-3 rounded-md border border-border bg-background px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                  checked ? "border-primary bg-primary/10" : "",
+                  "relative flex flex-col overflow-hidden rounded-xl border-2 p-5 text-left transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                  isSelected
+                    ? "scale-[1.02] border-primary bg-primary/5 shadow-md ring-1 ring-primary/20"
+                    : "border-border bg-card hover:border-primary/50 hover:bg-accent/50",
                 )}
-                aria-pressed={checked}
               >
-                <span
-                  className={cn(
-                    "mt-1 grid h-4 w-4 place-items-center rounded-sm border border-input",
-                    checked
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "bg-background text-transparent",
+                {isSelected && (
+                  <div className="absolute right-0 top-0 rounded-bl-xl bg-primary px-2 py-1 fade-in-0 zoom-in-95 animate-in duration-200">
+                    <Icon
+                      icon={CheckCircle2}
+                      size="sm"
+                      className="text-primary-foreground"
+                    />
+                  </div>
+                )}
+
+                <div className="mb-4 flex items-center justify-between">
+                  <div
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br shadow-inner transition-colors duration-200",
+                      isSelected ? "text-white" : "text-muted-foreground",
+                    )}
+                    style={{
+                      backgroundImage: isSelected
+                        ? `linear-gradient(135deg, ${template.accentColor}, ${template.accentColor}dd)`
+                        : "none",
+                      backgroundColor: isSelected
+                        ? undefined
+                        : "rgba(0,0,0,0.05)",
+                    }}
+                  >
+                    <Icon icon={TemplateIcon} size="lg" />
+                  </div>
+                  {template.badge && (
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-sm transition-colors duration-200",
+                        isSelected
+                          ? "bg-background text-foreground"
+                          : "bg-primary/10 text-primary",
+                      )}
+                    >
+                      {template.badge}
+                    </span>
                   )}
-                >
-                  <Check className="h-3 w-3" />
-                </span>
-                <span className="flex flex-col text-left">
-                  <span className="font-medium">{option.label}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {option.description}
-                  </span>
-                </span>
+                </div>
+
+                <div className="mb-2">
+                  <h3
+                    className={cn(
+                      "text-lg font-bold transition-colors duration-200",
+                      isSelected ? "text-primary" : "text-foreground",
+                    )}
+                  >
+                    {template.name}
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground/90 line-clamp-2 min-h-[2.5em]">
+                    {template.description}
+                  </p>
+                </div>
+
+                <div className="mt-auto space-y-2 pt-4">
+                  <div className="h-px w-full bg-border/50" />
+                  <ul className="space-y-1.5">
+                    {template.features.map((feature) => (
+                      <li
+                        key={`${template.id}-${feature.label}`}
+                        className="flex items-start gap-2"
+                      >
+                        <div className="mt-0.5 shrink-0">
+                          {feature.included ? (
+                            <Icon
+                              icon={Check}
+                              size={14}
+                              className="text-primary"
+                            />
+                          ) : (
+                            <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30 translate-y-1 translate-x-1" />
+                          )}
+                        </div>
+                        <span
+                          className={cn(
+                            "text-xs",
+                            feature.included
+                              ? "font-medium text-foreground"
+                              : "text-muted-foreground/60 line-through decoration-muted-foreground/40",
+                          )}
+                        >
+                          {feature.label}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </button>
             );
           })}
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Custom Options Section */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">
+            カスタムオプション
+          </h2>
+          <p className="text-muted-foreground">
+            ワークフローに合わせて機能を追加・カスタマイズできます。
+          </p>
+        </div>
+
+        {categoryOrder.map((category) => {
+          const options = groupedOptions[category];
+          if (!options || options.length === 0) return null;
+
+          return (
+            <div key={category} className="space-y-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                <span>
+                  {CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS]}
+                </span>
+                <span className="h-px flex-1 bg-border" />
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {options.map((option) => {
+                  const isChecked = Boolean(selectedCustomOptions[option.id]);
+                  const OptionIcon = getOptionIcon(option.id, option.category);
+
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => onToggleCustomOption(option.id)}
+                      className={cn(
+                        "group relative flex items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                        isChecked
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "border-border bg-card hover:border-primary/30 hover:bg-accent/30",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-200",
+                          isChecked
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : "bg-secondary text-muted-foreground group-hover:bg-secondary/80",
+                        )}
+                      >
+                        <Icon icon={OptionIcon} size="md" />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={cn(
+                              "font-semibold transition-colors",
+                              isChecked ? "text-primary" : "text-foreground",
+                            )}
+                          >
+                            {option.label}
+                          </span>
+                          <div
+                            className={cn(
+                              "h-5 w-9 shrink-0 rounded-full p-0.5 transition-colors duration-200",
+                              isChecked ? "bg-primary" : "bg-muted",
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200",
+                                isChecked ? "translate-x-4" : "translate-x-0",
+                              )}
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {option.description}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </section>
+    </div>
   );
 }
