@@ -3,8 +3,9 @@
  * JWT トークンの自動注入とエラーハンドリングを提供
  */
 
-import { getToken } from "@/lib/auth";
+import { getRefreshToken, getToken, saveToken } from "@/lib/auth";
 import type { ApiError } from "@/types/auth";
+import { postRefreshToken } from "./api-auth";
 
 /**
  * API のベース URL
@@ -46,7 +47,7 @@ interface ApiRequestOptions extends RequestInit {
 export async function apiRequest<T>(
   endpoint: string,
   options: ApiRequestOptions = {},
-  baseUrl?: string,
+  once?: boolean,
 ): Promise<T> {
   const { useAuth = true, headers = {}, ...fetchOptions } = options;
 
@@ -71,7 +72,7 @@ export async function apiRequest<T>(
 
   // リクエストの実行
   try {
-    const url = `${baseUrl || API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     console.log("[API Client] Sending request:", {
       url,
       method: fetchOptions.method || "GET",
@@ -135,7 +136,19 @@ export async function apiRequest<T>(
   } catch (error) {
     // ネットワークエラーまたはその他のエラー
     if (error instanceof ApiClientError) {
-      throw error;
+      const refreshToken = getRefreshToken();
+      // 401のときにトークンをリフレッシュして再実行
+      if (!once && refreshToken && error.code === 401) {
+        try {
+          const refreshResponse = await postRefreshToken({
+            refreshToken: refreshToken,
+          });
+          saveToken(refreshResponse.accessToken);
+          return await apiRequest(endpoint, options, true);
+        } catch (e) {
+          console.log("refresh failed", e);
+        }
+      }
     }
 
     if (error instanceof TypeError) {
@@ -160,16 +173,11 @@ export async function apiRequest<T>(
 export async function apiGet<T>(
   endpoint: string,
   options?: ApiRequestOptions,
-  baseUrl?: string,
 ): Promise<T> {
-  return apiRequest<T>(
-    endpoint,
-    {
-      ...options,
-      method: "GET",
-    },
-    baseUrl,
-  );
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "GET",
+  });
 }
 
 /**
@@ -179,15 +187,10 @@ export async function apiPost<T>(
   endpoint: string,
   body?: unknown,
   options?: ApiRequestOptions,
-  baseUrl?: string,
 ): Promise<T> {
-  return apiRequest<T>(
-    endpoint,
-    {
-      ...options,
-      method: "POST",
-      body: body ? JSON.stringify(body) : undefined,
-    },
-    baseUrl,
-  );
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "POST",
+    body: body ? JSON.stringify(body) : undefined,
+  });
 }

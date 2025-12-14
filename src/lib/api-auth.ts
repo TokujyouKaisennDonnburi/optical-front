@@ -1,8 +1,10 @@
-import { apiGet, apiPost } from "@/lib/api-client";
+import { apiGet, apiPost, apiRequest } from "@/lib/api-client";
 import type {
   AuthResponse,
   LoginRequest,
   SignupRequest,
+  TokenRefreshRequest,
+  TokenRefreshResponse,
   User,
 } from "@/types/auth";
 
@@ -27,6 +29,18 @@ export async function fetchCurrentUser() {
   return apiGet<User>("/users/@me");
 }
 
+export async function postRefreshToken(credentials: TokenRefreshRequest) {
+  return apiRequest<TokenRefreshResponse>(
+    "/refresh",
+    {
+      useAuth: false,
+      method: "POST",
+      body: JSON.stringify(credentials),
+    },
+    true,
+  );
+}
+
 export async function login(credentials: LoginRequest) {
   return apiPost<AuthResponse>("/login", credentials, {
     useAuth: false,
@@ -48,7 +62,7 @@ export async function logout() {
  * @returns GitHub認証用のURL
  */
 export async function getGitHubAuthState() {
-  return apiPost<GitHubStateResponse>("/auth/github/state", undefined, {
+  return apiPost<GitHubStateResponse>("/github/oauth/create", undefined, {
     useAuth: false,
   });
 }
@@ -59,7 +73,7 @@ export async function getGitHubAuthState() {
  * @returns アクセストークンとリフレッシュトークン
  */
 export async function postGitHubCallback(payload: GitHubCallbackRequest) {
-  return apiPost<AuthResponse>("/auth/github/callback", payload, {
+  return apiPost<AuthResponse>("/github/oauth/link", payload, {
     useAuth: false,
   });
 }

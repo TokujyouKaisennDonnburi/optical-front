@@ -8,15 +8,17 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import { postGitHubCallback } from "@/lib/api-auth";
 import { postGithubAppInstall } from "@/lib/api-github";
-import { saveToken } from "@/lib/auth";
+import { saveRefreshToken, saveToken } from "@/lib/auth";
 
 /**
  * OAuth コールバックページコンポーネント
  */
 function CallbackPageContent() {
   const router = useRouter();
+  const { refreshAuth } = useAuth();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +69,21 @@ function CallbackPageContent() {
             code: code,
             state: state,
           });
-          // トークンを保存
-          saveToken(response.accessToken);
-          toast.success("GitHubでログインしました");
-          router.push("/");
+          if (
+            response.accessToken.length === 0 ||
+            response.refreshToken.length === 0
+          ) {
+            // 既存ユーザーに紐づけ
+            toast.success("GitHubアカウントを紐づけました");
+            router.push("/");
+          } else {
+            // OAuthでログイン
+            saveToken(response.accessToken);
+            saveRefreshToken(response.refreshToken);
+            await refreshAuth();
+            toast.success("GitHubでログインしました");
+            router.push("/");
+          }
         } catch (_) {
           toast.error("認証に失敗しました");
           router.push("/auth/login");
@@ -79,7 +92,7 @@ function CallbackPageContent() {
     };
 
     void handleCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, refreshAuth]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

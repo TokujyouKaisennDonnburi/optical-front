@@ -21,6 +21,10 @@ export interface User {
   deleted_at?: string | null;
 }
 
+export interface TokenRefreshRequest {
+  refreshToken: string;
+}
+
 /**
  * ログインリクエスト
  */
@@ -49,8 +53,20 @@ export interface SignupRequest {
 export interface AuthResponse {
   /** JWT トークン */
   accessToken: string;
+  /** リフレッシュトークン */
+  refreshToken: string;
   /** ユーザー情報 */
   user: User;
+}
+
+/**
+ * 認証レスポンス
+ */
+export interface TokenRefreshResponse {
+  /** JWT トークン */
+  accessToken: string;
+  /** ユーザー情報 */
+  expiresIn: string;
 }
 
 /**
