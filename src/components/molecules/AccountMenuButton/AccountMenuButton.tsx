@@ -5,7 +5,7 @@ import { cn } from "@/utils_constants_styles/utils";
 // アカウントメニューボタンのプロパティ型
 export interface AccountMenuButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  avatarUrl?: string;
+  avatarUrl: string | null;
   name?: string;
   avatarSizeClass?: string;
 }

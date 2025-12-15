@@ -16,7 +16,7 @@ export interface AccountMenuProps {
     id: string;
     name: string;
     email: string;
-    iconUrl?: string;
+    avatarUrl: string | null;
   } | null;
   isLoading?: boolean;
   error?: Error | null;
@@ -89,7 +89,7 @@ export function AccountMenu({
       <DropdownMenuTrigger asChild>
         <AccountMenuButton
           name={user.name}
-          avatarUrl={user.iconUrl}
+          avatarUrl={user.avatarUrl}
           avatarSizeClass={avatarSizeClass}
         />
       </DropdownMenuTrigger>
@@ -108,7 +108,7 @@ export function AccountMenu({
           <AccountMenuItems
             name={user.name}
             email={user.email}
-            avatarUrl={user.iconUrl}
+            avatarUrl={user.avatarUrl}
             items={menuItems}
             onRequestEmailSave={onRequestEmailSave} // 親に渡す
             confirmSaveTrigger={confirmSaveTrigger}

@@ -13,7 +13,7 @@ const validateEmail = (email: string): boolean => {
 type AccountMenuItemsProps = {
   name: string;
   email: string;
-  avatarUrl?: string;
+  avatarUrl: string | null;
   items: {
     label: string;
     icon: React.ReactNode;
