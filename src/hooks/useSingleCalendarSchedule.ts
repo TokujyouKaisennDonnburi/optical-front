@@ -115,17 +115,29 @@ export function useSingleCalendarSchedule(calendarId: string) {
   }).format(new Date());
 
   // GitHub オプションの有無を判定
-  const customOptions = calendar?.options;
-  const hasGitHubOptions =
-    customOptions?.includes("pull_request_review_wait_count") ||
-    customOptions?.includes("team_review_load") ||
-    false;
+  const hasGitHubOptions = useMemo(() => {
+    if (!calendar?.customOptions) return false;
+    return (
+      calendar.customOptions.includes("pull_request_review_wait_count") ||
+      calendar.customOptions.includes("team_review_load") ||
+      calendar.customOptions?.includes("milestone_progress")
+    );
+  }, [calendar]);
 
-  const showPrReviewOption =
-    customOptions?.includes("pull_request_review_wait_count") ?? false;
+  const showPrReviewOption = useMemo(() => {
+    return (
+      calendar?.customOptions?.includes("pull_request_review_wait_count") ??
+      false
+    );
+  }, [calendar]);
 
-  const showTeamReviewLoadOption =
-    customOptions?.includes("team_review_load") ?? false;
+  const showTeamReviewLoadOption = useMemo(() => {
+    return calendar?.customOptions?.includes("team_review_load") ?? false;
+  }, [calendar]);
+
+  const showMilestoneProgressOption = useMemo(() => {
+    return calendar?.customOptions?.includes("milestone_progress") ?? false;
+  }, [calendar]);
 
   return {
     calendar,
@@ -137,6 +149,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
     hasGitHubOptions,
     showPrReviewOption,
     showTeamReviewLoadOption,
+    showMilestoneProgressOption,
   };
 }
 

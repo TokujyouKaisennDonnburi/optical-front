@@ -17,6 +17,7 @@ import { Loading } from "@/components/atoms/Loading";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
+import MilestoneProgressOption from "@/components/organisms/EngineerOption/MilestoneProgressOption";
 import { PullRequestReviewOption } from "@/components/organisms/EngineerOption/PullRequestReviewOption";
 import { TeamReviewLoadOption } from "@/components/organisms/EngineerOption/TeamReviewLoadOption";
 import { SingleSearchHeader } from "@/components/organisms/SearchHeader/SingleSearchHeader";
@@ -64,6 +65,7 @@ export function CalendarDetailClient({
     hasGitHubOptions,
     showPrReviewOption,
     showTeamReviewLoadOption,
+    showMilestoneProgressOption,
     refresh,
   } = useSingleCalendarSchedule(calendarId);
 
@@ -269,6 +271,12 @@ export function CalendarDetailClient({
                         )
                       }
                     />
+                  </div>
+                )}
+                {/* マイルストーン進捗オプション */}
+                {showMilestoneProgressOption && (
+                  <div className="flex-1 min-w-0 overflow-auto">
+                    <MilestoneProgressOption />
                   </div>
                 )}
               </>
