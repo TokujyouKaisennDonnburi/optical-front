@@ -230,11 +230,11 @@ export const scheduleHandlers = [
 
       // リクエストボディを取得
       const body = await request.json();
-      const { name, color, imageFileName, customOptions } = body as {
+      const { name, color, imageFileName, options } = body as {
         name: string;
         color: string;
         imageFileName?: string | null;
-        customOptions?: string[];
+        options?: string[];
       };
 
       // 新しいカレンダーを作成
@@ -243,9 +243,11 @@ export const scheduleHandlers = [
         name,
         color,
         userId,
-        customOptions: customOptions ?? [],
+        customOptions: options ?? [],
         ...(imageFileName && {
-          imageUrl: `https://images.unsplash.com/photo-${Math.random().toString(36).slice(2)}?auto=format&fit=crop&w=1200&q=80`,
+          imageUrl: `https://images.unsplash.com/photo-${Math.random()
+            .toString(36)
+            .slice(2)}?auto=format&fit=crop&w=1200&q=80`,
         }),
       };
 

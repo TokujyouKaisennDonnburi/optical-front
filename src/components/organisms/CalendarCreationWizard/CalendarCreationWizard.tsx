@@ -160,6 +160,13 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
     description: "リリース予定日をチームに通知します。",
     category: "engineer",
   },
+  {
+    id: "milestone_progress",
+    label: "マイルストーン進捗",
+    description:
+      "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
+    category: "engineer",
+  },
 
   // Family
   {

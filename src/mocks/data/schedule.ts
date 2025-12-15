@@ -565,6 +565,7 @@ export const calendars = [
       "webhook",
       "pull_request_review_wait_count",
       "team_review_load",
+      "milestone_progress",
     ],
   },
   {
