@@ -2,6 +2,7 @@ import { Pencil } from "lucide-react";
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
 import { DropdownMenuItem } from "@/components/atoms/DropdownMenu";
+import { updateUserProfile, uploadAvatarImage } from "@/lib/api-profile";
 
 // バリデーション関数
 const validateEmail = (email: string): boolean => {
@@ -98,29 +99,28 @@ export function AccountMenuItems({
   };
 
   // 保存処理 (名前やアバターが保存される)
-  const doSave = React.useCallback(() => {
+  const doSave = React.useCallback(async () => {
     // 保存後に元の値を更新
     originalNameRef.current = editedName;
     originalEmailRef.current = editedEmail;
     originalAvatarRef.current = editedAvatar;
 
-    // ここで実際の保存処理を実装
-    console.log("保存:", { editedName, editedEmail, editedAvatar });
+    await updateUserProfile({
+      name: editedName,
+      email: editedEmail,
+    });
 
     // 編集状態を解除
     setEditingField(null);
   }, [editedName, editedEmail, editedAvatar]);
 
   // アバター画像変更時の処理
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setEditedAvatar(reader.result as string); // 読み込んだ画像をステートにセット
-    };
-    reader.readAsDataURL(file); // 画像をDataURLとして読み込む
+    const response = await uploadAvatarImage(file);
+    setEditedAvatar(response.url);
   };
 
   React.useEffect(() => {
