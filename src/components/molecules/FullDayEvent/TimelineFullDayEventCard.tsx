@@ -93,7 +93,10 @@ export const TimelineFullDayEventCard = forwardRef<
             <Text
               as="span"
               weight="medium"
-              className={cn("block truncate text-white", titleClassName)}
+              className={cn(
+                "block truncate leading-normal text-white",
+                titleClassName,
+              )}
             >
               {title}
             </Text>
@@ -105,7 +108,7 @@ export const TimelineFullDayEventCard = forwardRef<
                 as="span"
                 size="sm"
                 className={cn(
-                  "block truncate text-white/90",
+                  "block truncate text-[0.5rem] leading-tight text-white/90",
                   subtitleClassName,
                 )}
               >
