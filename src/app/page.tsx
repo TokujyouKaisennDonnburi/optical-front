@@ -2,7 +2,13 @@
 
 import { CalendarDays } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { Card, CardContent } from "@/components/atoms/Card";
 import { Loading } from "@/components/atoms/Loading";
@@ -49,7 +55,14 @@ function HomeContent() {
     items: todayMonthItems,
     dateLabel,
     isLoading: isTodayLoading,
+    refresh: refreshToday,
   } = useGeneralSchedule();
+
+  // 両方のスケジュールを更新するための統合refresh関数
+  const handleRefreshAll = useCallback(() => {
+    refresh();
+    refreshToday();
+  }, [refresh, refreshToday]);
 
   // URLパラメータでrefresh=trueが指定されている場合、データを再取得
   useEffect(() => {
@@ -214,7 +227,7 @@ function HomeContent() {
           error={error}
           viewDate={viewDate}
           onChangeViewDate={handleViewDateChange}
-          onRefresh={refresh}
+          onRefresh={handleRefreshAll}
         />
         <div className="flex h-full w-full min-h-0 lg:col-start-2 lg:w-full lg:max-w-[32rem]">
           <TodaySchedulePanel
