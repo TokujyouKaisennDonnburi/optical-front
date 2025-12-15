@@ -4,6 +4,7 @@ import type {
   GitHubReviewOptionsResponse,
   GithubAppInstallRequest,
   GithubOauthRequest,
+  MilestoneProgressResponse,
 } from "@/types/github";
 
 export async function postGithubOauth(payload: GithubOauthRequest) {
@@ -20,4 +21,8 @@ export async function getGitHubReviewOptions() {
 
 export async function changeGitHubReviewer(payload: ChangeReviewerRequest) {
   return apiPost("/api/github/change-reviewer", payload);
+}
+
+export async function getMilestoneProgress() {
+  return apiGet<MilestoneProgressResponse>("/api/github/milestone-progress");
 }

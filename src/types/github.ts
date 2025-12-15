@@ -153,3 +153,20 @@ export type GithubAppInstallRequest = {
   state: string;
   installationId: string;
 };
+
+/**
+ * 単一のマイルストーン情報
+ */
+export type Milestone = {
+  name: string;
+  openIssues: number;
+  closedIssues: number;
+  url: string;
+};
+
+/**
+ * /api/github/milestone-progress のレスポンス
+ */
+export type MilestoneProgressResponse = {
+  milestones: Milestone[];
+};
