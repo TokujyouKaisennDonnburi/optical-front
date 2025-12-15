@@ -1,4 +1,5 @@
 import { LogOut } from "lucide-react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +37,8 @@ export function AccountMenu({
   confirmSaveTrigger,
 }: AccountMenuProps & { onRequestEmailSave: (newEmail: string) => void }) {
   const { logout } = useAuth();
+
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || null);
 
   /**
    * ログアウト処理を実行
@@ -89,7 +92,7 @@ export function AccountMenu({
       <DropdownMenuTrigger asChild>
         <AccountMenuButton
           name={user.name}
-          avatarUrl={user.avatarUrl}
+          avatarUrl={avatarUrl}
           avatarSizeClass={avatarSizeClass}
         />
       </DropdownMenuTrigger>
@@ -108,8 +111,9 @@ export function AccountMenu({
           <AccountMenuItems
             name={user.name}
             email={user.email}
-            avatarUrl={user.avatarUrl}
+            avatarUrl={avatarUrl}
             items={menuItems}
+            setAvatarUrl={setAvatarUrl}
             onRequestEmailSave={onRequestEmailSave} // 親に渡す
             confirmSaveTrigger={confirmSaveTrigger}
           />

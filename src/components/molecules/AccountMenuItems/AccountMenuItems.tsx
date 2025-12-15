@@ -20,6 +20,7 @@ type AccountMenuItemsProps = {
     icon: React.ReactNode;
     onSelect: () => void;
   }[];
+  setAvatarUrl: (avatarUrl: string | null) => void;
   onRequestEmailSave?: (newEmail: string) => void; // 親に渡す
   confirmSaveTrigger?: number; // 保存要求をトリガーするための数値
 };
@@ -29,6 +30,7 @@ export function AccountMenuItems({
   email,
   avatarUrl,
   items,
+  setAvatarUrl,
   onRequestEmailSave,
   confirmSaveTrigger,
 }: AccountMenuItemsProps) {
@@ -120,6 +122,7 @@ export function AccountMenuItems({
     if (!file) return;
 
     const response = await uploadAvatarImage(file);
+    setAvatarUrl(response.url);
     setEditedAvatar(response.url);
   };
 
