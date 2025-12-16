@@ -30,7 +30,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
       try {
         const json = await getCalendarDetail(calendarId);
         if (isMounted) {
-          setCalendar(json.calendar);
+          setCalendar(json);
         }
       } catch (err) {
         if (isMounted) {
