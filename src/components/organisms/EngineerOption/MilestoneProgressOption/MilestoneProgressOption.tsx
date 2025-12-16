@@ -10,18 +10,12 @@ import { Skeleton } from "@/components/atoms/Skeleton";
 import { MilestoneProgress } from "@/components/organisms/EngineerOption/MilestoneProgressOption/MilestoneProgress";
 import { getMilestoneProgress } from "@/lib/api-github";
 import { startMockServiceWorker } from "@/mocks/browser";
-
-type MilestoneData = {
-  name: string;
-  openIssues: number;
-  closedIssues: number;
-  url: string;
-};
+import type { Milestone } from "@/types/github";
 
 const skeletonItems = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
 export function MilestoneProgressOption() {
-  const [milestones, setMilestones] = useState<MilestoneData[] | null>(null);
+  const [milestones, setMilestones] = useState<Milestone[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +61,10 @@ export function MilestoneProgressOption() {
           milestones.map((milestone) => (
             <MilestoneProgress
               key={milestone.name}
-              open={milestone.openIssues}
-              closed={milestone.closedIssues}
-              milestoneName={milestone.name}
-              milestoneUrl={milestone.url}
+              openIssues={milestone.openIssues}
+              closedIssues={milestone.closedIssues}
+              name={milestone.name}
+              url={milestone.url}
             />
           ))
         ) : (

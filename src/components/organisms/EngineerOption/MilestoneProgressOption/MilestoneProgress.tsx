@@ -1,33 +1,27 @@
 import { ExternalLink } from "lucide-react";
-
-type MilestoneProgressProps = {
-  open: number;
-  closed: number;
-  milestoneName: string;
-  milestoneUrl?: string;
-};
+import type { Milestone } from "@/types/github";
 
 export function MilestoneProgress({
-  open,
-  closed,
-  milestoneName,
-  milestoneUrl,
-}: MilestoneProgressProps) {
-  const total = open + closed;
-  const progress = total === 0 ? 0 : Math.round((closed / total) * 100);
+  name,
+  openIssues,
+  closedIssues,
+  url,
+}: Milestone) {
+  const total = openIssues + closedIssues;
+  const progress = total === 0 ? 0 : Math.round((closedIssues / total) * 100);
 
   const MilestoneTitle = () => (
     <span className="w-full text-sm font-semibold leading-none text-foreground">
-      🚩{milestoneName}
+      🚩{name}
     </span>
   );
 
   return (
     <div className="space-y-0">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        {milestoneUrl ? (
+        {url ? (
           <a
-            href={milestoneUrl}
+            href={url}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 hover:underline"
@@ -52,7 +46,7 @@ export function MilestoneProgress({
           {progress}% 完了
         </span>
         <span className="text-xs text-muted-foreground text-right">
-          (Open: {open}, Closed: {closed})
+          (Open: {openIssues}, Closed: {closedIssues})
         </span>
       </div>
     </div>
