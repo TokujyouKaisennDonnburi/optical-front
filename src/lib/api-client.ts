@@ -12,7 +12,7 @@ import { postRefreshToken } from "./api-auth";
  * 環境変数から取得、デフォルトは空文字（相対パス）
  */
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_OPITCAL_API_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_OPTICAL_API_URL || "http://localhost:8000";
 
 /**
  * API エラークラス
