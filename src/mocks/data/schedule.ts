@@ -551,7 +551,7 @@ export const calendars = [
     userId: "user-1",
     imageUrl:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest", "weekly_report"],
+    options: ["reminder_digest", "weekly_report"],
   },
   {
     id: "development",
@@ -560,7 +560,7 @@ export const calendars = [
     userId: "user-1",
     imageUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
-    customOptions: [
+    options: [
       "reminder_digest",
       "webhook",
       "pull_request_review_wait_count",
@@ -573,7 +573,7 @@ export const calendars = [
     name: "デザインチームカレンダー",
     color: "#f97316",
     userId: "user-2",
-    customOptions: ["reminder_digest"],
+    options: ["reminder_digest"],
   },
   {
     id: "sales",
@@ -582,7 +582,7 @@ export const calendars = [
     userId: "user-2",
     imageUrl:
       "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest", "task_inbox"],
+    options: ["reminder_digest", "task_inbox"],
   },
   {
     id: "hr",
@@ -591,7 +591,7 @@ export const calendars = [
     userId: "user-3",
     imageUrl:
       "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest"],
+    options: ["reminder_digest"],
   },
   {
     id: "pr",
@@ -600,7 +600,7 @@ export const calendars = [
     userId: "user-1",
     imageUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest", "weekly_report"],
+    options: ["reminder_digest", "weekly_report"],
   },
   {
     id: "marketing",
@@ -609,7 +609,7 @@ export const calendars = [
     userId: "user-2",
     imageUrl:
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest"],
+    options: ["reminder_digest"],
   },
   {
     id: "support",
@@ -618,7 +618,7 @@ export const calendars = [
     userId: "user-1",
     imageUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest", "task_inbox"],
+    options: ["reminder_digest", "task_inbox"],
   },
   {
     id: "backoffice",
@@ -627,7 +627,7 @@ export const calendars = [
     userId: "user-3",
     imageUrl:
       "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest"],
+    options: ["reminder_digest"],
   },
   {
     id: "infra",
@@ -636,11 +636,7 @@ export const calendars = [
     userId: "user-1",
     imageUrl:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
-    customOptions: [
-      "reminder_digest",
-      "webhook",
-      "pull_request_review_wait_count",
-    ],
+    options: ["reminder_digest", "webhook", "pull_request_review_wait_count"],
   },
   {
     id: "qa",
@@ -649,7 +645,7 @@ export const calendars = [
     userId: "user-2",
     imageUrl:
       "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest", "team_review_load"],
+    options: ["reminder_digest", "team_review_load"],
   },
   {
     id: "product",
@@ -658,7 +654,7 @@ export const calendars = [
     userId: "user-1",
     imageUrl:
       "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1200&q=80",
-    customOptions: ["reminder_digest", "weekly_report"],
+    options: ["reminder_digest", "weekly_report"],
   },
 ];
 
