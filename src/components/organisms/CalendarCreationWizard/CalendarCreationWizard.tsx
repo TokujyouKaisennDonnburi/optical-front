@@ -459,15 +459,6 @@ export function CalendarCreationWizard() {
     setIsConfirmModalOpen(false);
 
     try {
-      // モックサービスワーカーを起動
-      if (typeof window !== "undefined") {
-        console.log("[CalendarCreationWizard] Starting MSW...");
-        await startMockServiceWorker();
-        // MSWが完全に起動するまで少し待機
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[CalendarCreationWizard] MSW started");
-      }
-
       const payload: CreateCalendarRequest = {
         name: state.name.trim(),
         color: state.color,

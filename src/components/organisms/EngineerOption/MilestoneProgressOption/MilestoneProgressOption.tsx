@@ -23,9 +23,6 @@ export function MilestoneProgressOption() {
     const fetchMilestones = async () => {
       try {
         setIsLoading(true);
-        await startMockServiceWorker();
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
         const data = await getMilestoneProgress();
         setMilestones(data.milestones);
       } catch (err) {
