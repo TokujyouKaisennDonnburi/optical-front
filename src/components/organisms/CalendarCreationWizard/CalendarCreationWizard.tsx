@@ -24,7 +24,6 @@ import { CalendarWizardSummary } from "@/components/molecules/CalendarWizardSumm
 import { ConfirmModal } from "@/components/molecules/ConfirmModal";
 import { createCalendar, uploadCalendarImage } from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
-import { startMockServiceWorker } from "@/mocks/browser";
 import type { CreateCalendarRequest } from "@/types/schedule";
 
 type StepKey = 0 | 1 | 2;

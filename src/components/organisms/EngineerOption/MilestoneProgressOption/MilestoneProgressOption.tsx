@@ -9,7 +9,6 @@ import {
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { MilestoneProgress } from "@/components/organisms/EngineerOption/MilestoneProgressOption/MilestoneProgress";
 import { getMilestoneProgress } from "@/lib/api-github";
-import { startMockServiceWorker } from "@/mocks/browser";
 import type { Milestone } from "@/types/github";
 
 const skeletonItems = [{ id: 1 }, { id: 2 }, { id: 3 }];
