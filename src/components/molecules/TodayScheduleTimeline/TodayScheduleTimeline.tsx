@@ -125,7 +125,6 @@ export function TodayScheduleTimeline({
                         {isFullDayEvent(event.timeRange) ? (
                           <TimelineFullDayEventCard
                             title={event.title}
-                            subtitle="終日"
                             calendarColor={event.calendarColor}
                             className="w-full min-w-0"
                           />

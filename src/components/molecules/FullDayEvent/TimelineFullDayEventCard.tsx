@@ -65,7 +65,7 @@ export const TimelineFullDayEventCard = forwardRef<
   (
     {
       title,
-      subtitle,
+      subtitle = "終日",
       calendarColor,
       variant = "single",
       className,
