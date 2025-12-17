@@ -243,7 +243,7 @@ export const scheduleHandlers = [
         name,
         color,
         userId,
-        customOptions: options ?? [],
+        options: options ?? [],
         ...(imageFileName && {
           imageUrl: `https://images.unsplash.com/photo-${Math.random()
             .toString(36)
@@ -385,8 +385,7 @@ export const scheduleHandlers = [
     return HttpResponse.json({
       calendar: {
         ...calendar,
-        customOptions:
-          (calendar as { customOptions?: string[] }).customOptions ?? [],
+        options: calendar.options ?? [],
       },
     });
   }),
