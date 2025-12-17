@@ -4,11 +4,15 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/atoms/HoverCard";
-import { ScrollArea, ScrollBar } from "@/components/atoms/ScrollArea";
+import { ScrollArea } from "@/components/atoms/ScrollArea";
 import { Separator } from "@/components/atoms/Separator";
 import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
+import {
+  isFullDayEvent,
+  TimelineFullDayEventCard,
+} from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
 import { cn } from "@/utils_constants_styles/utils";
 
@@ -59,20 +63,12 @@ export function TodayScheduleTimeline({
   }, [slotCount]);
 
   useEffect(() => {
-    if (hasAutoScrolledRef.current) {
-      return;
-    }
-
-    if (!slots.length) {
-      return;
-    }
+    if (hasAutoScrolledRef.current) return;
+    if (!slots.length) return;
 
     const viewport = viewportRef.current;
     const currentSlot = currentSlotRef.current;
-
-    if (!viewport || !currentSlot) {
-      return;
-    }
+    if (!viewport || !currentSlot) return;
 
     const frame = requestAnimationFrame(() => {
       const slotOffset = currentSlot.offsetTop;
@@ -83,6 +79,7 @@ export function TodayScheduleTimeline({
         top: Math.max(target, 0),
         behavior: "auto",
       });
+
       hasAutoScrolledRef.current = true;
     });
 
@@ -107,35 +104,48 @@ export function TodayScheduleTimeline({
             <TimeLabel
               time={slot.time}
               suffix={slot.suffix}
-              description={slot.description}
               isCurrent={slot.isCurrent}
             />
+
             {slot.events?.length ? (
-              <div className="mt-2 space-y-1.5">
+              <div className="mt-2 space-y-1.5 w-full">
                 {slot.events.map((event) => (
                   <HoverCard key={event.id} openDelay={120} closeDelay={120}>
                     <HoverCardTrigger asChild>
                       <button
                         type="button"
-                        className="flex w-full min-w-0 items-center gap-2.5 rounded-md border border-border bg-background px-3 py-1.5 text-left text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-md overflow-hidden text-left text-sm",
+                          "w-[280px] sm:w-[280px] md:w-[320px] lg:w-[360px]", // 予定カードの幅調整(仮)
+                          isFullDayEvent(event.timeRange)
+                            ? "bg-transparent"
+                            : "bg-background border border-border px-3 py-1.5 shadow-sm hover:bg-accent",
+                        )}
                       >
-                        <ScheduleEventCard
-                          title={event.title}
-                          subtitle={
-                            event.timeRange
-                              ? event.timeRange.end
+                        {isFullDayEvent(event.timeRange) ? (
+                          <TimelineFullDayEventCard
+                            title={event.title}
+                            calendarColor={event.calendarColor}
+                            className="w-full min-w-0"
+                          />
+                        ) : (
+                          <ScheduleEventCard
+                            title={event.title}
+                            subtitle={
+                              event.timeRange?.end
                                 ? `${event.timeRange.start} - ${event.timeRange.end}`
-                                : `${event.timeRange.start} 開始`
-                              : undefined
-                          }
-                          calendarColor={event.calendarColor}
-                          statusVariant={event.statusVariant}
-                          variant="timeline"
-                          className="flex-1"
-                          indicatorClassName="mt-0.5"
-                        />
+                                : `${event.timeRange?.start} 開始`
+                            }
+                            calendarColor={event.calendarColor}
+                            statusVariant={event.statusVariant}
+                            variant="timeline"
+                            className="w-full min-w-0"
+                            indicatorClassName="mt-0.5"
+                          />
+                        )}
                       </button>
                     </HoverCardTrigger>
+
                     <HoverCardContent
                       side="left"
                       align="center"
@@ -156,6 +166,7 @@ export function TodayScheduleTimeline({
                             : `${event.timeRange.start} 開始`}
                         </Text>
                       ) : null}
+
                       {event.location ? (
                         <Text
                           as="p"
@@ -165,6 +176,7 @@ export function TodayScheduleTimeline({
                           場所: {event.location}
                         </Text>
                       ) : null}
+
                       {event.memo ? (
                         <Text
                           as="p"
@@ -179,11 +191,11 @@ export function TodayScheduleTimeline({
                 ))}
               </div>
             ) : null}
+
             {index < slots.length - 1 ? <Separator className="mt-2" /> : null}
           </div>
         ))}
       </div>
-      <ScrollBar orientation="vertical" />
     </ScrollArea>
   );
 }
