@@ -12,15 +12,15 @@ export type ScheduleItem = {
   endAt: string;
 };
 
-export type ScheduleCalendar = {
+export type CalendarQueryResponse = {
   id: string;
   name: string;
   color: string;
   imageUrl?: string;
-  customOptions?: string[];
+  options?: string[];
 };
 
-export type CalendarDetail = ScheduleCalendar;
+export type CalendarDetail = CalendarQueryResponse;
 
 export type ScheduleApiResponse = {
   date: string;
@@ -49,7 +49,7 @@ export type CreateScheduleResponse = {
   id: string;
 };
 
-export type CalendarListResponse = ScheduleCalendar[];
+export type CalendarListResponse = CalendarQueryResponse[];
 
 export type CreateCalendarRequest = {
   name: string;

@@ -30,7 +30,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
       try {
         const json = await getCalendarDetail(calendarId);
         if (isMounted) {
-          setCalendar(json.calendar);
+          setCalendar(json);
         }
       } catch (err) {
         if (isMounted) {
@@ -115,7 +115,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
   }).format(new Date());
 
   // GitHub オプションの有無を判定
-  const customOptions = calendar?.customOptions;
+  const customOptions = calendar?.options;
   const hasGitHubOptions =
     customOptions?.includes("pull_request_review_wait_count") ||
     customOptions?.includes("team_review_load") ||
