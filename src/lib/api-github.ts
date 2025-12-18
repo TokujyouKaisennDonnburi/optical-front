@@ -1,6 +1,5 @@
-import { apiGet, apiPost } from "@/lib/api-client";
+import { apiPost } from "@/lib/api-client";
 import type {
-  ChangeReviewerRequest,
   GitHubReviewOptionsResponse,
   GithubAppInstallRequest,
   GithubOauthRequest,
@@ -15,14 +14,28 @@ export async function postGithubAppInstall(payload: GithubAppInstallRequest) {
   return apiPost("/github/apps/install", payload);
 }
 
-export async function getGitHubReviewOptions() {
-  return apiGet<GitHubReviewOptionsResponse>("/api/github/review-options");
+/**
+ * GitHub レビューオプション情報を取得
+ * TODO: バックエンドは POST /github/calendars/{calendarId}/review-requests を使用
+ * 現在はフロント側でモックデータを返す
+ */
+export async function getGitHubReviewOptions(): Promise<GitHubReviewOptionsResponse> {
+  // バックエンド未実装のため、モックデータを返す
+  return Promise.resolve({
+    myPendingReviews: [],
+    teamReviewLoads: [],
+    allPullRequestsUrl: "",
+  });
 }
 
-export async function changeGitHubReviewer(payload: ChangeReviewerRequest) {
-  return apiPost("/api/github/change-reviewer", payload);
-}
-
-export async function getMilestoneProgress() {
-  return apiGet<MilestoneProgressResponse>("/api/github/milestone-progress");
+/**
+ * マイルストーン進捗を取得
+ * TODO: バックエンドは GET /github/calendars/{calendarId}/review-load-status を使用
+ * 現在はフロント側でモックデータを返す
+ */
+export async function getMilestoneProgress(): Promise<MilestoneProgressResponse> {
+  // バックエンド未実装のため、モックデータを返す
+  return Promise.resolve({
+    milestones: [],
+  });
 }

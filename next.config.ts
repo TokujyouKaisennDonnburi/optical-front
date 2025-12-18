@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      {
+        // モック用画像ホスト
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
     ],
   },
   // Cloudflare Pages対応

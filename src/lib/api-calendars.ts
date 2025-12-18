@@ -1,5 +1,6 @@
 import { apiGet, apiPost, apiRequest } from "@/lib/api-client";
 import type {
+  CalendarDetailApiResponse,
   CalendarDetailResponse,
   CalendarListResponse,
   CreateCalendarRequest,
@@ -21,8 +22,28 @@ export async function uploadCalendarImage(file: File) {
   });
 }
 
-export async function getCalendarDetail(calendarId: string) {
-  return apiGet<CalendarDetailResponse>(`/calendars/${calendarId}`);
+export async function getCalendarDetail(
+  calendarId: string,
+): Promise<CalendarDetailResponse> {
+  // バックエンドのレスポンスを取得
+  const apiResponse = await apiGet<CalendarDetailApiResponse>(
+    `/calendars/${calendarId}`,
+  );
+
+  // フロントエンド用の形式に変換
+  return {
+    calendar: {
+      id: apiResponse.id,
+      name: apiResponse.name,
+      color: apiResponse.color,
+      imageUrl: apiResponse.imageUrl,
+      // option 配列から name を抽出して options 配列に変換
+      options:
+        apiResponse.option
+          ?.filter((opt) => !opt.deprecated)
+          .map((opt) => opt.name) ?? [],
+    },
+  };
 }
 
 export async function createCalendar(payload: CreateCalendarRequest) {

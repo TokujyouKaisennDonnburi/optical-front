@@ -14,87 +14,26 @@ const API_PREFIX = "http://localhost:8000";
 
 /**
  * GitHub ハンドラー
+ * バックエンドに実装されているAPIのみをモック
  */
 export const githubHandlers = [
   /**
-   * GET /api/github/review-options
-   * GitHub レビューオプション情報を取得
+   * POST /github/apps/install
+   * GitHub Apps インストール
    */
-  http.get(`${API_PREFIX}/api/github/review-options`, async () => {
-    // 少し遅延を追加してリアルな感じにする
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const response: GitHubReviewOptionsResponse = {
-      myPendingReviews: mockPullRequests,
-      teamReviewLoads: mockTeamMembers,
-      allPullRequestsUrl: mockAllPrsUrl,
+  http.post(`${API_PREFIX}/github/apps/install`, async ({ request }) => {
+    const body = (await request.json()) as {
+      installationId: number;
+      calendarId: string;
     };
-
-    return HttpResponse.json(response, { status: 200 });
-  }),
-
-  /**
-   * GET /api/github/pull-requests
-   * レビュー待ち PR 一覧を取得
-   */
-  http.get(`${API_PREFIX}/api/github/pull-requests`, async () => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    return HttpResponse.json(
-      {
-        pullRequests: mockPullRequests,
-        allPrsUrl: mockAllPrsUrl,
-      },
-      { status: 200 },
-    );
-  }),
-
-  /**
-   * GET /api/github/team-review-loads
-   * チームメンバーのレビュー負荷を取得
-   */
-  http.get(`${API_PREFIX}/api/github/team-review-loads`, async () => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    return HttpResponse.json(
-      {
-        members: mockTeamMembers,
-      },
-      { status: 200 },
-    );
-  }),
-
-  /**
-   * POST /api/github/change-reviewer
-   * レビュアーを変更
-   */
-  http.post(`${API_PREFIX}/api/github/change-reviewer`, async ({ request }) => {
-    const body = await request.json();
 
     // バリデーション
-    if (!body || typeof body !== "object") {
+    if (!body.installationId || !body.calendarId) {
       return HttpResponse.json(
         {
           error: {
             code: 400,
-            message: "リクエストボディが不正です",
-          },
-        },
-        { status: 400 },
-      );
-    }
-
-    const { pullRequestId, newReviewerUsername } = body as {
-      pullRequestId?: number;
-      newReviewerUsername?: string;
-    };
-
-    if (!pullRequestId || !newReviewerUsername) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: 400,
-            message: "pullRequestId と newReviewerUsername は必須です",
+            message: "installationId と calendarId は必須です",
           },
         },
         { status: 400 },
@@ -102,50 +41,67 @@ export const githubHandlers = [
     }
 
     // 少し遅延を追加
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
-    // モックなので成功レスポンスを返す
-    return HttpResponse.json(
-      {
-        success: true,
-        message: `PR #${pullRequestId} のレビュアーを ${newReviewerUsername} に変更しました`,
-      },
-      { status: 200 },
-    );
+    return HttpResponse.json({ success: true }, { status: 200 });
   }),
 
   /**
-   * GET /api/github/milestone-progress
-   * マイルストーンの進捗を取得
+   * POST /github/apps/state
+   * GitHub Apps 状態作成
    */
-  http.get(`${API_PREFIX}/api/github/milestone-progress`, async () => {
-    // 遅延を追加
-    await new Promise((resolve) => setTimeout(resolve, 400));
+  http.post(`${API_PREFIX}/github/apps/state`, async () => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
-    return HttpResponse.json(
-      {
-        milestones: [
-          {
-            name: "2025 Q1 Sprint",
-            openIssues: 8,
-            closedIssues: 22,
-            url: "https://github.com/mock/repo/milestones/1",
-          },
-          {
-            name: "2025 Q2 Infrastructure",
-            openIssues: 2,
-            closedIssues: 10,
-            url: "https://github.com/mock/repo/milestones/2",
-          },
-          {
-            name: "2025 Q2 New Features",
-            openIssues: 15,
-            closedIssues: 5,
-            url: "https://github.com/mock/repo/milestones/3",
-          },
-        ],
-      },
-      { status: 200 },
-    );
+    const mockState = `apps-state-${Date.now()}`;
+    return HttpResponse.json({ state: mockState }, { status: 200 });
   }),
+
+  /**
+   * POST /github/oauth/state
+   * GitHub OAuth 状態作成
+   */
+  http.post(`${API_PREFIX}/github/oauth/state`, async () => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const mockState = `oauth-state-${Date.now()}`;
+    return HttpResponse.json({ state: mockState }, { status: 200 });
+  }),
+
+  /**
+   * POST /github/calendars/:calendarId/review-requests
+   * レビューリクエスト取得（保護ルート）
+   */
+  http.post(
+    `${API_PREFIX}/github/calendars/:calendarId/review-requests`,
+    async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const response: GitHubReviewOptionsResponse = {
+        myPendingReviews: mockPullRequests,
+        teamReviewLoads: mockTeamMembers,
+        allPullRequestsUrl: mockAllPrsUrl,
+      };
+
+      return HttpResponse.json(response, { status: 200 });
+    },
+  ),
+
+  /**
+   * GET /github/calendars/:calendarId/review-load-status
+   * レビュー読み込み状態
+   */
+  http.get(
+    `${API_PREFIX}/github/calendars/:calendarId/review-load-status`,
+    async () => {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      return HttpResponse.json(
+        {
+          members: mockTeamMembers,
+        },
+        { status: 200 },
+      );
+    },
+  ),
 ];

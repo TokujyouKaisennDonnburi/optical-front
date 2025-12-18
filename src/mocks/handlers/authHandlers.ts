@@ -18,10 +18,10 @@ import {
  */
 export const authHandlers = [
   /**
-   * POST /api/auth/signup
+   * POST /register
    * サインアップ
    */
-  http.post("/api/auth/register", async ({ request }) => {
+  http.post("http://localhost:8000/register", async ({ request }) => {
     const body = (await request.json()) as SignupRequest;
     const { name, email, password } = body;
 
@@ -147,10 +147,10 @@ export const authHandlers = [
   }),
 
   /**
-   * GET /api/auth/me
+   * GET /users/@me
    * 現在のユーザー情報を取得
    */
-  http.get("/api/users/@me", ({ request }) => {
+  http.get("http://localhost:8000/users/@me", ({ request }) => {
     // Authorization ヘッダーからトークンを取得
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -232,10 +232,10 @@ export const authHandlers = [
   }),
 
   /**
-   * POST /api/auth/logout
+   * POST /logout
    * ログアウト
    */
-  http.post("/api/auth/logout", async () => {
+  http.post("http://localhost:8000/logout", async () => {
     // モックなので特に処理は不要
     // 実際のバックエンドではトークンの無効化などを行う
 
@@ -249,62 +249,43 @@ export const authHandlers = [
   }),
 
   /**
-   * GET /api/auth/google
-   * Google OAuth 開始（リダイレクト）
+   * POST /github/oauth/create
+   * GitHub OAuth 開始（URL取得）
    */
-  http.get("/api/auth/google", () => {
-    // 実際の実装では Google の認証ページにリダイレクト
-    // モックでは直接コールバックにリダイレクト
-    const mockGoogleId = "google-id-1";
-    const callbackUrl = `/api/auth/google/callback?code=mock-code-${mockGoogleId}`;
+  http.post("http://localhost:8000/github/oauth/create", async () => {
+    // 少し遅延を追加
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
-    return HttpResponse.json(
-      { redirect: callbackUrl },
-      {
-        status: 302,
-        headers: {
-          Location: callbackUrl,
-        },
-      },
-    );
+    // モック用のGitHub認証URL
+    const mockState = `mock-state-${Date.now()}`;
+    const mockUrl = `https://github.com/login/oauth/authorize?client_id=mock&state=${mockState}`;
+
+    return HttpResponse.json({ url: mockUrl }, { status: 200 });
   }),
 
   /**
-   * GET /api/auth/google/callback
-   * Google OAuth コールバック
+   * POST /github/oauth/link
+   * GitHub OAuth コールバック処理
    */
-  http.get("/api/auth/google/callback", ({ request }) => {
-    const url = new URL(request.url);
-    const code = url.searchParams.get("code");
-    const error = url.searchParams.get("error");
+  http.post("http://localhost:8000/github/oauth/link", async ({ request }) => {
+    const body = (await request.json()) as { code: string; state: string };
+    const { code, state } = body;
 
-    // エラーハンドリング
-    if (error) {
+    // バリデーション
+    if (!code || !state) {
       return HttpResponse.json(
         {
           error: {
             code: 400,
-            message: "Google認証がキャンセルされました",
+            message: "code と state は必須です",
           },
         },
         { status: 400 },
       );
     }
 
-    if (!code) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: 400,
-            message: "認証コードが見つかりません",
-          },
-        },
-        { status: 400 },
-      );
-    }
-
-    // Google ID からユーザーを検索(既存ユーザー)
-    const user = findUserById("user-1"); // モックなので固定
+    // モックユーザーを取得
+    const user = findUserById("user-1");
 
     if (!user) {
       return HttpResponse.json(
@@ -321,17 +302,16 @@ export const authHandlers = [
     // JWT トークンを生成
     const token = generateMockToken(user.id);
 
-    // フロントエンドのコールバックページにリダイレクト
-    const frontendCallbackUrl = `/auth/callback?token=${token}`;
+    // 少し遅延を追加
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return HttpResponse.json(
-      { redirect: frontendCallbackUrl },
       {
-        status: 302,
-        headers: {
-          Location: frontendCallbackUrl,
-        },
+        accessToken: token,
+        refreshToken: token,
+        user,
       },
+      { status: 200 },
     );
   }),
 ];

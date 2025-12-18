@@ -184,6 +184,49 @@ export const scheduleHandlers = [
     }
   }),
 
+  // POST /calendars/images - 画像アップロード
+  http.post("http://localhost:8000/calendars/images", async ({ request }) => {
+    console.log("[MSW] POST /calendars/images handler called");
+
+    // Authorization ヘッダーからトークンを取得
+    const authHeader = request.headers.get("Authorization");
+
+    // 認証されていない場合は401エラー
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return HttpResponse.json(
+        {
+          error: {
+            code: 401,
+            message: "認証が必要です",
+          },
+        },
+        { status: 401 },
+      );
+    }
+
+    // FormDataを取得（実際には使用しないがリクエストを消費するため）
+    try {
+      await request.formData();
+    } catch (e) {
+      console.warn("[MSW] FormData parse warning:", e);
+    }
+
+    // 少し遅延を追加
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // モック画像データを返す（ImageUploadResponse型に合わせる）
+    const mockImageId = `mock-image-${Date.now()}`;
+    const mockImageUrl = `https://picsum.photos/seed/${mockImageId}/800/400`;
+
+    return HttpResponse.json(
+      {
+        id: mockImageId,
+        url: mockImageUrl,
+      },
+      { status: 200 },
+    );
+  }),
+
   http.post("http://localhost:8000/calendars", async ({ request }) => {
     console.log("[MSW] POST /api/calendars handler called");
 

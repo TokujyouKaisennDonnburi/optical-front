@@ -43,12 +43,26 @@ export function SelectCalendarGrid({
     const onScroll = () => updateEdges();
     el.addEventListener("scroll", onScroll, { passive: true });
 
+    // マウスホイールで横スクロールできるようにする
+    const onWheel = (e: WheelEvent) => {
+      // Shift+ホイールは既に横スクロールなのでスキップ
+      if (e.shiftKey) return;
+
+      // 縦スクロール量がある場合のみ処理
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+
     // Re-evaluate on resize since widths can change
     const onResize = () => updateEdges();
     window.addEventListener("resize", onResize);
 
     return () => {
       el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("wheel", onWheel);
       window.removeEventListener("resize", onResize);
     };
   }, [updateEdges]);

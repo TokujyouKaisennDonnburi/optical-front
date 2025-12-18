@@ -20,6 +20,24 @@ export type CalendarQueryResponse = {
   options?: string[];
 };
 
+// バックエンドのカレンダー詳細レスポンス形式
+export type CalendarDetailApiResponse = {
+  id: string;
+  name: string;
+  color: string;
+  imageUrl?: string;
+  member?: Array<{
+    userId: string;
+    name: string;
+    joinedAt: string;
+  }>;
+  option?: Array<{
+    id: number;
+    name: string;
+    deprecated: boolean;
+  }>;
+};
+
 export type CalendarDetail = CalendarQueryResponse;
 
 export type ScheduleApiResponse = {
@@ -27,6 +45,7 @@ export type ScheduleApiResponse = {
   items: ScheduleItem[];
 };
 
+// フロントエンド用に変換後のレスポンス形式
 export type CalendarDetailResponse = {
   calendar: CalendarDetail;
 };

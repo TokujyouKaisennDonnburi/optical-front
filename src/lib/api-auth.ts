@@ -54,7 +54,7 @@ export async function signup(payload: SignupRequest) {
 }
 
 export async function logout() {
-  return apiPost("/api/auth/logout");
+  return apiPost("/logout");
 }
 
 /**

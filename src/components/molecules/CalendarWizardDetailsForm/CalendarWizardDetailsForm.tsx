@@ -144,8 +144,10 @@ export function CalendarWizardDetailsForm({
             <div className="flex flex-col gap-3">
               <div
                 className={cn(
-                  "relative flex min-h-[13.75rem] w-full overflow-hidden rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 text-center transition hover:border-primary/70 hover:bg-primary/5",
-                  imagePreviewUrl ? "border-primary/60 bg-background" : "",
+                  "relative flex min-h-[10rem] w-full overflow-hidden rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 text-center transition hover:border-primary/70 hover:bg-primary/5",
+                  imagePreviewUrl
+                    ? "min-h-[12rem] border-primary/60 bg-background"
+                    : "",
                 )}
               >
                 <button
