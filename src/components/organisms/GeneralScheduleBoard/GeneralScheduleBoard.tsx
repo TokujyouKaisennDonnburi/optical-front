@@ -8,56 +8,27 @@ import {
   isFullDayEventISO,
 } from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
+import type {
+  CalendarCell,
+  CalendarEvent,
+  ScheduleBoardItem,
+} from "@/types/schedule";
 import { cn } from "@/utils_constants_styles/utils";
 import styles from "./GeneralScheduleBoard.module.css";
 
-export type GeneralScheduleBoardItem = {
-  id: string;
-  title: string;
-  start: string; // ISO datetime string
-  end?: string;
-  memo?: string;
-  location?: string;
-  locationUrl?: string;
-  members?: string[];
-  calendarName?: string;
-  calendarColor?: string;
-};
+/** @deprecated Use ScheduleBoardItem instead */
+export type GeneralScheduleBoardItem = ScheduleBoardItem;
 
 export type GeneralScheduleBoardProps = {
   title?: string;
-  items: GeneralScheduleBoardItem[];
+  items: ScheduleBoardItem[];
   isLoading?: boolean;
   emptyMessage?: string;
   errorMessage?: string;
   className?: string;
   baseDate?: Date;
-  onSelectItem?: (item: GeneralScheduleBoardItem) => void;
+  onSelectItem?: (item: ScheduleBoardItem) => void;
   onCreateItem?: (date: Date) => void;
-};
-
-type CalendarCell = {
-  date: Date;
-  key: string;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  weekday: number; // 0 = Sunday, 6 = Saturday
-};
-
-type CalendarEvent = {
-  id: string;
-  title: string;
-  memo?: string;
-  location?: string;
-  locationUrl?: string;
-  members?: string[];
-  calendarName?: string;
-  calendarColor?: string;
-  startLabel?: string;
-  endLabel?: string;
-  date: Date;
-  item: GeneralScheduleBoardItem;
-  sortKey: number;
 };
 
 export function GeneralScheduleBoard({
@@ -324,7 +295,7 @@ export function GeneralScheduleBoard({
   );
 }
 
-function deriveBaseDate(items: GeneralScheduleBoardItem[]) {
+function deriveBaseDate(items: ScheduleBoardItem[]) {
   const firstValid = items
     .map((item) => parseDate(item.start))
     .find((date) => date !== null);
@@ -372,7 +343,7 @@ function buildCalendarCells(baseDate: Date): CalendarCell[] {
   return cells;
 }
 
-function groupEventsByDay(items: GeneralScheduleBoardItem[]) {
+function groupEventsByDay(items: ScheduleBoardItem[]) {
   const map = new Map<string, CalendarEvent[]>();
 
   const sorted = [...items].sort((a, b) => {

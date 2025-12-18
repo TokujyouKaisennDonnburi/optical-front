@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
@@ -8,21 +8,22 @@ import {
   isFullDayEventISO,
 } from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
+import type {
+  CalendarCell,
+  CalendarEvent,
+  ScheduleBoardItem,
+} from "@/types/schedule";
 import { cn } from "@/utils_constants_styles/utils";
 import styles from "./SingleCalendarBoard.module.css";
 
-export type SingleCalendarBoardItem = {
-  id: string;
-  title: string;
-  start: string; // ISO datetime string
-  end?: string;
-  memo?: string;
-  location?: string;
-  locationUrl?: string;
-  members?: string[];
-  calendarName?: string;
-  calendarColor?: string;
-};
+/** 長押し判定時の移動距離閾値（px）。この値以下の移動距離なら長押しとして判定する */
+const LONG_PRESS_MOVE_THRESHOLD = 10;
+
+/** 長押し判定までの時間（ms） */
+const LONG_PRESS_TIMEOUT_MS = 200;
+
+/** @deprecated Use ScheduleBoardItem instead */
+export type SingleCalendarBoardItem = ScheduleBoardItem;
 
 export type SingleCalendarBoardProps = {
   /** カレンダー名 */
@@ -30,7 +31,7 @@ export type SingleCalendarBoardProps = {
   /** カレンダーカラー */
   calendarColor?: string;
   /** スケジュールアイテム */
-  items: SingleCalendarBoardItem[];
+  items: ScheduleBoardItem[];
   /** ローディング状態 */
   isLoading?: boolean;
   /** 空の場合のメッセージ */
@@ -42,34 +43,37 @@ export type SingleCalendarBoardProps = {
   /** 表示基準日 */
   baseDate?: Date;
   /** アイテム選択時のコールバック */
-  onSelectItem?: (item: SingleCalendarBoardItem) => void;
+  onSelectItem?: (item: ScheduleBoardItem) => void;
   /** 新規予定作成時のコールバック (日付セルクリック時) */
   onCreateItem?: (date: Date) => void;
 };
 
-type CalendarCell = {
-  date: Date;
-  key: string;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  weekday: number; // 0 = Sunday, 6 = Saturday
-};
+/**
+ * data-cell-key 属性からセルキーを取得するユーティリティ
+ */
+function getCellKeyFromEvent(
+  e: React.MouseEvent | React.TouchEvent | React.KeyboardEvent,
+): string | null {
+  const target = e.target as HTMLElement;
+  const cellElement = target.closest("[data-cell-key]");
+  return cellElement?.getAttribute("data-cell-key") ?? null;
+}
 
-type CalendarEvent = {
-  id: string;
-  title: string;
-  memo?: string;
-  location?: string;
-  locationUrl?: string;
-  members?: string[];
-  calendarName?: string;
-  calendarColor?: string;
-  startLabel?: string;
-  endLabel?: string;
-  date: Date;
-  item: SingleCalendarBoardItem;
-  sortKey: number;
-};
+/**
+ * イベントから座標を取得するユーティリティ
+ */
+function getPositionFromEvent(
+  e: React.MouseEvent | React.TouchEvent | React.KeyboardEvent,
+): { x: number; y: number } {
+  if ("touches" in e && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+  if ("clientX" in e) {
+    return { x: e.clientX, y: e.clientY };
+  }
+  // キーボードイベントの場合はダミー座標
+  return { x: 0, y: 0 };
+}
 
 /**
  * 単体カレンダー用のスケジュールボードコンポーネント
@@ -106,6 +110,16 @@ export function SingleCalendarBoard({
     () => buildCalendarCells(effectiveBaseDate),
     [effectiveBaseDate],
   );
+
+  // キーからセル情報を効率的に取得するためのMap
+  const calendarCellMap = useMemo(() => {
+    const map = new Map<string, CalendarCell>();
+    for (const cell of calendarCells) {
+      map.set(cell.key, cell);
+    }
+    return map;
+  }, [calendarCells]);
+
   const calendarWeeks = useMemo(
     () => chunkIntoWeeks(calendarCells),
     [calendarCells],
@@ -115,11 +129,119 @@ export function SingleCalendarBoard({
     [items, calendarColor],
   );
 
+  // イベント委譲: 長押し開始ハンドラー（親要素で単一のハンドラーを管理）
+  const handleLongPressStart = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      // イベントカード（button要素）をクリックした場合は長押し判定をキャンセル
+      if (e.target instanceof HTMLElement) {
+        if (e.target.closest("button[type='button']")) {
+          return;
+        }
+      }
+
+      const cellKey = getCellKeyFromEvent(e);
+      if (!cellKey) return;
+
+      const cell = calendarCellMap.get(cellKey);
+      if (!cell) return;
+
+      const pos = getPositionFromEvent(e);
+      longPressStartPosRef.current.set(cellKey, pos);
+
+      const timeoutId = setTimeout(() => {
+        const startPos = longPressStartPosRef.current.get(cellKey);
+        if (!startPos) return;
+
+        // 移動距離が閾値以下なら長押し判定
+        if (onCreateItem && cell.isCurrentMonth) {
+          onCreateItem(cell.date);
+        }
+      }, LONG_PRESS_TIMEOUT_MS);
+
+      longPressTimeoutsRef.current.set(cellKey, timeoutId);
+    },
+    [calendarCellMap, onCreateItem],
+  );
+
+  // イベント委譲: 長押し終了ハンドラー
+  const handleLongPressEnd = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      const cellKey = getCellKeyFromEvent(e);
+      if (!cellKey) return;
+
+      const timeoutId = longPressTimeoutsRef.current.get(cellKey);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        longPressTimeoutsRef.current.delete(cellKey);
+      }
+      longPressStartPosRef.current.delete(cellKey);
+    },
+    [],
+  );
+
+  // イベント委譲: 長押し中の移動ハンドラー
+  const handleLongPressMove = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      const cellKey = getCellKeyFromEvent(e);
+      if (!cellKey) return;
+
+      const startPos = longPressStartPosRef.current.get(cellKey);
+      if (!startPos) return;
+
+      const currentPos = getPositionFromEvent(e);
+      const movedDistance = Math.hypot(
+        currentPos.x - startPos.x,
+        currentPos.y - startPos.y,
+      );
+
+      // 移動距離が閾値を超えたらタイマーをキャンセル（スクロール判定）
+      if (movedDistance > LONG_PRESS_MOVE_THRESHOLD) {
+        const timeoutId = longPressTimeoutsRef.current.get(cellKey);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          longPressTimeoutsRef.current.delete(cellKey);
+        }
+      }
+    },
+    [],
+  );
+
+  // イベント委譲: キーボードハンドラー
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        const cellKey = getCellKeyFromEvent(e);
+        if (!cellKey) return;
+
+        const cell = calendarCellMap.get(cellKey);
+        if (!cell) return;
+
+        e.preventDefault();
+        if (onCreateItem && cell.isCurrentMonth) {
+          onCreateItem(cell.date);
+        }
+      }
+    },
+    [calendarCellMap, onCreateItem],
+  );
+
   const showEmptyState = !isLoading && !errorMessage && !items.length;
 
   return (
     <CalendarGrid className={className}>
-      <div className="relative flex min-h-0 flex-1 flex-col pb-2.5">
+      {/* イベント委譲: 親要素で全セルのイベントを管理 */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: イベント委譲のためのコンテナ。各セル(role="button")がキーボード操作とフォーカスを担当 */}
+      <div
+        className="relative flex min-h-0 flex-1 flex-col pb-2.5"
+        onMouseDown={handleLongPressStart}
+        onMouseUp={handleLongPressEnd}
+        onMouseLeave={handleLongPressEnd}
+        onMouseMove={handleLongPressMove}
+        onTouchStart={handleLongPressStart}
+        onTouchEnd={handleLongPressEnd}
+        onTouchMove={handleLongPressMove}
+        onKeyDown={handleKeyDown}
+      >
         {isLoading ? (
           <CalendarSkeleton weeksCount={calendarWeeks.length || 5} />
         ) : (
@@ -133,133 +255,25 @@ export function SingleCalendarBoard({
                   const events = eventsByDay.get(cell.key) ?? [];
                   const isWeekend = cell.weekday === 0 || cell.weekday === 6;
 
-                  const handleLongPressStart = (
-                    e:
-                      | React.MouseEvent<HTMLDivElement>
-                      | React.TouchEvent<HTMLDivElement>,
-                  ) => {
-                    // イベントカード（button要素）をクリックした場合は長押し判定をキャンセル
-                    if (e.target instanceof HTMLElement) {
-                      if (e.target.closest("button[type='button']")) {
-                        return;
-                      }
-                    }
-
-                    const pos =
-                      "touches" in e
-                        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-                        : {
-                            x: (e as React.MouseEvent).clientX,
-                            y: (e as React.MouseEvent).clientY,
-                          };
-
-                    longPressStartPosRef.current.set(cell.key, pos);
-
-                    const timeoutId = setTimeout(() => {
-                      const startPos = longPressStartPosRef.current.get(
-                        cell.key,
-                      );
-                      if (!startPos) return;
-
-                      // 移動距離チェック
-                      const currentPos =
-                        "touches" in e
-                          ? {
-                              x: e.touches[0]?.clientX ?? 0,
-                              y: e.touches[0]?.clientY ?? 0,
-                            }
-                          : {
-                              x: (e as React.MouseEvent).clientX,
-                              y: (e as React.MouseEvent).clientY,
-                            };
-
-                      const movedDistance = Math.hypot(
-                        currentPos.x - startPos.x,
-                        currentPos.y - startPos.y,
-                      );
-
-                      // 移動距離が10px以下なら長押し判定
-                      if (
-                        movedDistance <= 10 &&
-                        onCreateItem &&
-                        cell.isCurrentMonth
-                      ) {
-                        onCreateItem(cell.date);
-                      }
-                    }, 200);
-
-                    longPressTimeoutsRef.current.set(cell.key, timeoutId);
-                  };
-
-                  const handleLongPressEnd = () => {
-                    const timeoutId = longPressTimeoutsRef.current.get(
-                      cell.key,
-                    );
-                    if (timeoutId) {
-                      clearTimeout(timeoutId);
-                      longPressTimeoutsRef.current.delete(cell.key);
-                    }
-                    longPressStartPosRef.current.delete(cell.key);
-                  };
-
-                  const handleLongPressMove = (
-                    e:
-                      | React.MouseEvent<HTMLDivElement>
-                      | React.TouchEvent<HTMLDivElement>,
-                  ) => {
-                    const startPos = longPressStartPosRef.current.get(cell.key);
-                    if (!startPos) return;
-
-                    const currentPos =
-                      "touches" in e
-                        ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-                        : {
-                            x: (e as React.MouseEvent).clientX,
-                            y: (e as React.MouseEvent).clientY,
-                          };
-
-                    const movedDistance = Math.hypot(
-                      currentPos.x - startPos.x,
-                      currentPos.y - startPos.y,
-                    );
-
-                    // 移動距離が10pxを超えたらタイマーをキャンセル（スクロール判定）
-                    if (movedDistance > 10) {
-                      const timeoutId = longPressTimeoutsRef.current.get(
-                        cell.key,
-                      );
-                      if (timeoutId) {
-                        clearTimeout(timeoutId);
-                        longPressTimeoutsRef.current.delete(cell.key);
-                      }
-                    }
-                  };
-
                   return (
                     <div
                       key={cell.key}
-                      role="button"
-                      tabIndex={0}
-                      onMouseDown={handleLongPressStart}
-                      onMouseUp={handleLongPressEnd}
-                      onMouseLeave={handleLongPressEnd}
-                      onMouseMove={handleLongPressMove}
-                      onTouchStart={handleLongPressStart}
-                      onTouchEnd={handleLongPressEnd}
-                      onTouchMove={handleLongPressMove}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          handleLongPressStart(
-                            e as unknown as React.MouseEvent<HTMLDivElement>,
-                          );
-                        }
-                      }}
+                      data-cell-key={cell.key}
+                      role={
+                        onCreateItem && cell.isCurrentMonth
+                          ? "button"
+                          : undefined
+                      }
+                      tabIndex={
+                        onCreateItem && cell.isCurrentMonth ? 0 : undefined
+                      }
                       className={cn(
-                        "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden bg-slate-950/40 p-0.5 transition-colors cursor-pointer",
+                        "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden bg-slate-950/40 p-0.5 transition-colors",
                         !cell.isCurrentMonth &&
                           "bg-slate-950/10 text-muted-foreground/70",
                         isWeekend && cell.isCurrentMonth && "bg-slate-950/55",
+                        // クリック可能な場合のみポインターカーソルを表示
+                        onCreateItem && cell.isCurrentMonth && "cursor-pointer",
                       )}
                     >
                       {cell.isToday ? (
@@ -351,7 +365,7 @@ export function SingleCalendarBoard({
   );
 }
 
-function deriveBaseDate(items: SingleCalendarBoardItem[]) {
+function deriveBaseDate(items: ScheduleBoardItem[]) {
   const firstValid = items
     .map((item) => parseDate(item.start))
     .find((date) => date !== null);
@@ -395,10 +409,7 @@ function buildCalendarCells(baseDate: Date): CalendarCell[] {
   return cells;
 }
 
-function groupEventsByDay(
-  items: SingleCalendarBoardItem[],
-  defaultColor?: string,
-) {
+function groupEventsByDay(items: ScheduleBoardItem[], defaultColor?: string) {
   const map = new Map<string, CalendarEvent[]>();
 
   const sorted = [...items].sort((a, b) => {

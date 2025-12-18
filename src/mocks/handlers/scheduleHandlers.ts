@@ -434,6 +434,8 @@ export const scheduleHandlers = [
       name: calendar.name,
       color: calendar.color,
       imageUrl: calendar.imageUrl,
+      // モックデータにはメンバー情報が含まれていないため、空配列を返す
+      // 将来的にメンバー機能を実装する際に、scheduleStore.calendarsにmemberプロパティを追加する
       member: [],
       // options配列をoption配列形式に変換
       option: (calendar.options ?? []).map((name, index) => ({
