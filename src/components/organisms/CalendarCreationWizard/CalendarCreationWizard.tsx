@@ -238,16 +238,11 @@ const generateMemberId = () => {
     .slice(2, 8)}`;
 };
 
-const createMemberInvite = (email = ""): MemberInvite => ({
-  id: generateMemberId(),
-  email,
-});
-
 const createInitialState = (): CalendarCreationState => ({
   name: "",
   color: COLOR_OPTIONS[0],
   imageId: null,
-  members: [createMemberInvite()],
+  members: [],
   selectedTemplateId: null,
   customOptions: CUSTOM_OPTIONS_WITH_DEFAULT.reduce<Record<string, boolean>>(
     (acc, option) => {
@@ -337,14 +332,14 @@ export function CalendarCreationWizard() {
     }));
   };
 
-  const handleAddMember = () => {
+  const handleAddMember = (email?: string) => {
     setState((prev) => ({
       ...prev,
       members: [
         ...prev.members,
         {
           id: generateMemberId(),
-          email: "",
+          email: email ?? "",
         },
       ],
     }));
