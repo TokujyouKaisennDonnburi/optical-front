@@ -64,7 +64,7 @@ export function GeneralScheduleBoard({
   title: _title = "総合スケジュール",
   items,
   isLoading = false,
-  emptyMessage = "予定がありません。",
+  emptyMessage = "予定がありません。カレンダーを長押しして追加できます。",
   errorMessage,
   className,
   baseDate,

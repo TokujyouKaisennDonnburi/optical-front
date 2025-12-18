@@ -491,7 +491,6 @@ function BoardArea({
           items={boardItems}
           isLoading={isLoading}
           errorMessage={error ? "予定を取得できませんでした" : undefined}
-          emptyMessage="予定がありません。"
           className="flex h-full min-h-0 flex-col"
           baseDate={viewDate}
           onSelectItem={handleSelectItem}
