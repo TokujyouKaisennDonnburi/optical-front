@@ -21,7 +21,10 @@ export function CalendarGrid({ children, className }: CalendarGridProps) {
         {WEEKDAYS.map((label, index) => (
           <div
             key={`weekday-${label}`}
-            className={cn("px-2 py-0.5", (index === 0 || index === 6) && "text-rose-200/80")}
+            className={cn(
+              "px-2 py-0.5",
+              (index === 0 || index === 6) && "text-rose-200/80",
+            )}
           >
             {label}
           </div>

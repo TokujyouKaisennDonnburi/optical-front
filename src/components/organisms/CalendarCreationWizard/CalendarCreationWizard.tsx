@@ -238,11 +238,6 @@ const generateMemberId = () => {
     .slice(2, 8)}`;
 };
 
-const createMemberInvite = (email = ""): MemberInvite => ({
-  id: generateMemberId(),
-  email,
-});
-
 const createInitialState = (): CalendarCreationState => ({
   name: "",
   color: COLOR_OPTIONS[0],
