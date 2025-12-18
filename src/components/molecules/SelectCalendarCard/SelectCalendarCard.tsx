@@ -78,6 +78,18 @@ export function SelectCalendarCard({
     typeof imageUrl === "string" &&
     (imageUrl.startsWith("data:") || imageUrl.startsWith("blob:"));
 
+  // Check if imageUrl is a valid URL
+  const isValidImageUrl = (() => {
+    if (!imageUrl || imageUrl.length === 0) return false;
+    if (isInlineImage) return true;
+    try {
+      new URL(imageUrl);
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
   return (
     <button
       type="button"
@@ -92,7 +104,7 @@ export function SelectCalendarCard({
     >
       <div className="relative grid aspect-[16/8] w-full place-items-stretch">
         <div className="relative h-full w-full overflow-hidden">
-          {imageUrl ? (
+          {isValidImageUrl && imageUrl ? (
             <Image
               src={imageUrl}
               alt={calendar.name}

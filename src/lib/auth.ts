@@ -6,7 +6,7 @@
 import { postRefreshToken } from "./api-auth";
 
 const TOKEN_KEY = "auth_token";
-const REFRESH_TOKEN_KEY = "auth_refres_token";
+const REFRESH_TOKEN_KEY = "auth_refresh_token";
 
 /**
  * JWT トークンを localStorage に保存する
