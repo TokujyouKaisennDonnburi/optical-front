@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/utils_constants_styles/utils";
 
-const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
 export type CalendarGridProps = {
   children: ReactNode;
@@ -21,7 +21,7 @@ export function CalendarGrid({ children, className }: CalendarGridProps) {
         {WEEKDAYS.map((label, index) => (
           <div
             key={`weekday-${label}`}
-            className={cn("px-2 py-0.5", index >= 5 && "text-rose-200/80")}
+            className={cn("px-2 py-0.5", (index === 0 || index === 6) && "text-rose-200/80")}
           >
             {label}
           </div>

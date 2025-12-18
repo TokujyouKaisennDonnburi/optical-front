@@ -41,7 +41,7 @@ type CalendarCell = {
   key: string;
   isCurrentMonth: boolean;
   isToday: boolean;
-  weekday: number; // 0 = Monday, 6 = Sunday
+  weekday: number; // 0 = Sunday, 6 = Saturday
 };
 
 type CalendarEvent = {
@@ -110,7 +110,7 @@ export function GeneralScheduleBoard({
               >
                 {week.map((cell, _dayIndex) => {
                   const events = eventsByDay.get(cell.key) ?? [];
-                  const isWeekend = cell.weekday >= 5;
+                  const isWeekend = cell.weekday === 0 || cell.weekday === 6;
 
                   const handleLongPressStart = (
                     e:
@@ -165,7 +165,7 @@ export function GeneralScheduleBoard({
                       ) {
                         onCreateItem(cell.date);
                       }
-                    }, 600);
+                    }, 200);
 
                     longPressTimeoutsRef.current.set(cell.key, timeoutId);
                   };
@@ -338,8 +338,8 @@ function buildCalendarCells(baseDate: Date): CalendarCell[] {
   const firstDayOfMonth = new Date(year, month, 1);
   const lastDayOfMonth = new Date(year, month + 1, 0);
 
-  const firstWeekday = toMondayStartWeekday(firstDayOfMonth.getDay());
-  const lastWeekday = toMondayStartWeekday(lastDayOfMonth.getDay());
+  const firstWeekday = firstDayOfMonth.getDay();
+  const lastWeekday = lastDayOfMonth.getDay();
 
   // 前月分のセル数
   const prevMonthDays = firstWeekday;
@@ -458,9 +458,7 @@ function normalizeDate(value: Date) {
   return normalized;
 }
 
-function toMondayStartWeekday(weekday: number) {
-  return (weekday + 6) % 7;
-}
+// Removed: toMondayStartWeekday (now using Sunday-start weekdays directly from getDay())
 
 function isSameDay(a: Date, b: Date) {
   return (

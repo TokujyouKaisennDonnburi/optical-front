@@ -13,7 +13,8 @@ import { cn } from "@/utils_constants_styles/utils";
 
 export type CalendarWizardMembersFormProps = {
   members: Array<{ id: string; email: string }>;
-  onChangeMember: (memberId: string, email: string) => void;
+  /** @deprecated This prop is no longer used and will be removed in a future version */
+  onChangeMember?: (memberId: string, email: string) => void;
   onAddMember: (email?: string) => void;
   onRemoveMember: (memberId: string) => void;
   hasError: boolean;
@@ -22,6 +23,13 @@ export type CalendarWizardMembersFormProps = {
 };
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Spring animation configuration for member list items */
+const SPRING_ANIMATION_CONFIG = {
+  type: "spring",
+  stiffness: 500,
+  damping: 30,
+} as const;
 
 export function CalendarWizardMembersForm({
   members,
@@ -34,7 +42,7 @@ export function CalendarWizardMembersForm({
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
 
-  const handleAddParams = () => {
+  const handleSubmitMember = () => {
     const trimmed = inputValue.trim();
     if (!trimmed) return;
 
@@ -60,7 +68,7 @@ export function CalendarWizardMembersForm({
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      handleAddParams();
+      handleSubmitMember();
     }
   };
 
@@ -81,15 +89,28 @@ export function CalendarWizardMembersForm({
         </Text>
       </header>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div
+        role="radiogroup"
+        aria-label="利用スタイルを選択"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+      >
         {/* Solo Option */}
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Card
+            role="radio"
+            tabIndex={0}
+            aria-checked={useSolo}
             className={cn(
               "cursor-pointer transition-all duration-300 relative overflow-hidden h-full",
               useSolo ? activeOptionClasses : inactiveOptionClasses,
             )}
             onClick={() => onToggleUseSolo(true)}
+            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onToggleUseSolo(true);
+              }
+            }}
           >
             <div className="p-6 flex flex-col items-center text-center gap-4 h-full justify-center">
               <div
@@ -128,11 +149,20 @@ export function CalendarWizardMembersForm({
         {/* Team Option */}
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Card
+            role="radio"
+            tabIndex={0}
+            aria-checked={!useSolo}
             className={cn(
               "cursor-pointer transition-all duration-300 relative overflow-hidden h-full",
               !useSolo ? activeOptionClasses : inactiveOptionClasses,
             )}
             onClick={() => onToggleUseSolo(false)}
+            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onToggleUseSolo(false);
+              }
+            }}
           >
             <div className="p-6 flex flex-col items-center text-center gap-4 h-full justify-center">
               <div
@@ -212,7 +242,7 @@ export function CalendarWizardMembersForm({
                       )}
                     </div>
                     <Button
-                      onClick={handleAddParams}
+                      onClick={handleSubmitMember}
                       disabled={!inputValue.trim()}
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -251,11 +281,7 @@ export function CalendarWizardMembersForm({
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 500,
-                              damping: 30,
-                            }}
+                            transition={SPRING_ANIMATION_CONFIG}
                           >
                             <div className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors group">
                               <Avatar className="h-9 w-9 border">
@@ -278,9 +304,9 @@ export function CalendarWizardMembersForm({
                                 size="icon"
                                 className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={() => onRemoveMember(member.id)}
+                                aria-label={`${member.email} を削除`}
                               >
                                 <Trash2 className="w-4 h-4" />
-                                <span className="sr-only">削除</span>
                               </Button>
                             </div>
                           </motion.li>
