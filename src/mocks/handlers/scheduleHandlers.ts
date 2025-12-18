@@ -1,6 +1,6 @@
 import { HttpResponse, http } from "msw";
 
-import { scheduleMock } from "@/mocks/data/schedule";
+import { scheduleStore } from "@/mocks/data/scheduleStore";
 
 /**
  * スケジュールAPIのモックハンドラー
@@ -19,10 +19,10 @@ export const scheduleHandlers = [
     // デバッグ用: 認証なしでも全データを返す
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       console.log("[MSW] No auth - returning all data for user-1");
-      const userCalendars = scheduleMock.calendars.filter(
+      const userCalendars = scheduleStore.calendars.filter(
         (calendar) => calendar.userId === "user-1",
       );
-      const userItems = scheduleMock.items.filter(
+      const userItems = scheduleStore.items.filter(
         (item) => item.userId === "user-1",
       );
       console.log("[MSW] Returning:", {
@@ -74,10 +74,10 @@ export const scheduleHandlers = [
       }
 
       // ユーザーIDに基づいてカレンダーとスケジュールをフィルタリング
-      const userCalendars = scheduleMock.calendars.filter(
+      const userCalendars = scheduleStore.calendars.filter(
         (calendar) => calendar.userId === userId,
       );
-      const userItems = scheduleMock.items.filter(
+      const userItems = scheduleStore.items.filter(
         (item) => item.userId === userId,
       );
       console.log("[MSW] Returning:", {
@@ -102,7 +102,7 @@ export const scheduleHandlers = [
       });
     } catch (_error) {
       console.log("[MSW] Token parse error, returning all data for user-1");
-      const userItems = scheduleMock.items.filter(
+      const userItems = scheduleStore.items.filter(
         (item) => item.userId === "user-1",
       );
       return HttpResponse.json({
@@ -133,7 +133,7 @@ export const scheduleHandlers = [
     // デバッグ用: 認証なしでも全データを返す
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       console.log("[MSW] No auth - returning all calendars for user-1");
-      const userCalendars = scheduleMock.calendars.filter(
+      const userCalendars = scheduleStore.calendars.filter(
         (calendar) => calendar.userId === "user-1",
       );
       console.log("[MSW] Returning calendars:", userCalendars.length);
@@ -168,7 +168,7 @@ export const scheduleHandlers = [
       }
 
       // ユーザーIDに基づいてカレンダーとスケジュールをフィルタリング
-      const userCalendars = scheduleMock.calendars.filter(
+      const userCalendars = scheduleStore.calendars.filter(
         (calendar) => calendar.userId === userId,
       );
       console.log("[MSW] Returning calendars:", userCalendars.length);
@@ -177,7 +177,7 @@ export const scheduleHandlers = [
       console.log(
         "[MSW] Token parse error, returning all calendars for user-1",
       );
-      const userCalendars = scheduleMock.calendars.filter(
+      const userCalendars = scheduleStore.calendars.filter(
         (calendar) => calendar.userId === "user-1",
       );
       return HttpResponse.json(userCalendars);
@@ -230,11 +230,11 @@ export const scheduleHandlers = [
 
       // リクエストボディを取得
       const body = await request.json();
-      const { name, color, imageFileName, customOptions } = body as {
+      const { name, color, imageFileName, options } = body as {
         name: string;
         color: string;
         imageFileName?: string | null;
-        customOptions?: string[];
+        options?: string[];
       };
 
       // 新しいカレンダーを作成
@@ -243,14 +243,16 @@ export const scheduleHandlers = [
         name,
         color,
         userId,
-        customOptions: customOptions ?? [],
+        options: options ?? [],
         ...(imageFileName && {
-          imageUrl: `https://images.unsplash.com/photo-${Math.random().toString(36).slice(2)}?auto=format&fit=crop&w=1200&q=80`,
+          imageUrl: `https://images.unsplash.com/photo-${Math.random()
+            .toString(36)
+            .slice(2)}?auto=format&fit=crop&w=1200&q=80`,
         }),
       };
 
       // モックデータに追加
-      (scheduleMock.calendars as unknown as Array<typeof newCalendar>).push(
+      (scheduleStore.calendars as unknown as Array<typeof newCalendar>).push(
         newCalendar,
       );
 
@@ -319,7 +321,7 @@ export const scheduleHandlers = [
           isAllDay?: boolean;
         };
 
-        const calendar = scheduleMock.calendars.find(
+        const calendar = scheduleStore.calendars.find(
           (c) => c.id === calendarId,
         );
 
@@ -350,8 +352,8 @@ export const scheduleHandlers = [
         };
 
         console.log("[MSW] 作成されたアイテム:", newItem);
-        (scheduleMock.items as unknown as Array<typeof newItem>).push(newItem);
-        console.log("[MSW] 現在のアイテム数:", scheduleMock.items.length);
+        (scheduleStore.items as unknown as Array<typeof newItem>).push(newItem);
+        console.log("[MSW] 現在のアイテム数:", scheduleStore.items.length);
 
         return HttpResponse.json({ id: newItem.id }, { status: 201 });
       } catch (_error) {
@@ -366,7 +368,7 @@ export const scheduleHandlers = [
   // GET /api/calendars/:id - カレンダー詳細取得
   http.get("http://localhost:8000/calendars/:id", ({ params }) => {
     const { id } = params;
-    const calendar = scheduleMock.calendars.find((c) => c.id === id);
+    const calendar = scheduleStore.calendars.find((c) => c.id === id);
 
     if (!calendar) {
       return HttpResponse.json(
@@ -383,8 +385,7 @@ export const scheduleHandlers = [
     return HttpResponse.json({
       calendar: {
         ...calendar,
-        customOptions:
-          (calendar as { customOptions?: string[] }).customOptions ?? [],
+        options: calendar.options ?? [],
       },
     });
   }),

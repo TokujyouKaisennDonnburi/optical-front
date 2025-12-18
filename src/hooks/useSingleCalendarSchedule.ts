@@ -20,7 +20,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
-  // カレンダー詳細と customOptions を取得
+  // カレンダー詳細と options を取得
   useEffect(() => {
     let isMounted = true;
 
@@ -30,7 +30,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
       try {
         const json = await getCalendarDetail(calendarId);
         if (isMounted) {
-          setCalendar(json);
+          setCalendar(json.calendar as CalendarDetail);
         }
       } catch (err) {
         if (isMounted) {
@@ -115,17 +115,28 @@ export function useSingleCalendarSchedule(calendarId: string) {
   }).format(new Date());
 
   // GitHub オプションの有無を判定
-  const customOptions = calendar?.options;
-  const hasGitHubOptions =
-    customOptions?.includes("pull_request_review_wait_count") ||
-    customOptions?.includes("team_review_load") ||
-    false;
+  const hasGitHubOptions = useMemo(() => {
+    if (!calendar?.options) return false;
+    return (
+      calendar.options.includes("pull_request_review_wait_count") ||
+      calendar.options.includes("team_review_load") ||
+      calendar.options.includes("milestone_progress")
+    );
+  }, [calendar]);
 
-  const showPrReviewOption =
-    customOptions?.includes("pull_request_review_wait_count") ?? false;
+  const showPrReviewOption = useMemo(() => {
+    return (
+      calendar?.options?.includes("pull_request_review_wait_count") ?? false
+    );
+  }, [calendar]);
 
-  const showTeamReviewLoadOption =
-    customOptions?.includes("team_review_load") ?? false;
+  const showTeamReviewLoadOption = useMemo(() => {
+    return calendar?.options?.includes("team_review_load") ?? false;
+  }, [calendar]);
+
+  const showMilestoneProgressOption = useMemo(() => {
+    return calendar?.options?.includes("milestone_progress") ?? false;
+  }, [calendar]);
 
   return {
     calendar,
@@ -137,6 +148,7 @@ export function useSingleCalendarSchedule(calendarId: string) {
     hasGitHubOptions,
     showPrReviewOption,
     showTeamReviewLoadOption,
+    showMilestoneProgressOption,
   };
 }
 

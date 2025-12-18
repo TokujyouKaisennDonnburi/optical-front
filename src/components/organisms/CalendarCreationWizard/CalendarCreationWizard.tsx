@@ -24,7 +24,6 @@ import { CalendarWizardSummary } from "@/components/molecules/CalendarWizardSumm
 import { ConfirmModal } from "@/components/molecules/ConfirmModal";
 import { createCalendar, uploadCalendarImage } from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
-import { startMockServiceWorker } from "@/mocks/browser";
 import type { CreateCalendarRequest } from "@/types/schedule";
 
 type StepKey = 0 | 1 | 2;
@@ -158,6 +157,13 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
     id: "release_notification",
     label: "リリース通知",
     description: "リリース予定日をチームに通知します。",
+    category: "engineer",
+  },
+  {
+    id: "milestone_progress",
+    label: "マイルストーン進捗",
+    description:
+      "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
     category: "engineer",
   },
 
@@ -452,15 +458,6 @@ export function CalendarCreationWizard() {
     setIsConfirmModalOpen(false);
 
     try {
-      // モックサービスワーカーを起動
-      if (typeof window !== "undefined") {
-        console.log("[CalendarCreationWizard] Starting MSW...");
-        await startMockServiceWorker();
-        // MSWが完全に起動するまで少し待機
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        console.log("[CalendarCreationWizard] MSW started");
-      }
-
       const payload: CreateCalendarRequest = {
         name: state.name.trim(),
         color: state.color,

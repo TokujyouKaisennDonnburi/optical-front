@@ -1,7 +1,7 @@
 import { apiGet, apiPost, apiRequest } from "@/lib/api-client";
 import type {
+  CalendarDetailResponse,
   CalendarListResponse,
-  CalendarQueryResponse,
   CreateCalendarRequest,
   CreateCalendarResponse,
   ImageUploadResponse,
@@ -22,7 +22,7 @@ export async function uploadCalendarImage(file: File) {
 }
 
 export async function getCalendarDetail(calendarId: string) {
-  return apiGet<CalendarQueryResponse>(`/calendars/${calendarId}`);
+  return apiGet<CalendarDetailResponse>(`/calendars/${calendarId}`);
 }
 
 export async function createCalendar(payload: CreateCalendarRequest) {
