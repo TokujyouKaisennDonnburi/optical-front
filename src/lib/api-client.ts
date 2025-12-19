@@ -194,3 +194,18 @@ export async function apiPost<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 }
+
+/**
+ * PATCH リクエスト
+ */
+export async function apiPatch<T>(
+  endpoint: string,
+  body?: unknown,
+  options?: ApiRequestOptions,
+): Promise<T> {
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "PATCH",
+    body: body ? JSON.stringify(body) : undefined,
+  });
+}

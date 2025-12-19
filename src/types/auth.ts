@@ -13,6 +13,8 @@ export interface User {
   name: string;
   /** メールアドレス */
   email: string;
+  /** プロフィール画像 */
+  avatarUrl: string | null;
   /** 作成日時 */
   created_at: string;
   /** 更新日時 */
