@@ -55,7 +55,7 @@ export function TodaySchedulePanel({
   items,
   timeline,
   isLoading = false,
-  emptyMessage = "今日の予定はありません。",
+  emptyMessage = "今日の予定はありません。お疲れ様です",
   className,
   contentClassName,
 }: TodaySchedulePanelProps) {

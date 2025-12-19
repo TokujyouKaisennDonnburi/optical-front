@@ -143,11 +143,13 @@ export type TeamReviewLoadOptionProps = {
   onReviewerChange?: (payload: ChangeReviewerRequest) => void;
 };
 
+/** GitHub OAuth コールバックリクエスト */
 export type GithubOauthRequest = {
   code: string;
   state: string;
 };
 
+/** GitHub App インストールリクエスト */
 export type GithubAppInstallRequest = {
   code: string;
   state: string;

@@ -23,6 +23,7 @@ export interface User {
   deleted_at?: string | null;
 }
 
+/** トークンリフレッシュリクエスト */
 export interface TokenRefreshRequest {
   refreshToken: string;
 }

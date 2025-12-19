@@ -411,9 +411,11 @@ export const scheduleHandlers = [
   // GET /api/calendars/:id - カレンダー詳細取得
   http.get("http://localhost:8000/calendars/:id", ({ params }) => {
     const { id } = params;
+    console.log("[MSW] GET /calendars/:id handler called, id:", id);
     const calendar = scheduleStore.calendars.find((c) => c.id === id);
 
     if (!calendar) {
+      console.log("[MSW] Calendar not found:", id);
       return HttpResponse.json(
         {
           error: {
@@ -425,11 +427,22 @@ export const scheduleHandlers = [
       );
     }
 
+    console.log("[MSW] Returning calendar:", calendar);
+    // CalendarDetailApiResponse形式で返す（calendarでラップしない）
     return HttpResponse.json({
-      calendar: {
-        ...calendar,
-        options: calendar.options ?? [],
-      },
+      id: calendar.id,
+      name: calendar.name,
+      color: calendar.color,
+      imageUrl: calendar.imageUrl,
+      // モックデータにはメンバー情報が含まれていないため、空配列を返す
+      // 将来的にメンバー機能を実装する際に、scheduleStore.calendarsにmemberプロパティを追加する
+      member: [],
+      // options配列をoption配列形式に変換
+      option: (calendar.options ?? []).map((name, index) => ({
+        id: index + 1,
+        name,
+        deprecated: false,
+      })),
     });
   }),
 ];
