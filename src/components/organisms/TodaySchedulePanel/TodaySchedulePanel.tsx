@@ -1,5 +1,8 @@
-import { useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bot, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
 
+import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
@@ -12,6 +15,7 @@ import type {
   TodayScheduleTimelineSlot,
 } from "@/components/molecules/TodayScheduleTimeline";
 import { TodayScheduleTimeline } from "@/components/molecules/TodayScheduleTimeline";
+import { AgentChatView } from "@/components/organisms/AgentChat";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type TodaySchedulePanelItem = {
@@ -48,6 +52,7 @@ export type TodaySchedulePanelProps = {
   emptyMessage?: string;
   className?: string;
   contentClassName?: string;
+  defaultViewMode?: "agenda" | "agent";
 };
 
 export function TodaySchedulePanel({
@@ -58,7 +63,10 @@ export function TodaySchedulePanel({
   emptyMessage = "今日の予定はありません。お疲れ様です",
   className,
   contentClassName,
+  defaultViewMode = "agenda",
 }: TodaySchedulePanelProps) {
+  const [viewMode, setViewMode] = useState<"agenda" | "agent">(defaultViewMode);
+
   const derivedSlots = useMemo(() => {
     if (timeline?.slots?.length) {
       return markCurrentSlot(timeline.slots);
@@ -67,40 +75,93 @@ export function TodaySchedulePanel({
   }, [items, timeline?.slots]);
 
   return (
-    <Card className={cn("flex h-full w-full min-h-0 flex-col", className)}>
+    <Card
+      className={cn(
+        "flex h-full w-full min-h-0 flex-col overflow-hidden",
+        className,
+      )}
+    >
       <CardHeader className="border-b border-border px-4 py-3">
         <TodayScheduleHeader
-          title={header.title}
-          dateLabel={header.dateLabel}
-          description={header.description}
-          actions={header.actions}
+          title={viewMode === "agenda" ? header.title : "OptiCal Agent"}
+          dateLabel={viewMode === "agenda" ? header.dateLabel : undefined}
+          description={viewMode === "agenda" ? header.description : undefined}
+          actions={
+            <div className="flex items-center gap-1.5">
+              {header.actions}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={() =>
+                  setViewMode((prev) =>
+                    prev === "agenda" ? "agent" : "agenda",
+                  )
+                }
+              >
+                {viewMode === "agenda" ? (
+                  <Sparkles size={18} />
+                ) : (
+                  <Bot size={18} />
+                )}
+              </Button>
+            </div>
+          }
         />
       </CardHeader>
       <CardContent
         className={cn(
-          "flex flex-1 flex-col overflow-hidden px-4 py-3",
+          "flex flex-1 flex-col overflow-hidden px-0 py-0",
           contentClassName,
         )}
       >
         <div className="relative flex flex-1 min-h-0">
-          {isLoading ? (
-            <Skeleton className="h-full min-h-0 w-full" />
-          ) : (
-            <>
-              <TodayScheduleTimeline
-                slots={derivedSlots}
-                className={cn("flex-1", timeline?.className)}
-                contentClassName={timeline?.contentClassName}
-              />
-              {!items.length ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                  <Text as="span" size="sm" className="text-muted-foreground">
-                    {emptyMessage}
-                  </Text>
-                </div>
-              ) : null}
-            </>
-          )}
+          <AnimatePresence mode="wait" initial={false}>
+            {viewMode === "agenda" ? (
+              <motion.div
+                key="agenda"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-1 flex-col w-full h-full px-4 py-3"
+              >
+                {isLoading ? (
+                  <Skeleton className="h-full min-h-0 w-full" />
+                ) : (
+                  <>
+                    <TodayScheduleTimeline
+                      slots={derivedSlots}
+                      className={cn("flex-1", timeline?.className)}
+                      contentClassName={timeline?.contentClassName}
+                    />
+                    {!items.length ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <Text
+                          as="span"
+                          size="sm"
+                          className="text-muted-foreground"
+                        >
+                          {emptyMessage}
+                        </Text>
+                      </div>
+                    ) : null}
+                  </>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="agent"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-1 flex-col w-full h-full"
+              >
+                <AgentChatView />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </CardContent>
     </Card>
