@@ -117,7 +117,7 @@ export function AgentChatView({ className }: AgentChatViewProps) {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="AIエージェントに話しかける..."
+            placeholder="OptiCalエージェントに話しかける..."
             className="pr-10"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.nativeEvent.isComposing) {
