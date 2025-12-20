@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, Sparkles } from "lucide-react";
+import { CalendarCheck, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/atoms/Button";
@@ -102,7 +102,7 @@ export function TodaySchedulePanel({
                 {viewMode === "agenda" ? (
                   <Sparkles size={18} />
                 ) : (
-                  <Bot size={18} />
+                  <CalendarCheck size={18} />
                 )}
               </Button>
             </div>
