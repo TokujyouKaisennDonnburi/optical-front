@@ -59,9 +59,9 @@ export const Playground: Story = {
 export const SoloMode: Story = {
   render: () => {
     const [useSolo, setUseSolo] = useState(true);
-    const [members, setMembers] = useState<Array<{ id: string; email: string }>>(
-      [],
-    );
+    const [members, setMembers] = useState<
+      Array<{ id: string; email: string }>
+    >([]);
 
     return (
       <div className="max-w-2xl">
