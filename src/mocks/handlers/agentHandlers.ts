@@ -37,7 +37,7 @@ export const agentHandlers = [
         type: "text",
         content: "承知いたしました。他にお手伝いできることはありますか？",
       });
-    } catch (e) {
+    } catch (e: unknown) {
       console.error("[MSW] Failed to parse request body", e);
       return HttpResponse.json({ error: "Invalid request" }, { status: 400 });
     }

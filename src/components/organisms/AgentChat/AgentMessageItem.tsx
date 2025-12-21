@@ -24,11 +24,47 @@ export type AgentMessageItemProps = {
   } | null;
 };
 
+/**
+ * ユーザー名からイニシャル（2文字）を生成する。
+ * スペース区切りで単語を分割し、各単語の先頭コードポイントを取得。
+ * 絵文字やサロゲートペアにも対応。
+ */
+function getInitials(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return "U";
+  }
+
+  // スペース区切りで単語に分割し、各単語の先頭コードポイントを取得
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  const chars: string[] = [];
+
+  for (let i = 0; i < words.length && chars.length < 2; i++) {
+    const word = words[i];
+    const codePoints = Array.from(word);
+    if (codePoints.length > 0) {
+      chars.push(codePoints[0]);
+    }
+  }
+
+  if (chars.length === 2) {
+    return (chars[0] + chars[1]).toUpperCase();
+  }
+  if (chars.length === 1) {
+    // 1文字名などの場合でも2文字のイニシャルを返す
+    return (chars[0] + chars[0]).toUpperCase();
+  }
+
+  // 単語単位で取得できなかった場合は、全体から最大2コードポイントを使用
+  const fallback = Array.from(trimmed).slice(0, 2).join("");
+  return fallback.toUpperCase() || "U";
+}
+
 export function AgentMessageItem({ message, user }: AgentMessageItemProps) {
   const isAgent = message.role === "agent";
 
   // Initials generation
-  const initials = user?.name ? user.name.slice(0, 2).toUpperCase() : "U";
+  const initials = user?.name ? getInitials(user.name) : "U";
 
   return (
     <div

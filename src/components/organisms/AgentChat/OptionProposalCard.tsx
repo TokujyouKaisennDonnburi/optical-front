@@ -18,7 +18,7 @@ export function OptionProposalCard({
     "idle",
   );
 
-  const handleInstall = () => {
+  const handleInstall = (): void => {
     setStatus("loading");
     // Simulate network request
     setTimeout(() => {

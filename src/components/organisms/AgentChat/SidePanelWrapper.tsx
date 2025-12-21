@@ -5,16 +5,34 @@ import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/atoms/Button";
 
+/** サイドパネルのデフォルト幅（px） */
+const SIDE_PANEL_DEFAULT_WIDTH = 400;
+
+/** アニメーション設定 */
+const ANIMATION = {
+  /** パネルのスプリングアニメーション設定 */
+  panel: {
+    type: "spring" as const,
+    damping: 30,
+    stiffness: 300,
+  },
+  /** FAB（Floating Action Button）の表示遅延（秒） */
+  fabDelay: 0.5,
+} as const;
+
 type SidePanelWrapperProps = {
   isOpen: boolean;
   onToggle: () => void;
   children: ReactNode;
+  /** パネルの幅（px）。デフォルトは400px */
+  width?: number;
 };
 
 export function SidePanelWrapper({
   isOpen,
   onToggle,
   children,
+  width = SIDE_PANEL_DEFAULT_WIDTH,
 }: SidePanelWrapperProps) {
   return (
     <>
@@ -22,13 +40,13 @@ export function SidePanelWrapper({
         {isOpen && (
           <motion.div
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 400, opacity: 1 }}
+            animate={{ width, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            transition={ANIMATION.panel}
             className="flex-shrink-0 border border-border bg-card h-full overflow-hidden shadow-xl rounded-xl"
             data-id="side-panel-wrapper"
           >
-            <div className="flex h-full w-[400px] flex-col">
+            <div className="flex h-full flex-col" style={{ width }}>
               {/* Content passed from parent */}
               {children}
             </div>
@@ -41,7 +59,7 @@ export function SidePanelWrapper({
         className="fixed bottom-6 right-6 z-30"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: ANIMATION.fabDelay }}
       >
         {!isOpen && (
           <Button

@@ -8,6 +8,27 @@ import { sendChatMessage } from "@/lib/api-agent";
 import { cn } from "@/utils_constants_styles/utils";
 import { type AgentMessage, AgentMessageItem } from "./AgentMessageItem";
 
+/**
+ * UIメッセージ定数
+ * TODO: 将来的にはi18nライブラリ（react-intl, next-intl等）に置き換え
+ */
+const MESSAGES = {
+  error: {
+    generic: "すみません、エラーが発生しました。もう一度お試しください。",
+  },
+  placeholder: {
+    input: "OptiCalエージェントに話しかける...",
+  },
+  emptyState: {
+    greeting: "カレンダーの最適化をお手伝いします。",
+    question: "何かお手伝いできることはありますか？",
+  },
+  quickChips: {
+    recommendOptions: "おすすめのオプションは？",
+    githubIntegration: "GitHub連携について教えて",
+  },
+} as const;
+
 export type AgentChatViewProps = {
   className?: string;
 };
@@ -25,7 +46,7 @@ export function AgentChatView({ className }: AgentChatViewProps) {
     }
   }, [messages]);
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = async (text: string): Promise<void> => {
     if (!text.trim()) return;
 
     const userMessage: AgentMessage = {
@@ -57,7 +78,7 @@ export function AgentChatView({ className }: AgentChatViewProps) {
         id: Date.now().toString(),
         role: "agent",
         type: "text",
-        content: "すみません、エラーが発生しました。もう一度お試しください。",
+        content: MESSAGES.error.generic,
       };
       setMessages((prev) => [...prev, errorMessage]);
     }
@@ -75,9 +96,9 @@ export function AgentChatView({ className }: AgentChatViewProps) {
               </div>
               <div className="space-y-2 max-w-[280px]">
                 <Text size="sm" className="text-muted-foreground">
-                  カレンダーの最適化をお手伝いします。
+                  {MESSAGES.emptyState.greeting}
                   <br />
-                  何かお手伝いできることはありますか？
+                  {MESSAGES.emptyState.question}
                 </Text>
               </div>
             </div>
@@ -88,17 +109,21 @@ export function AgentChatView({ className }: AgentChatViewProps) {
                 variant="outline"
                 size="sm"
                 className="rounded-full text-xs h-7"
-                onClick={() => handleSendMessage("おすすめのオプションは？")}
+                onClick={() =>
+                  handleSendMessage(MESSAGES.quickChips.recommendOptions)
+                }
               >
-                おすすめのオプションは？
+                {MESSAGES.quickChips.recommendOptions}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 className="rounded-full text-xs h-7"
-                onClick={() => handleSendMessage("GitHub連携について教えて")}
+                onClick={() =>
+                  handleSendMessage(MESSAGES.quickChips.githubIntegration)
+                }
               >
-                GitHub連携について教えて
+                {MESSAGES.quickChips.githubIntegration}
               </Button>
             </div>
           </div>
@@ -117,7 +142,7 @@ export function AgentChatView({ className }: AgentChatViewProps) {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="OptiCalエージェントに話しかける..."
+            placeholder={MESSAGES.placeholder.input}
             className="pr-10"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.nativeEvent.isComposing) {
