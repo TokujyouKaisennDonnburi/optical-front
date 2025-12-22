@@ -1,4 +1,5 @@
 import { HttpResponse, http } from "msw";
+import { mockAgentResponses, mockOptionProposals } from "../data/agent";
 
 export const agentHandlers = [
   http.post("http://localhost:8000/agent/chat", async ({ request }) => {
@@ -9,25 +10,34 @@ export const agentHandlers = [
 
     try {
       const body = (await request.json()) as { message: string };
-      const text = body.message;
+      const text = body.message.toLowerCase();
+
+      // GitHub連携についての質問
+      if (
+        text.includes("github連携") ||
+        (text.includes("github") && text.includes("教えて"))
+      ) {
+        return HttpResponse.json({
+          id: (Date.now() + 1).toString(),
+          role: "agent",
+          type: "text",
+          content: mockAgentResponses.githubInfo,
+        });
+      }
+
+      // オプション提案リクエスト
       const isOptionRequest =
         text.includes("オプション") ||
         text.includes("option") ||
-        text.includes("GitHub");
+        text.includes("おすすめ");
 
       if (isOptionRequest) {
         return HttpResponse.json({
           id: (Date.now() + 1).toString(),
           role: "agent",
           type: "option-proposal",
-          content: "こちらのオプションがおすすめです。",
-          data: [
-            {
-              id: 1,
-              name: "GitHub Integration",
-              description: "開発スプリントと連携します",
-            },
-          ],
+          content: mockAgentResponses.optionProposal,
+          data: mockOptionProposals,
         });
       }
 
@@ -35,7 +45,7 @@ export const agentHandlers = [
         id: (Date.now() + 1).toString(),
         role: "agent",
         type: "text",
-        content: "承知いたしました。他にお手伝いできることはありますか？",
+        content: mockAgentResponses.defaultResponse,
       });
     } catch (e: unknown) {
       console.error("[MSW] Failed to parse request body", e);

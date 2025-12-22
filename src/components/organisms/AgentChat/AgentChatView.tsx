@@ -1,8 +1,13 @@
-import { Bot, Send } from "lucide-react";
+import { Bot, CalendarPlus, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/atoms/Button";
-import { Input } from "@/components/atoms/Input";
 import { Text } from "@/components/atoms/Text";
+import { Textarea } from "@/components/atoms/Textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/atoms/Tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { sendChatMessage } from "@/lib/api-agent";
 import { cn } from "@/utils_constants_styles/utils";
@@ -29,6 +34,35 @@ const MESSAGES = {
   },
 } as const;
 
+/**
+ * テンプレートボタンの定義
+ * template: 虫食い形式のテンプレート文字列（[]内を編集）
+ */
+const TEMPLATE_BUTTONS = [
+  {
+    id: "create-schedule",
+    label: "予定を作る",
+    icon: CalendarPlus,
+    tooltip: "予定作成テンプレートを入力",
+    template: `予定を作成してください。
+
+予定名: [予定名を入力]
+時間帯: [開始時刻] 〜 [終了時刻] または 終日
+メモ: [メモを入力（任意）]
+場所: [場所を入力（任意）]`,
+  },
+  {
+    id: "suggest-options",
+    label: "オプション提案",
+    icon: Sparkles,
+    tooltip: "オプション提案をリクエスト",
+    template: `このカレンダーにおすすめのオプションを提案してください。
+
+用途: [カレンダーの用途を入力]
+優先したいこと: [効率化 / 可視化 / 通知 など]`,
+  },
+] as const;
+
 export type AgentChatViewProps = {
   className?: string;
 };
@@ -38,6 +72,7 @@ export function AgentChatView({ className }: AgentChatViewProps) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<AgentMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom when messages change
   useEffect(() => {
@@ -82,6 +117,15 @@ export function AgentChatView({ className }: AgentChatViewProps) {
       };
       setMessages((prev) => [...prev, errorMessage]);
     }
+  };
+
+  /**
+   * テンプレートをテキストフィールドに挿入
+   */
+  const handleTemplateClick = (template: string) => {
+    setInputValue(template);
+    // フォーカスをテキストエリアに移動
+    textareaRef.current?.focus();
   };
 
   return (
@@ -137,28 +181,63 @@ export function AgentChatView({ className }: AgentChatViewProps) {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border bg-background/50 backdrop-blur-sm">
-        <div className="relative flex items-center">
-          <Input
+      <div className="p-4 border-t border-border bg-background/50 backdrop-blur-sm space-y-3">
+        {/* Template Buttons */}
+        <div className="flex gap-2">
+          {TEMPLATE_BUTTONS.map((btn) => (
+            <Tooltip key={btn.id}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1.5 text-xs font-medium hover:bg-primary/10 hover:border-primary/50 transition-colors"
+                  onClick={() => handleTemplateClick(btn.template)}
+                >
+                  <btn.icon size={14} />
+                  {btn.label}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={8}>
+                {btn.tooltip}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+
+        {/* Text Input */}
+        <div className="relative">
+          <Textarea
+            ref={textareaRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={MESSAGES.placeholder.input}
-            className="pr-10"
+            rows={4}
+            className="pr-12 resize-none min-h-[100px]"
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+              // Cmd/Ctrl + Enter で送信
+              if (
+                e.key === "Enter" &&
+                (e.metaKey || e.ctrlKey) &&
+                !e.nativeEvent.isComposing
+              ) {
                 e.preventDefault();
                 handleSendMessage(inputValue);
               }
             }}
           />
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute right-1 w-8 h-8 text-muted-foreground hover:text-foreground"
-            onClick={() => handleSendMessage(inputValue)}
-          >
-            <Send size={16} />
-          </Button>
+          <div className="absolute right-2 bottom-2 flex items-center gap-1">
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">
+              ⌘+Enter で送信
+            </span>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-8 h-8 text-muted-foreground hover:text-foreground hover:bg-primary/10"
+              onClick={() => handleSendMessage(inputValue)}
+            >
+              <Send size={16} />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

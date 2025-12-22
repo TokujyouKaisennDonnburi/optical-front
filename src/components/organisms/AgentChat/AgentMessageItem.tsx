@@ -1,5 +1,6 @@
 import { Bot } from "lucide-react";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 import { cn } from "@/utils_constants_styles/utils";
 import {
   OptionProposalCard,
@@ -14,6 +15,27 @@ export type AgentMessage = {
   type: MessageType;
   content?: string;
   data?: OptionProposalProps[];
+};
+
+/**
+ * マークダウンレンダリング用のカスタムスタイル
+ */
+const markdownStyles = {
+  container: "prose prose-sm dark:prose-invert max-w-none",
+  // 各要素のスタイル
+  p: "mb-2 last:mb-0",
+  ul: "list-disc list-inside mb-2 last:mb-0 space-y-1",
+  ol: "list-decimal list-inside mb-2 last:mb-0 space-y-1",
+  li: "ml-2",
+  h1: "text-lg font-bold mb-2",
+  h2: "text-base font-bold mb-2",
+  h3: "text-sm font-bold mb-2",
+  code: "bg-black/10 dark:bg-white/10 px-1 py-0.5 rounded text-xs font-mono",
+  pre: "bg-black/10 dark:bg-white/10 p-2 rounded-md overflow-x-auto mb-2 last:mb-0",
+  blockquote: "border-l-2 border-primary pl-3 italic my-2",
+  a: "text-primary underline hover:no-underline",
+  strong: "font-bold",
+  em: "italic",
 };
 
 export type AgentMessageItemProps = {
@@ -88,13 +110,72 @@ export function AgentMessageItem({ message, user }: AgentMessageItemProps) {
         {message.type === "text" && (
           <div
             className={cn(
-              "px-3 py-2 rounded-lg text-sm whitespace-pre-wrap",
+              "px-3 py-2 rounded-lg text-sm",
               isAgent
                 ? "bg-muted text-foreground"
-                : "bg-primary text-primary-foreground",
+                : "bg-primary text-primary-foreground whitespace-pre-wrap",
             )}
           >
-            {message.content}
+            {isAgent && message.content ? (
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => (
+                    <p className={markdownStyles.p}>{children}</p>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className={markdownStyles.ul}>{children}</ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className={markdownStyles.ol}>{children}</ol>
+                  ),
+                  li: ({ children }) => (
+                    <li className={markdownStyles.li}>{children}</li>
+                  ),
+                  h1: ({ children }) => (
+                    <h1 className={markdownStyles.h1}>{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className={markdownStyles.h2}>{children}</h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className={markdownStyles.h3}>{children}</h3>
+                  ),
+                  code: ({ children }) => (
+                    <code className={markdownStyles.code}>{children}</code>
+                  ),
+                  pre: ({ children }) => (
+                    <pre className={markdownStyles.pre}>{children}</pre>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote className={markdownStyles.blockquote}>
+                      {children}
+                    </blockquote>
+                  ),
+                  a: ({ children, href }) => (
+                    <a
+                      href={href}
+                      className={markdownStyles.a}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {children}
+                    </a>
+                  ),
+                  strong: ({ children }) => (
+                    <strong className={markdownStyles.strong}>
+                      {children}
+                    </strong>
+                  ),
+                  em: ({ children }) => (
+                    <em className={markdownStyles.em}>{children}</em>
+                  ),
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            ) : (
+              message.content
+            )}
           </div>
         )}
 
@@ -102,7 +183,23 @@ export function AgentMessageItem({ message, user }: AgentMessageItemProps) {
           <div className="flex flex-col gap-2">
             {message.content && (
               <div className="px-3 py-2 rounded-lg text-sm bg-muted text-foreground mb-1">
-                {message.content}
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => (
+                      <p className={markdownStyles.p}>{children}</p>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className={markdownStyles.strong}>
+                        {children}
+                      </strong>
+                    ),
+                    em: ({ children }) => (
+                      <em className={markdownStyles.em}>{children}</em>
+                    ),
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
               </div>
             )}
             {message.data.map((proposal) => (
