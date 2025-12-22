@@ -9,8 +9,16 @@ export const agentHandlers = [
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     try {
-      const body = (await request.json()) as { message: string };
+      const body = (await request.json()) as {
+        message: string;
+        calendarId?: string;
+      };
       const text = body.message.toLowerCase();
+
+      // カレンダーIDがある場合はログ出力
+      if (body.calendarId) {
+        console.log("[MSW] Using calendar ID:", body.calendarId);
+      }
 
       // GitHub連携についての質問
       if (

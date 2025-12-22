@@ -15,7 +15,10 @@ import type {
   TodayScheduleTimelineSlot,
 } from "@/components/molecules/TodayScheduleTimeline";
 import { TodayScheduleTimeline } from "@/components/molecules/TodayScheduleTimeline";
-import { AgentChatView } from "@/components/organisms/AgentChat";
+import {
+  AgentChatView,
+  type CalendarInfo,
+} from "@/components/organisms/AgentChat";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type TodaySchedulePanelItem = {
@@ -53,6 +56,8 @@ export type TodaySchedulePanelProps = {
   className?: string;
   contentClassName?: string;
   defaultViewMode?: "agenda" | "agent";
+  /** AIエージェントで選択可能なカレンダーリスト */
+  calendars?: CalendarInfo[];
 };
 
 export function TodaySchedulePanel({
@@ -64,6 +69,7 @@ export function TodaySchedulePanel({
   className,
   contentClassName,
   defaultViewMode = "agenda",
+  calendars = [],
 }: TodaySchedulePanelProps) {
   const [viewMode, setViewMode] = useState<"agenda" | "agent">(defaultViewMode);
 
@@ -158,7 +164,7 @@ export function TodaySchedulePanel({
                 transition={{ duration: 0.2 }}
                 className="flex flex-1 flex-col w-full h-full"
               >
-                <AgentChatView />
+                <AgentChatView calendars={calendars} />
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,4 +1,11 @@
-import { Bot, CalendarPlus, Send, Sparkles } from "lucide-react";
+import {
+  Bot,
+  Calendar,
+  CalendarPlus,
+  ChevronDown,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Text } from "@/components/atoms/Text";
@@ -8,10 +15,25 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/atoms/Tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/DropdownMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { sendChatMessage } from "@/lib/api-agent";
 import { cn } from "@/utils_constants_styles/utils";
 import { type AgentMessage, AgentMessageItem } from "./AgentMessageItem";
+
+/**
+ * カレンダー情報の型（AgentChatViewで使用）
+ */
+export type CalendarInfo = {
+  id: string;
+  name: string;
+  color: string;
+};
 
 /**
  * UIメッセージ定数
@@ -31,6 +53,11 @@ const MESSAGES = {
   quickChips: {
     recommendOptions: "おすすめのオプションは？",
     githubIntegration: "GitHub連携について教えて",
+  },
+  calendarSelector: {
+    label: "対象カレンダー",
+    placeholder: "カレンダーを選択",
+    allCalendars: "すべてのカレンダー",
   },
 } as const;
 
@@ -65,14 +92,36 @@ const TEMPLATE_BUTTONS = [
 
 export type AgentChatViewProps = {
   className?: string;
+  /** 選択可能なカレンダーのリスト */
+  calendars?: CalendarInfo[];
 };
 
-export function AgentChatView({ className }: AgentChatViewProps) {
+export function AgentChatView({
+  className,
+  calendars = [],
+}: AgentChatViewProps) {
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<AgentMessage[]>([]);
+  // undefined = すべてのカレンダーを対象
+  const [selectedCalendarId, setSelectedCalendarId] = useState<
+    string | undefined
+  >(undefined);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // カレンダーリストが変わったら、選択中のカレンダーが存在しなければリセット（undefinedは常に有効）
+  useEffect(() => {
+    if (
+      selectedCalendarId !== undefined &&
+      calendars.length > 0 &&
+      !calendars.find((c) => c.id === selectedCalendarId)
+    ) {
+      setSelectedCalendarId(undefined);
+    }
+  }, [calendars, selectedCalendarId]);
+
+  const selectedCalendar = calendars.find((c) => c.id === selectedCalendarId);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom when messages change
   useEffect(() => {
@@ -95,7 +144,7 @@ export function AgentChatView({ className }: AgentChatViewProps) {
     setInputValue("");
 
     try {
-      const data = await sendChatMessage(text);
+      const data = await sendChatMessage(text, selectedCalendarId);
 
       const agentMessage: AgentMessage = {
         id: data.id,
@@ -130,6 +179,86 @@ export function AgentChatView({ className }: AgentChatViewProps) {
 
   return (
     <div className={cn("flex flex-col h-full relative", className)}>
+      {/* Calendar Selector */}
+      {calendars.length > 0 && (
+        <div className="px-4 py-2 border-b border-border bg-muted/30">
+          <div className="flex items-center gap-2">
+            <Calendar size={14} className="text-muted-foreground" />
+            <Text size="sm" className="text-muted-foreground text-xs">
+              {MESSAGES.calendarSelector.label}:
+            </Text>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 gap-1.5 px-2 text-xs font-medium hover:bg-background/80"
+                >
+                  {selectedCalendar ? (
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: selectedCalendar.color }}
+                      aria-hidden
+                    />
+                  ) : (
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500"
+                      aria-hidden
+                    />
+                  )}
+                  <span className="truncate max-w-[150px]">
+                    {selectedCalendar?.name ??
+                      MESSAGES.calendarSelector.allCalendars}
+                  </span>
+                  <ChevronDown
+                    size={12}
+                    className="text-muted-foreground shrink-0"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[200px]">
+                {/* All Calendars Option */}
+                <DropdownMenuItem
+                  className={cn(
+                    "flex items-center gap-2 cursor-pointer",
+                    selectedCalendarId === undefined && "bg-accent",
+                  )}
+                  onClick={() => setSelectedCalendarId(undefined)}
+                >
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full shrink-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500"
+                    aria-hidden
+                  />
+                  <span className="truncate">
+                    {MESSAGES.calendarSelector.allCalendars}
+                  </span>
+                </DropdownMenuItem>
+                {/* Separator */}
+                <div className="my-1 h-px bg-border" />
+                {/* Individual Calendars */}
+                {calendars.map((cal) => (
+                  <DropdownMenuItem
+                    key={cal.id}
+                    className={cn(
+                      "flex items-center gap-2 cursor-pointer",
+                      selectedCalendarId === cal.id && "bg-accent",
+                    )}
+                    onClick={() => setSelectedCalendarId(cal.id)}
+                  >
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: cal.color }}
+                      aria-hidden
+                    />
+                    <span className="truncate">{cal.name}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      )}
+
       {/* Messages Area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 flex flex-col">
         {messages.length === 0 ? (

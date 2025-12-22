@@ -226,6 +226,7 @@ function HomeContent() {
             emptyMessage={
               error ? "予定を取得できませんでした" : "今日の予定はありません。"
             }
+            calendars={calendars}
           />
         </div>
       </main>
