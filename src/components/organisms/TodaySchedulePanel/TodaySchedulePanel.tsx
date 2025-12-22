@@ -104,6 +104,11 @@ export function TodaySchedulePanel({
                     prev === "agenda" ? "agent" : "agenda",
                   )
                 }
+                aria-label={
+                  viewMode === "agenda"
+                    ? "AIエージェントに切り替え"
+                    : "アジェンダビューに切り替え"
+                }
               >
                 {viewMode === "agenda" ? (
                   <Sparkles size={18} />

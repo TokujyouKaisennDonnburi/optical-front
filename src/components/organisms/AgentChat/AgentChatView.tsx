@@ -134,7 +134,7 @@ export function AgentChatView({
     if (!text.trim()) return;
 
     const userMessage: AgentMessage = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       role: "user",
       type: "text",
       content: text,
@@ -159,7 +159,7 @@ export function AgentChatView({
       console.error("Chat error:", error);
       // Optional: Add error message to chat
       const errorMessage: AgentMessage = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         role: "agent",
         type: "text",
         content: MESSAGES.error.generic,
@@ -363,6 +363,7 @@ export function AgentChatView({
               variant="ghost"
               className="w-8 h-8 text-muted-foreground hover:text-foreground hover:bg-primary/10"
               onClick={() => handleSendMessage(inputValue)}
+              aria-label="メッセージを送信"
             >
               <Send size={16} />
             </Button>

@@ -67,6 +67,7 @@ export function SidePanelWrapper({
             className="h-14 w-14 rounded-full bg-primary shadow-lg shadow-primary/25 hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-300"
             onClick={onToggle}
             data-id="agent-trigger-fab"
+            aria-label="AIエージェントを開く"
           >
             <Sparkles className="h-6 w-6 text-primary-foreground" />
           </Button>
