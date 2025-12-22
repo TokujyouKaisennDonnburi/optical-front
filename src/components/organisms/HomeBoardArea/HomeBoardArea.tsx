@@ -1,5 +1,5 @@
 import { CalendarDays } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Card, CardContent } from "@/components/atoms/Card";
 import { toast } from "@/components/atoms/Toast";
@@ -10,7 +10,7 @@ import {
   type GeneralScheduleBoardItem,
   ScheduleEventDialog,
 } from "@/components/organisms/GeneralScheduleBoard";
-import { useGeneralSchedule } from "@/hooks/useGeneralSchedule";
+import type { useGeneralSchedule } from "@/hooks/useGeneralSchedule";
 import { createSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
