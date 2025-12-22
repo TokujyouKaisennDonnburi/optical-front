@@ -12,7 +12,7 @@ import React, {
 import { Loading } from "@/components/atoms/Loading";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
-import { HomeBoardArea } from "@/components/organisms/HomeBoardArea/HomeBoardArea";
+import { HomeBoardArea } from "@/components/organisms/HomeBoardArea";
 import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/GeneralSearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
