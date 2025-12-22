@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "Running pre-push checks..."
 echo "Build validation will be performed in GitHub Actions"
 echo "pre-push checks passed!"
