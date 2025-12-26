@@ -1,6 +1,7 @@
 import { Bot } from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { cn } from "@/utils_constants_styles/utils";
 import {
   OptionProposalCard,
@@ -36,6 +37,13 @@ const markdownStyles = {
   a: "text-primary underline hover:no-underline",
   strong: "font-bold",
   em: "italic",
+  // テーブル関連のスタイル
+  table: "w-full border-collapse mb-2 last:mb-0 text-xs",
+  thead: "bg-black/5 dark:bg-white/10",
+  tbody: "",
+  tr: "border-b border-black/10 dark:border-white/10",
+  th: "px-2 py-1.5 text-left font-semibold",
+  td: "px-2 py-1.5",
 };
 
 export type AgentMessageItemProps = {
@@ -118,6 +126,7 @@ export function AgentMessageItem({ message, user }: AgentMessageItemProps) {
           >
             {isAgent && message.content ? (
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   p: ({ children }) => (
                     <p className={markdownStyles.p}>{children}</p>
@@ -168,6 +177,27 @@ export function AgentMessageItem({ message, user }: AgentMessageItemProps) {
                   ),
                   em: ({ children }) => (
                     <em className={markdownStyles.em}>{children}</em>
+                  ),
+                  // テーブル要素
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto">
+                      <table className={markdownStyles.table}>{children}</table>
+                    </div>
+                  ),
+                  thead: ({ children }) => (
+                    <thead className={markdownStyles.thead}>{children}</thead>
+                  ),
+                  tbody: ({ children }) => (
+                    <tbody className={markdownStyles.tbody}>{children}</tbody>
+                  ),
+                  tr: ({ children }) => (
+                    <tr className={markdownStyles.tr}>{children}</tr>
+                  ),
+                  th: ({ children }) => (
+                    <th className={markdownStyles.th}>{children}</th>
+                  ),
+                  td: ({ children }) => (
+                    <td className={markdownStyles.td}>{children}</td>
                   ),
                 }}
               >

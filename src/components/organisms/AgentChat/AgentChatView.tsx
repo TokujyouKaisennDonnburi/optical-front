@@ -22,8 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
 import { useAuth } from "@/hooks/useAuth";
-import { sendChatMessage } from "@/lib/api-agent";
+import { type StatusEvent, sendChatMessageSSE } from "@/lib/api-agent-sse";
 import { cn } from "@/utils_constants_styles/utils";
+import { AgentLoadingIndicator } from "./AgentLoadingIndicator";
 import { type AgentMessage, AgentMessageItem } from "./AgentMessageItem";
 
 /**
@@ -107,8 +108,14 @@ export function AgentChatView({
   const [selectedCalendarId, setSelectedCalendarId] = useState<
     string | undefined
   >(undefined);
+  // SSE処理中のステータス
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<StatusEvent | null>(
+    null,
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // カレンダーリストが変わったら、選択中のカレンダーが存在しなければリセット（undefinedは常に有効）
   useEffect(() => {
@@ -128,10 +135,19 @@ export function AgentChatView({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, processingStatus]);
 
-  const handleSendMessage = async (text: string): Promise<void> => {
-    if (!text.trim()) return;
+  // コンポーネントアンマウント時にリクエストをキャンセル
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  const handleSendMessage = (text: string): void => {
+    if (!text.trim() || isProcessing) return;
 
     const userMessage: AgentMessage = {
       id: crypto.randomUUID(),
@@ -142,30 +158,41 @@ export function AgentChatView({
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
+    setIsProcessing(true);
+    setProcessingStatus({ stage: "connecting", message: "接続中..." });
 
-    try {
-      const data = await sendChatMessage(text, selectedCalendarId);
-
-      const agentMessage: AgentMessage = {
-        id: data.id,
-        role: "agent",
-        type: data.type,
-        content: data.content,
-        data: data.data,
-      };
-
-      setMessages((prev) => [...prev, agentMessage]);
-    } catch (error) {
-      console.error("Chat error:", error);
-      // Optional: Add error message to chat
-      const errorMessage: AgentMessage = {
-        id: crypto.randomUUID(),
-        role: "agent",
-        type: "text",
-        content: MESSAGES.error.generic,
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    }
+    // SSEリクエストを送信
+    abortControllerRef.current = sendChatMessageSSE(text, selectedCalendarId, {
+      onStatus: (status: StatusEvent) => {
+        setProcessingStatus(status);
+      },
+      onComplete: (response: AgentMessage) => {
+        const agentMessage: AgentMessage = {
+          id: response.id,
+          role: "agent",
+          type: response.type,
+          content: response.content,
+          data: response.data,
+        };
+        setMessages((prev) => [...prev, agentMessage]);
+        setIsProcessing(false);
+        setProcessingStatus(null);
+        abortControllerRef.current = null;
+      },
+      onError: (error: Error) => {
+        console.error("Chat error:", error);
+        const errorMessage: AgentMessage = {
+          id: crypto.randomUUID(),
+          role: "agent",
+          type: "text",
+          content: MESSAGES.error.generic,
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+        setIsProcessing(false);
+        setProcessingStatus(null);
+        abortControllerRef.current = null;
+      },
+    });
   };
 
   /**
@@ -305,6 +332,13 @@ export function AgentChatView({
             {messages.map((msg) => (
               <AgentMessageItem key={msg.id} message={msg} user={user} />
             ))}
+            {/* Processing Status Indicator */}
+            {isProcessing && processingStatus && (
+              <AgentLoadingIndicator
+                stage={processingStatus.stage}
+                message={processingStatus.message}
+              />
+            )}
           </div>
         )}
       </div>
@@ -342,6 +376,7 @@ export function AgentChatView({
             placeholder={MESSAGES.placeholder.input}
             rows={4}
             className="pr-12 resize-none min-h-[100px]"
+            disabled={isProcessing}
             onKeyDown={(e) => {
               // Cmd/Ctrl + Enter で送信
               if (
@@ -361,8 +396,9 @@ export function AgentChatView({
             <Button
               size="icon"
               variant="ghost"
-              className="w-8 h-8 text-muted-foreground hover:text-foreground hover:bg-primary/10"
+              className="w-8 h-8 text-muted-foreground hover:text-foreground hover:bg-primary/10 disabled:opacity-50"
               onClick={() => handleSendMessage(inputValue)}
+              disabled={isProcessing || !inputValue.trim()}
               aria-label="メッセージを送信"
             >
               <Send size={16} />
