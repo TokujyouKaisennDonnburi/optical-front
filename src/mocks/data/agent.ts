@@ -284,7 +284,15 @@ export const responseKeywordMapping: {
     responseType: "todaySchedule",
   },
   {
-    keywords: ["予定", "スケジュール", "イベント", "一覧", "週間", "先週", "来週"],
+    keywords: [
+      "予定",
+      "スケジュール",
+      "イベント",
+      "一覧",
+      "週間",
+      "先週",
+      "来週",
+    ],
     responseType: "weeklySchedule",
   },
   {
