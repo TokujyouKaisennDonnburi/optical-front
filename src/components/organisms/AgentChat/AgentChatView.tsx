@@ -22,7 +22,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
 import { useAuth } from "@/hooks/useAuth";
-import { type StatusEvent, sendChatMessageSSE } from "@/lib/api-agent-sse";
+import {
+  STAGE_MESSAGES,
+  type StatusEvent,
+  sendChatMessageSSE,
+} from "@/lib/api-agent-sse";
 import { cn } from "@/utils_constants_styles/utils";
 import { AgentLoadingIndicator } from "./AgentLoadingIndicator";
 import { type AgentMessage, AgentMessageItem } from "./AgentMessageItem";
@@ -159,35 +163,55 @@ export function AgentChatView({
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsProcessing(true);
-    setProcessingStatus({ stage: "connecting", message: "接続中..." });
+    setProcessingStatus({
+      stage: "connecting",
+      message: STAGE_MESSAGES.connecting,
+    });
+
+    const agentMessage: AgentMessage = {
+      id: crypto.randomUUID(),
+      role: "agent",
+      type: "text",
+    };
+    setMessages((prev) => [...prev, agentMessage]);
 
     // SSEリクエストを送信
     abortControllerRef.current = sendChatMessageSSE(text, selectedCalendarId, {
       onStatus: (status: StatusEvent) => {
+        console.log("status", status);
         setProcessingStatus(status);
       },
-      onComplete: (response: AgentMessage) => {
-        const agentMessage: AgentMessage = {
-          id: response.id,
-          role: "agent",
-          type: response.type,
-          content: response.content,
-          data: response.data,
-        };
-        setMessages((prev) => [...prev, agentMessage]);
-        setIsProcessing(false);
-        setProcessingStatus(null);
-        abortControllerRef.current = null;
+      onMessage: (content: string) => {
+        console.log("onMessage", content);
+        setMessages((prev) =>
+          prev.map((message) => {
+            if (message.id !== agentMessage.id) {
+              return message;
+            }
+            return {
+              ...message,
+              content: message.content ? message.content + content : content,
+            };
+          }),
+        );
       },
       onError: (error: Error) => {
         console.error("Chat error:", error);
-        const errorMessage: AgentMessage = {
-          id: crypto.randomUUID(),
-          role: "agent",
-          type: "text",
-          content: MESSAGES.error.generic,
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) =>
+          prev.map((message) => {
+            if (message.id !== agentMessage.id) {
+              return message;
+            }
+            return {
+              ...message,
+              content: MESSAGES.error.generic,
+            };
+          }),
+        );
+      },
+      onFinish: (isEdited: boolean) => {
+        if (isEdited) {
+        }
         setIsProcessing(false);
         setProcessingStatus(null);
         abortControllerRef.current = null;

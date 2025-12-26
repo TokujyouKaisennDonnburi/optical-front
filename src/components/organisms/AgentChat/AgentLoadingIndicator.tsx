@@ -24,7 +24,11 @@ function getStageIcon(stage: ProcessingStage) {
       return Loader2;
     case "analyzing":
       return Brain;
-    case "fetching":
+    case "fetching_events":
+      return Calendar;
+    case "fetching_calendars":
+      return Calendar;
+    case "creating_events":
       return Calendar;
     case "generating":
       return Sparkles;
@@ -42,7 +46,11 @@ function getAnimationClass(stage: ProcessingStage): string {
       return "animate-spin";
     case "analyzing":
       return "animate-pulse";
-    case "fetching":
+    case "fetching_events":
+      return "animate-bounce";
+    case "fetching_calendars":
+      return "animate-bounce";
+    case "creating_events":
       return "animate-bounce";
     case "generating":
       return "animate-pulse";
