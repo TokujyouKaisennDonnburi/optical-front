@@ -6,13 +6,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/atoms/Dialog";
 import { Loading } from "@/components/atoms/Loading";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
@@ -23,6 +16,7 @@ import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrap
 import MilestoneProgressOption from "@/components/organisms/EngineerOption/MilestoneProgressOption";
 import { PullRequestReviewOption } from "@/components/organisms/EngineerOption/PullRequestReviewOption";
 import { TeamReviewLoadOption } from "@/components/organisms/EngineerOption/TeamReviewLoadOption";
+import { RightSidebar } from "@/components/organisms/RightSidebar/RightSidebar";
 import { SingleSearchHeader } from "@/components/organisms/SearchHeader/SingleSearchHeader";
 import {
   SingleCalendarBoard,
@@ -35,7 +29,6 @@ import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
 import { getGitHubReviewOptions } from "@/lib/api-github";
 import { createSchedule } from "@/lib/api-schedule";
 import type {
-  ChangeReviewerRequest,
   GitHubPullRequest,
   GitHubReviewOptionsResponse,
   TeamMemberReviewLoad,
@@ -66,9 +59,9 @@ export function CalendarDetailClient({
     isLoading,
     error,
     hasGitHubOptions,
-    showPrReviewOption,
-    showTeamReviewLoadOption,
-    showMilestoneProgressOption,
+    showPrReviewOption: _showPrReviewOption,
+    showTeamReviewLoadOption: _showTeamReviewLoadOption,
+    showMilestoneProgressOption: _showMilestoneProgressOption,
     refresh,
   } = useSingleCalendarSchedule(calendarId);
 
@@ -76,8 +69,19 @@ export function CalendarDetailClient({
   const [searchTerm, setSearchTerm] = useState("");
   const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
 
-  // OptiCal ダイアログの状態
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  // サイドバーの選択状態
+  const [selectedSidebarItem, setSelectedSidebarItem] = useState<string | null>(
+    null,
+  );
+
+  const handleSidebarSelect = (id: string) => {
+    // 既に選択されているものをクリックしたら閉じる
+    if (selectedSidebarItem === id) {
+      setSelectedSidebarItem(null);
+    } else {
+      setSelectedSidebarItem(id);
+    }
+  };
 
   // ナビゲーション中のローディング状態
   const [isNavigating, setIsNavigating] = useState(false);
@@ -86,10 +90,7 @@ export function CalendarDetailClient({
   const [pullRequests, setPullRequests] = useState<GitHubPullRequest[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMemberReviewLoad[]>([]);
   const [allPrsUrl, setAllPrsUrl] = useState<string>("");
-  const [isGitHubLoading, setIsGitHubLoading] = useState(false);
-
-  // AI Agent の状態
-  const [isAgentOpen, setIsAgentOpen] = useState(false);
+  const [_isGitHubLoading, setIsGitHubLoading] = useState(false);
 
   // GitHub レビューオプションを取得
   const fetchGitHubReviewOptions = useCallback(async () => {
@@ -106,12 +107,17 @@ export function CalendarDetailClient({
     }
   }, []);
 
-  // GitHub オプションが有効でダイアログが開かれた場合のみデータを取得
+  // GitHub オプションが有効で、関連するサイドバーアイテムが選択された場合のみデータを取得
   useEffect(() => {
-    if (isPreviewOpen && hasGitHubOptions) {
+    if (
+      hasGitHubOptions &&
+      (selectedSidebarItem === "pr-review" ||
+        selectedSidebarItem === "team-load" ||
+        selectedSidebarItem === "milestone")
+    ) {
       fetchGitHubReviewOptions();
     }
-  }, [isPreviewOpen, hasGitHubOptions, fetchGitHubReviewOptions]);
+  }, [selectedSidebarItem, hasGitHubOptions, fetchGitHubReviewOptions]);
 
   // 検索フィルタリング
   const filteredItems = useMemo(() => {
@@ -193,7 +199,6 @@ export function CalendarDetailClient({
                 }
               }}
               onClear={handleClear}
-              onOptiCalClick={() => setIsPreviewOpen(true)}
             />
 
             {/* アカウントメニュー */}
@@ -210,114 +215,159 @@ export function CalendarDetailClient({
       </header>
 
       {/* メインコンテンツ */}
-      <main className="mx-auto w-full max-w-7xl flex-1 gap-3 px-2 py-2 flex">
-        {/* スケジュールボード（画面いっぱいに表示） */}
-        <BoardArea
-          className="min-h-0 flex-1 transition-all duration-300 ease-in-out"
-          calendarId={calendarId}
-          items={filteredItems}
-          isLoading={isLoading}
-          error={error}
-          viewDate={viewDate}
-          onChangeViewDate={handleViewDateChange}
-          calendarName={calendar?.name}
-          calendarColor={calendar?.color}
-          onScheduleCreated={refresh}
-        />
+      <div className="flex flex-1 overflow-hidden">
+        <main className="flex-1 flex justify-center min-w-0">
+          <div className="w-full max-w-7xl gap-3 px-2 py-2 flex">
+            {/* スケジュールボード（画面いっぱいに表示） */}
+            <BoardArea
+              className="min-h-0 flex-1 transition-all duration-300 ease-in-out"
+              calendarId={calendarId}
+              items={filteredItems}
+              isLoading={isLoading}
+              error={error}
+              viewDate={viewDate}
+              onChangeViewDate={handleViewDateChange}
+              calendarName={calendar?.name}
+              calendarColor={calendar?.color}
+              onScheduleCreated={refresh}
+            />
+          </div>
+        </main>
 
-        {/* AI Agent Side Panel */}
+        {/* Side Panel Area - Now full height */}
         <SidePanelWrapper
-          isOpen={isAgentOpen}
-          onToggle={() => setIsAgentOpen(!isAgentOpen)}
+          isOpen={!!selectedSidebarItem}
+          onToggle={() => setSelectedSidebarItem(null)}
         >
-          <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden border-0">
-            {/* Header: Reuse TodayScheduleHeader for consistency */}
-            <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
-              <TodayScheduleHeader
-                title="OptiCal Agent"
-                actions={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-muted-foreground hover:text-foreground hover:bg-muted"
-                    onClick={() => setIsAgentOpen(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                }
-              />
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col overflow-hidden px-0 py-0">
-              <AgentChatView />
-            </CardContent>
-          </Card>
-        </SidePanelWrapper>
-      </main>
-
-      {/* OptiCal ダイアログ */}
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="w-[80vw] h-[80vh] max-w-8xl overflow-auto">
-          <DialogHeader>
-            <DialogTitle>OptiCal - {calendar?.name}</DialogTitle>
-            <DialogDescription>
-              カレンダーに設定された GitHub オプションを表示します
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="flex flex-row gap-6 p-4 w-full h-full">
-            {/* GitHub オプション未選択時 */}
-            {!hasGitHubOptions && (
-              <div className="flex items-center justify-center w-full">
-                <Text className="text-muted-foreground">
-                  このカレンダーには GitHub オプションが設定されていません
-                </Text>
-              </div>
-            )}
-
-            {/* ローディング中 */}
-            {hasGitHubOptions && isGitHubLoading && (
-              <div className="flex items-center justify-center w-full">
-                <Text className="text-muted-foreground">読み込み中...</Text>
-              </div>
-            )}
-
-            {/* GitHub オプションが有効な場合のみ表示 */}
-            {hasGitHubOptions && !isGitHubLoading && (
+          <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden border-0 bg-background/50 backdrop-blur-sm rounded-none border-l border-border">
+            {selectedSidebarItem === "agent" && (
               <>
-                {/* PRレビュー待ち件数オプション */}
-                {showPrReviewOption && (
-                  <div className="flex-1 min-w-0 overflow-auto">
-                    <PullRequestReviewOption
-                      pullRequests={pullRequests}
-                      allPrsUrl={allPrsUrl}
-                    />
-                  </div>
-                )}
-                {/* チームレビュー負荷オプション */}
-                {showTeamReviewLoadOption && (
-                  <div className="flex-1 min-w-0 overflow-auto">
-                    <TeamReviewLoadOption
-                      members={teamMembers}
-                      onReviewerChange={(payload: ChangeReviewerRequest) =>
-                        console.log(
-                          "Reviewer change requested:",
-                          JSON.stringify(payload, null, 2),
-                        )
-                      }
-                    />
-                  </div>
-                )}
-                {/* マイルストーン進捗オプション */}
-                {showMilestoneProgressOption && (
-                  <div className="flex-1 min-w-0 overflow-auto">
-                    <MilestoneProgressOption />
-                  </div>
-                )}
+                <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                  <TodayScheduleHeader
+                    title="OptiCal Agent"
+                    actions={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                        onClick={() => setSelectedSidebarItem(null)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col overflow-hidden px-0 py-0">
+                  <AgentChatView />
+                </CardContent>
               </>
             )}
-          </div>
-        </DialogContent>
-      </Dialog>
+
+            {selectedSidebarItem === "pr-review" && (
+              <>
+                <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <Text size="lg" weight="semibold">
+                      PR Review
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedSidebarItem(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto p-4">
+                  {/* TODO: Add loading state */}
+                  <PullRequestReviewOption
+                    pullRequests={pullRequests}
+                    allPrsUrl={allPrsUrl}
+                  />
+                </CardContent>
+              </>
+            )}
+
+            {selectedSidebarItem === "team-load" && (
+              <>
+                <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <Text size="lg" weight="semibold">
+                      Team Load
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedSidebarItem(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto p-4">
+                  <TeamReviewLoadOption
+                    members={teamMembers}
+                    onReviewerChange={(payload) => console.log(payload)}
+                  />
+                </CardContent>
+              </>
+            )}
+
+            {selectedSidebarItem === "milestone" && (
+              <>
+                <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <Text size="lg" weight="semibold">
+                      Milestone
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedSidebarItem(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto p-4">
+                  <MilestoneProgressOption />
+                </CardContent>
+              </>
+            )}
+
+            {selectedSidebarItem === "add-option" && (
+              <>
+                <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <Text size="lg" weight="semibold">
+                      Add Option
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedSidebarItem(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto p-4 flex items-center justify-center">
+                  <Text className="text-muted-foreground">
+                    Option Store coming soon...
+                  </Text>
+                </CardContent>
+              </>
+            )}
+          </Card>
+        </SidePanelWrapper>
+
+        {/* Right Sidebar */}
+        <RightSidebar
+          selectedId={selectedSidebarItem}
+          onSelect={handleSidebarSelect}
+        />
+      </div>
 
       {/* 遷移時のローディングオーバーレイ */}
       {isNavigating && (
