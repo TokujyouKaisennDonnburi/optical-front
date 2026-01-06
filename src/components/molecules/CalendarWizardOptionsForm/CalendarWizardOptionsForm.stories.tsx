@@ -62,16 +62,19 @@ const CUSTOM_OPTIONS: CalendarWizardCustomOption[] = [
     id: "reminder_digest",
     label: "リマインダーサマリメール",
     description: "翌日の予定をまとめてメール通知します。",
+    category: "general",
   },
   {
     id: "task_inbox",
     label: "インボックス連携",
     description: "メール経由で受け取ったタスクを自動で追加します。",
+    category: "general",
   },
   {
     id: "weekly_report",
     label: "週次レポート",
     description: "毎週のアクティビティをまとめて配信します。",
+    category: "general",
   },
 ];
 
@@ -82,24 +85,27 @@ const CUSTOM_OPTIONS_WITH_GITHUB: CalendarWizardCustomOption[] = [
     label: "Webhook連携",
     description:
       "他サービスとの自動連携用にカスタムWebhookを設定できるようにします。",
+    category: "engineer",
   },
   {
     id: "pull_request_review_wait_count",
     label: "PRレビュー待ち件数",
     description:
       "GitHub連携により、あなたがレビュー待ちのPull Request件数をプレビューに表示します。",
+    category: "engineer",
   },
   {
     id: "team_review_load",
     label: "チームレビュー負荷",
     description:
       "GitHub連携により、チームメンバーのレビュー負荷状況をプレビューに表示します。",
+    category: "engineer",
   },
 ];
 
 export const Playground: Story = {
   render: () => {
-    const [selectedTemplateId, setSelectedTemplateId] = useState(
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
       TEMPLATES[0].id,
     );
     const [selectedCustomOptions, setSelectedCustomOptions] = useState<
@@ -138,7 +144,7 @@ export const Playground: Story = {
  */
 export const WithGitHubOptions: Story = {
   render: () => {
-    const [selectedTemplateId, setSelectedTemplateId] = useState(
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
       TEMPLATES[1].id, // Dev テンプレートを選択
     );
     const [selectedCustomOptions, setSelectedCustomOptions] = useState<

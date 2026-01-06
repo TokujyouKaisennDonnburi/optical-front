@@ -29,6 +29,7 @@ export const WithAvatar: Story = {
           name="佐藤 花子"
           email="hanako.sato@example.com"
           avatarUrl="https://i.pravatar.cc/100"
+          setAvatarUrl={() => {}}
           items={[
             {
               label: "プロフィール",
@@ -64,6 +65,8 @@ export const WithoutAvatar: Story = {
         <AccountMenuItems
           name="山田 太郎"
           email="taro.yamada@example.com"
+          avatarUrl={null}
+          setAvatarUrl={() => {}}
           items={[
             {
               label: "プロフィール",

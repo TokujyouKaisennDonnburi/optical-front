@@ -20,9 +20,9 @@ const createMember = (id: number, email = "") => ({
 
 export const Playground: Story = {
   render: () => {
+    const [useSolo, setUseSolo] = useState(false);
     const [members, setMembers] = useState([
       createMember(1, "team@example.com"),
-      createMember(2),
     ]);
 
     return (
@@ -35,21 +35,54 @@ export const Playground: Story = {
               trimmed.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
             );
           })}
-          onChangeMember={(memberId, email) => {
-            setMembers((prev) =>
-              prev.map((member) =>
-                member.id === memberId ? { ...member, email } : member,
-              ),
-            );
-          }}
-          onAddMember={() => {
-            setMembers((prev) => [...prev, createMember(prev.length + 1)]);
+          onAddMember={(email) => {
+            if (email) {
+              setMembers((prev) => [
+                ...prev,
+                createMember(prev.length + 1, email),
+              ]);
+            }
           }}
           onRemoveMember={(memberId) => {
             setMembers((prev) =>
               prev.filter((member) => member.id !== memberId),
             );
           }}
+          useSolo={useSolo}
+          onToggleUseSolo={setUseSolo}
+        />
+      </div>
+    );
+  },
+};
+
+export const SoloMode: Story = {
+  render: () => {
+    const [useSolo, setUseSolo] = useState(true);
+    const [members, setMembers] = useState<
+      Array<{ id: string; email: string }>
+    >([]);
+
+    return (
+      <div className="max-w-2xl">
+        <CalendarWizardMembersForm
+          members={members}
+          hasError={false}
+          onAddMember={(email) => {
+            if (email) {
+              setMembers((prev) => [
+                ...prev,
+                createMember(prev.length + 1, email),
+              ]);
+            }
+          }}
+          onRemoveMember={(memberId) => {
+            setMembers((prev) =>
+              prev.filter((member) => member.id !== memberId),
+            );
+          }}
+          useSolo={useSolo}
+          onToggleUseSolo={setUseSolo}
         />
       </div>
     );

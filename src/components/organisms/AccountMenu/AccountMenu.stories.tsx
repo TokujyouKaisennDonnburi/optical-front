@@ -21,7 +21,7 @@ export const Default: Story = {
       id: "1",
       name: "John Doe",
       email: "john.doe@example.com",
-      iconUrl: "https://i.pravatar.cc/100?img=10",
+      avatarUrl: "https://i.pravatar.cc/100?img=10",
     },
     onRequestEmailSave: (newEmail: string) =>
       console.log("Saving email:", newEmail),
@@ -34,7 +34,7 @@ export const WithLongText: Story = {
       id: "2",
       name: "Johnathan Verylongusername Example",
       email: "verylongemailaddress@example-domain.com",
-      iconUrl: "https://i.pravatar.cc/100?img=20",
+      avatarUrl: "https://i.pravatar.cc/100?img=20",
     },
     onRequestEmailSave: (newEmail: string) =>
       console.log("Saving email:", newEmail),
@@ -47,7 +47,7 @@ export const WithoutAvatar: Story = {
       id: "3",
       name: "Jane Smith",
       email: "jane.smith@example.com",
-      iconUrl: undefined,
+      avatarUrl: null,
     },
     onRequestEmailSave: (newEmail: string) =>
       console.log("Saving email:", newEmail),
@@ -117,7 +117,7 @@ export const WithModal: Story = {
       id: "4",
       name: "Modal Tester",
       email: "test@example.com",
-      iconUrl: "https://i.pravatar.cc/100?img=25",
+      avatarUrl: "https://i.pravatar.cc/100?img=25",
     },
   },
 };

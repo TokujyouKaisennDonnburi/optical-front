@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowLeft, CalendarDays } from "lucide-react";
+import { ArrowLeft, CalendarDays, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/atoms/Button";
-import { Card, CardContent } from "@/components/atoms/Card";
+import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,10 @@ import {
 import { Loading } from "@/components/atoms/Loading";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
+import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
+import { AgentChatView } from "@/components/organisms/AgentChat";
+import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrapper";
 import MilestoneProgressOption from "@/components/organisms/EngineerOption/MilestoneProgressOption";
 import { PullRequestReviewOption } from "@/components/organisms/EngineerOption/PullRequestReviewOption";
 import { TeamReviewLoadOption } from "@/components/organisms/EngineerOption/TeamReviewLoadOption";
@@ -84,6 +87,9 @@ export function CalendarDetailClient({
   const [teamMembers, setTeamMembers] = useState<TeamMemberReviewLoad[]>([]);
   const [allPrsUrl, setAllPrsUrl] = useState<string>("");
   const [isGitHubLoading, setIsGitHubLoading] = useState(false);
+
+  // AI Agent の状態
+  const [isAgentOpen, setIsAgentOpen] = useState(false);
 
   // GitHub レビューオプションを取得
   const fetchGitHubReviewOptions = useCallback(async () => {
@@ -204,10 +210,10 @@ export function CalendarDetailClient({
       </header>
 
       {/* メインコンテンツ */}
-      <main className="mx-auto w-full max-w-7xl flex-1 gap-3 overflow-hidden px-2 py-2 flex">
+      <main className="mx-auto w-full max-w-7xl flex-1 gap-3 px-2 py-2 flex">
         {/* スケジュールボード（画面いっぱいに表示） */}
         <BoardArea
-          className="min-h-0 flex-1 w-full"
+          className="min-h-0 flex-1 transition-all duration-300 ease-in-out"
           calendarId={calendarId}
           items={filteredItems}
           isLoading={isLoading}
@@ -218,6 +224,34 @@ export function CalendarDetailClient({
           calendarColor={calendar?.color}
           onScheduleCreated={refresh}
         />
+
+        {/* AI Agent Side Panel */}
+        <SidePanelWrapper
+          isOpen={isAgentOpen}
+          onToggle={() => setIsAgentOpen(!isAgentOpen)}
+        >
+          <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden border-0">
+            {/* Header: Reuse TodayScheduleHeader for consistency */}
+            <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+              <TodayScheduleHeader
+                title="OptiCal Agent"
+                actions={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                    onClick={() => setIsAgentOpen(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                }
+              />
+            </CardHeader>
+            <CardContent className="flex flex-1 flex-col overflow-hidden px-0 py-0">
+              <AgentChatView />
+            </CardContent>
+          </Card>
+        </SidePanelWrapper>
       </main>
 
       {/* OptiCal ダイアログ */}
