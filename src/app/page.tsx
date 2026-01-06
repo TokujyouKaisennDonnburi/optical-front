@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { Sparkles, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
   Suspense,
@@ -8,10 +10,13 @@ import React, {
   useMemo,
   useState,
 } from "react";
-
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Loading } from "@/components/atoms/Loading";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
+import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
+import { AgentChatView } from "@/components/organisms/AgentChat";
 import { HomeBoardArea } from "@/components/organisms/HomeBoardArea";
 import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/GeneralSearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
@@ -71,6 +76,7 @@ function HomeContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isAgentOpen, setIsAgentOpen] = useState(false);
 
   const filteredItems = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -207,29 +213,98 @@ function HomeContent() {
           </div>
         </div>
       </header>
-      <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-3 overflow-hidden px-2 py-2 lg:grid-cols-[minmax(0,1fr)_clamp(24rem,32vw,32rem)] ">
-        <HomeBoardArea
-          className="flex-1 min-h-0 lg:col-start-1"
-          items={filteredItems}
-          calendars={calendars}
-          isLoading={isLoading}
-          error={error}
-          viewDate={viewDate}
-          onChangeViewDate={handleViewDateChange}
-          onRefresh={handleRefreshAll}
-        />
-        <div className="flex h-full w-full min-h-0 lg:col-start-2 lg:w-full lg:max-w-[32rem]">
-          <TodaySchedulePanel
-            header={boardHeader}
-            items={todayItems}
-            isLoading={isTodayLoading}
-            emptyMessage={
-              error ? "予定を取得できませんでした" : "今日の予定はありません。"
-            }
-            calendars={calendars}
-          />
-        </div>
-      </main>
+      <div className="flex flex-1 overflow-hidden">
+        <main className="flex-1 flex justify-center min-w-0">
+          <div className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-3 overflow-hidden px-2 py-2 lg:grid-cols-[minmax(0,1fr)_clamp(24rem,32vw,32rem)]">
+            <HomeBoardArea
+              className="flex-1 min-h-0 lg:col-start-1"
+              items={filteredItems}
+              calendars={calendars}
+              isLoading={isLoading}
+              error={error}
+              viewDate={viewDate}
+              onChangeViewDate={handleViewDateChange}
+              onRefresh={handleRefreshAll}
+            />
+            <div className="flex h-full w-full min-h-0 lg:col-start-2 lg:w-full lg:max-w-[32rem]">
+              <div className="relative h-full w-full overflow-hidden">
+                <AnimatePresence mode="wait" initial={false}>
+                  {isAgentOpen ? (
+                    <motion.div
+                      key="agent"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute inset-0 h-full w-full"
+                    >
+                      <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden shadow-xl">
+                        <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                          <TodayScheduleHeader
+                            title="OptiCal Agent"
+                            actions={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                                onClick={() => setIsAgentOpen(false)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                        </CardHeader>
+                        <CardContent className="flex flex-1 flex-col overflow-hidden px-0 py-0">
+                          <AgentChatView
+                            calendars={calendars.map((c) => ({
+                              id: c.id,
+                              name: c.name,
+                              color: c.color,
+                            }))}
+                          />
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="schedule"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute inset-0 h-full w-full"
+                    >
+                      <TodaySchedulePanel
+                        header={{
+                          ...boardHeader,
+                          actions: (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                              onClick={() => setIsAgentOpen(true)}
+                              title="AI Agent"
+                            >
+                              <Sparkles className="h-4 w-4" />
+                            </Button>
+                          ),
+                        }}
+                        items={todayItems}
+                        isLoading={isTodayLoading}
+                        emptyMessage={
+                          error
+                            ? "予定を取得できませんでした"
+                            : "今日の予定はありません。"
+                        }
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
       <SelectCalendarStrip
         calendars={calendars}
         onSelectCalendar={(cal) => {

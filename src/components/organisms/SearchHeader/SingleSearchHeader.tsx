@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
@@ -12,7 +11,6 @@ type SingleSearchHeaderProps = {
   onDateChange?: (date: Date | undefined) => void;
   date?: Date;
   onClear?: () => void;
-  onOptiCalClick?: () => void;
 };
 
 /**
@@ -26,7 +24,6 @@ export function SingleSearchHeader({
   onDateChange,
   date,
   onClear,
-  onOptiCalClick,
 }: SingleSearchHeaderProps) {
   const [search, setSearch] = useState(searchValue ?? ""); // 検索バーの入力値
 
@@ -72,18 +69,6 @@ export function SingleSearchHeader({
       <Button variant="outline" onClick={handleClear}>
         クリア
       </Button>
-
-      {/* OptiCalボタン */}
-      <div className="ml-auto">
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={onOptiCalClick}
-          aria-label="OptiCalを表示"
-        >
-          <Image src="/optical.png" alt="OptiCal" width={24} height={24} />
-        </Button>
-      </div>
 
       {/* 通知バッチ */}
       <BadgeButton
