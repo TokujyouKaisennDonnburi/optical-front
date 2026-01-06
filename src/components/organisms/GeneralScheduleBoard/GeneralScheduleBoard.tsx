@@ -29,7 +29,11 @@ export type GeneralScheduleBoardProps = {
   errorMessage?: string;
   className?: string;
   baseDate?: Date;
-  onSelectItem?: (item: ScheduleBoardItem) => void;
+  /** 予定選択時のコールバック。positionにはクリックした位置が含まれる */
+  onSelectItem?: (
+    item: ScheduleBoardItem,
+    position: { x: number; y: number },
+  ) => void;
   onCreateItem?: (date: Date) => void;
 };
 
@@ -260,9 +264,12 @@ export function GeneralScheduleBoard({
                         )}
                       >
                         {events.map((event) => {
-                          const handleClick = () => {
+                          const handleClick = (e: React.MouseEvent) => {
                             if (onSelectItem) {
-                              onSelectItem(event.item);
+                              onSelectItem(event.item, {
+                                x: e.clientX,
+                                y: e.clientY,
+                              });
                             }
                           };
 

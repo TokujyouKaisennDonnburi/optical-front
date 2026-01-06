@@ -35,8 +35,10 @@ export function HomeBoardArea({
   onChangeViewDate,
   onRefresh,
 }: HomeBoardAreaProps) {
-  const [selectedItem, setSelectedItem] =
-    useState<GeneralScheduleBoardItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    item: GeneralScheduleBoardItem;
+    position: { x: number; y: number };
+  } | null>(null);
   const [createDate, setCreateDate] = useState<Date | null>(null);
 
   const boardItems = useMemo(() => {
@@ -113,8 +115,11 @@ export function HomeBoardArea({
     onChangeViewDate(new Date());
   };
 
-  const handleSelectItem = (item: GeneralScheduleBoardItem) => {
-    setSelectedItem(item);
+  const handleSelectItem = (
+    item: GeneralScheduleBoardItem,
+    position: { x: number; y: number },
+  ) => {
+    setSelectedItem({ item, position });
   };
 
   const handleCloseDialog = () => {
@@ -233,9 +238,10 @@ export function HomeBoardArea({
       </CardContent>
       {selectedItem ? (
         <ScheduleEventDialog
-          item={selectedItem}
+          item={selectedItem.item}
           isOpen
           onClose={handleCloseDialog}
+          anchorPosition={selectedItem.position}
         />
       ) : null}
       {createDate ? (

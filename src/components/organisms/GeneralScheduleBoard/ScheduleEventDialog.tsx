@@ -8,7 +8,7 @@ import {
   UserCircle2,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { Button } from "@/components/atoms/Button";
@@ -21,18 +21,73 @@ export type ScheduleEventDialogProps = {
   item: GeneralScheduleBoardItem;
   isOpen: boolean;
   onClose: () => void;
+  /** クリックした要素の位置情報 */
+  anchorPosition?: { x: number; y: number };
 };
+
+/** ダイアログのサイズ（位置計算用） */
+const DIALOG_WIDTH = 380;
+const DIALOG_HEIGHT = 320;
+const MARGIN = 16;
 
 export function ScheduleEventDialog({
   item,
   isOpen,
   onClose,
+  anchorPosition,
 }: ScheduleEventDialogProps) {
   const [mounted, setMounted] = useState(false);
+  const [dialogPosition, setDialogPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // ダイアログの位置を計算
+  const calculatePosition = useCallback(() => {
+    if (!anchorPosition) {
+      // anchorPositionがない場合は画面中央
+      return null;
+    }
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let left = anchorPosition.x + MARGIN;
+    let top = anchorPosition.y - DIALOG_HEIGHT / 2;
+
+    // 右端からはみ出す場合は左側に配置
+    if (left + DIALOG_WIDTH + MARGIN > viewportWidth) {
+      left = anchorPosition.x - DIALOG_WIDTH - MARGIN;
+    }
+
+    // 左端からはみ出す場合は調整
+    if (left < MARGIN) {
+      left = MARGIN;
+    }
+
+    // 上端からはみ出す場合
+    if (top < MARGIN) {
+      top = MARGIN;
+    }
+
+    // 下端からはみ出す場合
+    if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
+      top = viewportHeight - DIALOG_HEIGHT - MARGIN;
+    }
+
+    return { top, left };
+  }, [anchorPosition]);
+
+  useEffect(() => {
+    if (isOpen && anchorPosition) {
+      setDialogPosition(calculatePosition());
+    }
+  }, [isOpen, anchorPosition, calculatePosition]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -49,14 +104,7 @@ export function ScheduleEventDialog({
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  // スクロールロックは削除（ポップオーバーではスクロールを許可）
 
   if (!mounted || !isOpen) {
     return null;
@@ -72,9 +120,39 @@ export function ScheduleEventDialog({
     ? item.calendarName
     : "登録カレンダー";
 
+  // ポップオーバースタイル or 中央配置
+  const usePopover = anchorPosition && dialogPosition;
+
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur">
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 text-white shadow-2xl">
+    // biome-ignore lint/a11y/noStaticElementInteractions: Backdrop overlay for closing dialog on click
+    <div
+      className="fixed inset-0 z-50"
+      onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+      role="presentation"
+    >
+      <div
+        ref={dialogRef}
+        className="absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm"
+        style={
+          usePopover
+            ? {
+                top: dialogPosition.top,
+                left: dialogPosition.left,
+              }
+            : {
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }
+        }
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
         <div
           className="relative flex flex-col gap-2.5 px-5 py-4 text-white"
           style={{ backgroundColor: headerColor }}
@@ -101,13 +179,14 @@ export function ScheduleEventDialog({
             variant="ghost"
             size="icon"
             onClick={onClose}
+            aria-label="閉じる"
             className="absolute right-3 top-3 h-8 w-8 rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:bg-black/40"
           >
             <Icon icon={X} size="sm" />
           </Button>
         </div>
 
-        <div className="space-y-4 px-5 py-4 text-sm text-white/90">
+        <div className="max-h-[300px] space-y-4 overflow-y-auto px-5 py-4 text-sm text-white/90">
           {item.memo ? (
             <div className="flex items-start gap-2 text-white/85">
               <Icon
