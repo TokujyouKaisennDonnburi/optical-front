@@ -18,7 +18,6 @@ const ANIMATION = {
 
 type SidePanelWrapperProps = {
   isOpen: boolean;
-  onToggle: () => void;
   children: ReactNode;
   /** パネルの幅（px）。デフォルトは400px */
   width?: number;
@@ -26,7 +25,6 @@ type SidePanelWrapperProps = {
 
 export function SidePanelWrapper({
   isOpen,
-  onToggle: _onToggle,
   children,
   width = SIDE_PANEL_DEFAULT_WIDTH,
 }: SidePanelWrapperProps) {

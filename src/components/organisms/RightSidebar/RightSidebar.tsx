@@ -6,7 +6,6 @@ export interface SidebarItem {
   id: string;
   icon: React.ReactNode;
   label: string;
-  isAgent?: boolean;
 }
 
 interface RightSidebarProps {

@@ -16,7 +16,7 @@ import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrap
 import MilestoneProgressOption from "@/components/organisms/EngineerOption/MilestoneProgressOption";
 import { PullRequestReviewOption } from "@/components/organisms/EngineerOption/PullRequestReviewOption";
 import { TeamReviewLoadOption } from "@/components/organisms/EngineerOption/TeamReviewLoadOption";
-import { RightSidebar } from "@/components/organisms/RightSidebar/RightSidebar";
+import { RightSidebar } from "@/components/organisms/RightSidebar";
 import { SingleSearchHeader } from "@/components/organisms/SearchHeader/SingleSearchHeader";
 import {
   SingleCalendarBoard,
@@ -53,17 +53,8 @@ export function CalendarDetailClient({
     }
   }, [user, authLoading, router]);
 
-  const {
-    calendar,
-    items,
-    isLoading,
-    error,
-    hasGitHubOptions,
-    showPrReviewOption: _showPrReviewOption,
-    showTeamReviewLoadOption: _showTeamReviewLoadOption,
-    showMilestoneProgressOption: _showMilestoneProgressOption,
-    refresh,
-  } = useSingleCalendarSchedule(calendarId);
+  const { calendar, items, isLoading, error, hasGitHubOptions, refresh } =
+    useSingleCalendarSchedule(calendarId);
 
   // 検索機能
   const [searchTerm, setSearchTerm] = useState("");
@@ -90,7 +81,7 @@ export function CalendarDetailClient({
   const [pullRequests, setPullRequests] = useState<GitHubPullRequest[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMemberReviewLoad[]>([]);
   const [allPrsUrl, setAllPrsUrl] = useState<string>("");
-  const [_isGitHubLoading, setIsGitHubLoading] = useState(false);
+  const [isGitHubLoading, setIsGitHubLoading] = useState(false);
 
   // GitHub レビューオプションを取得
   const fetchGitHubReviewOptions = useCallback(async () => {
@@ -235,10 +226,7 @@ export function CalendarDetailClient({
         </main>
 
         {/* Side Panel Area - Now full height */}
-        <SidePanelWrapper
-          isOpen={!!selectedSidebarItem}
-          onToggle={() => setSelectedSidebarItem(null)}
-        >
+        <SidePanelWrapper isOpen={!!selectedSidebarItem}>
           <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden border-0 bg-background/50 backdrop-blur-sm rounded-none border-l border-border">
             {selectedSidebarItem === "agent" && (
               <>
@@ -251,6 +239,7 @@ export function CalendarDetailClient({
                         size="icon"
                         className="text-muted-foreground hover:text-foreground hover:bg-muted"
                         onClick={() => setSelectedSidebarItem(null)}
+                        aria-label="パネルを閉じる"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -274,17 +263,25 @@ export function CalendarDetailClient({
                       variant="ghost"
                       size="icon"
                       onClick={() => setSelectedSidebarItem(null)}
+                      aria-label="PR Reviewパネルを閉じる"
                     >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
-                  {/* TODO: Add loading state */}
-                  <PullRequestReviewOption
-                    pullRequests={pullRequests}
-                    allPrsUrl={allPrsUrl}
-                  />
+                  {isGitHubLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Text className="text-muted-foreground">
+                        読み込み中...
+                      </Text>
+                    </div>
+                  ) : (
+                    <PullRequestReviewOption
+                      pullRequests={pullRequests}
+                      allPrsUrl={allPrsUrl}
+                    />
+                  )}
                 </CardContent>
               </>
             )}
@@ -300,16 +297,25 @@ export function CalendarDetailClient({
                       variant="ghost"
                       size="icon"
                       onClick={() => setSelectedSidebarItem(null)}
+                      aria-label="Team Loadパネルを閉じる"
                     >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
-                  <TeamReviewLoadOption
-                    members={teamMembers}
-                    onReviewerChange={(payload) => console.log(payload)}
-                  />
+                  {isGitHubLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Text className="text-muted-foreground">
+                        読み込み中...
+                      </Text>
+                    </div>
+                  ) : (
+                    <TeamReviewLoadOption
+                      members={teamMembers}
+                      onReviewerChange={(payload) => console.log(payload)}
+                    />
+                  )}
                 </CardContent>
               </>
             )}
@@ -325,13 +331,22 @@ export function CalendarDetailClient({
                       variant="ghost"
                       size="icon"
                       onClick={() => setSelectedSidebarItem(null)}
+                      aria-label="Milestoneパネルを閉じる"
                     >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
-                  <MilestoneProgressOption />
+                  {isGitHubLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Text className="text-muted-foreground">
+                        読み込み中...
+                      </Text>
+                    </div>
+                  ) : (
+                    <MilestoneProgressOption />
+                  )}
                 </CardContent>
               </>
             )}
@@ -347,6 +362,7 @@ export function CalendarDetailClient({
                       variant="ghost"
                       size="icon"
                       onClick={() => setSelectedSidebarItem(null)}
+                      aria-label="Add Optionパネルを閉じる"
                     >
                       <X className="h-4 w-4" />
                     </Button>
