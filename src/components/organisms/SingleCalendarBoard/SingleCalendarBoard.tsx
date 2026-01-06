@@ -8,6 +8,7 @@ import {
   isFullDayEventISO,
 } from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
+import { useSettings } from "@/providers/SettingsProvider";
 import type {
   CalendarCell,
   CalendarEvent,
@@ -99,6 +100,8 @@ export function SingleCalendarBoard({
   const longPressStartPosRef = useRef<Map<string, { x: number; y: number }>>(
     new Map(),
   );
+
+  const { isGamingHoliday } = useSettings();
 
   const effectiveBaseDate = useMemo(() => {
     if (baseDate) {
@@ -295,10 +298,11 @@ export function SingleCalendarBoard({
                               !cell.isCurrentMonth &&
                                 "text-muted-foreground/70",
                               cell.isToday && "font-semibold",
-                              // 祝日の場合は赤くする（当日の場合はカレンダーカラーを優先するためstyleで上書きされる）
                               cell.holidayName &&
                                 !cell.isToday &&
-                                "text-green-400",
+                                (isGamingHoliday
+                                  ? "animate-gaming-text font-bold"
+                                  : "text-green-400"),
                             )}
                             style={{
                               color: cell.isToday ? calendarColor : undefined,
@@ -310,6 +314,7 @@ export function SingleCalendarBoard({
                             <HolidayLabel
                               name={cell.holidayName}
                               className="truncate"
+                              isGaming={isGamingHoliday}
                             />
                           )}
                         </div>

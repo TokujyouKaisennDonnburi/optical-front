@@ -6,5 +6,5 @@ import JapaneseHolidays from "japanese-holidays";
  */
 export function getHolidayName(date: Date): string | undefined {
   const holiday = JapaneseHolidays.isHoliday(date);
-  return holiday || undefined;
+  return typeof holiday === "string" ? holiday : undefined;
 }

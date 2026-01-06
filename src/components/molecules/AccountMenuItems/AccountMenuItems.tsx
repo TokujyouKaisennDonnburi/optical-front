@@ -1,8 +1,10 @@
-import { Pencil } from "lucide-react";
+import { Gamepad2, Pencil } from "lucide-react";
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
 import { DropdownMenuItem } from "@/components/atoms/DropdownMenu";
+import { Switch } from "@/components/atoms/Switch";
 import { updateUserProfile, uploadAvatarImage } from "@/lib/api-profile";
+import { useSettings } from "@/providers/SettingsProvider";
 
 // バリデーション関数
 const validateEmail = (email: string): boolean => {
@@ -34,6 +36,7 @@ export function AccountMenuItems({
   onRequestEmailSave,
   confirmSaveTrigger,
 }: AccountMenuItemsProps) {
+  const { isGamingHoliday, setGamingHoliday } = useSettings();
   // 編集中のフィールドを管理（"name", "email", "icon"）
   const [editingField, setEditingField] = React.useState<
     "name" | "email" | "icon" | null
@@ -249,6 +252,19 @@ export function AccountMenuItems({
       {/* 区切り線 */}
       <hr className="my-2" />
 
+      {/* 設定トグル: 祝日ゲーミング */}
+      <div className="flex items-center justify-between px-4 py-3 text-sm">
+        <div className="flex items-center gap-3">
+          <Gamepad2 className="h-4 w-4" />
+          <span>祝日ゲーミング</span>
+        </div>
+        <Switch
+          checked={isGamingHoliday}
+          onCheckedChange={setGamingHoliday}
+          className="scale-75"
+        />
+      </div>
+
       {/* メニューアイテム */}
       {items.map((item) => (
         <DropdownMenuItem
@@ -257,7 +273,7 @@ export function AccountMenuItems({
             e.preventDefault();
             item.onSelect?.();
           }}
-          className="flex items-center gap-3 px-4 py-3 text-sm"
+          className="flex items-center gap-3 px-4 py-3 text-sm cursor-pointer hover:bg-muted"
         >
           {item.icon}
           <span className="text-sm">{item.label}</span>
