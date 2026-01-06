@@ -94,11 +94,11 @@ export const ScheduleEventCard = forwardRef<
         <div className="flex min-w-0 flex-col">
           <Text
             as="span"
-            weight={isCompact || isSpan ? "normal" : "medium"}
+            weight={isCompact || isSpan ? "bold" : "medium"}
             className={cn(
               "block truncate",
               isCompact || isSpan
-                ? "text-[0.5625rem] leading-[1.2] text-white"
+                ? "text-[10px] leading-[1.2] text-white"
                 : "text-foreground",
               titleClassName,
             )}
@@ -108,10 +108,11 @@ export const ScheduleEventCard = forwardRef<
           {subtitle ? (
             <Text
               as="span"
-              size="sm"
               className={cn(
-                "block truncate text-[0.5rem] leading-tight",
-                isCompact || isSpan ? "text-white/70" : "text-muted-foreground",
+                "block truncate text-[9px] leading-tight",
+                isCompact || isSpan
+                  ? "font-medium text-white/90"
+                  : "text-muted-foreground",
                 subtitleClassName,
               )}
             >

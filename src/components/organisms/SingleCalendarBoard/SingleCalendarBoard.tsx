@@ -319,7 +319,7 @@ export function SingleCalendarBoard({
                           )}
                         </div>
                         {events.length ? (
-                          <span className="text-[0.625rem] text-white/60">{`${events.length} 件`}</span>
+                          <span className="text-[0.625rem] font-medium text-white/80">{`${events.length} 件`}</span>
                         ) : null}
                       </div>
 
