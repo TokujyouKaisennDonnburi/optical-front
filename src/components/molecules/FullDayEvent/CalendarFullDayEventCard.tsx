@@ -95,7 +95,7 @@ export const CalendarFullDayEventCard = forwardRef<
           <Text
             as="span"
             className={cn(
-              "block truncate text-[9px] leading-[1.2] text-white",
+              "block truncate text-[10px] font-bold leading-[1.2] text-white",
               titleClassName,
             )}
           >
@@ -106,7 +106,7 @@ export const CalendarFullDayEventCard = forwardRef<
             <Text
               as="span"
               className={cn(
-                "block truncate text-[8px] leading-tight text-white/70",
+                "block truncate text-[9px] font-medium leading-tight text-white/90",
                 subtitleClassName,
               )}
             >
