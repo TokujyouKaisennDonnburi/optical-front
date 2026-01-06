@@ -113,6 +113,7 @@ export type CalendarCell = {
   isCurrentMonth: boolean;
   isToday: boolean;
   weekday: number; // 0 = Sunday, 6 = Saturday
+  holidayName?: string;
 };
 
 /** カレンダーイベント表示用の型（GeneralScheduleBoard/SingleCalendarBoard共通） */

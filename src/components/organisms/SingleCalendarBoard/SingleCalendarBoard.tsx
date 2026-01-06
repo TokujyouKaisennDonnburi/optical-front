@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from "react";
-
+import { HolidayLabel } from "@/components/atoms/HolidayLabel/HolidayLabel";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
 import { CalendarGrid } from "@/components/molecules/CalendarGrid";
@@ -13,6 +13,7 @@ import type {
   CalendarEvent,
   ScheduleBoardItem,
 } from "@/types/schedule";
+import { getHolidayName } from "@/utils/holidays";
 import { cn } from "@/utils_constants_styles/utils";
 import styles from "./SingleCalendarBoard.module.css";
 
@@ -287,18 +288,31 @@ export function SingleCalendarBoard({
                         />
                       ) : null}
                       <div className="flex items-center justify-between text-[0.625rem]">
-                        <span
-                          className={cn(
-                            "font-medium text-white/90",
-                            !cell.isCurrentMonth && "text-muted-foreground/70",
-                            cell.isToday && "font-semibold",
+                        <div className="flex min-w-0 items-baseline gap-1.5 overflow-hidden">
+                          <span
+                            className={cn(
+                              "font-medium text-white/90",
+                              !cell.isCurrentMonth &&
+                                "text-muted-foreground/70",
+                              cell.isToday && "font-semibold",
+                              // 祝日の場合は赤くする（当日の場合はカレンダーカラーを優先するためstyleで上書きされる）
+                              cell.holidayName &&
+                                !cell.isToday &&
+                                "text-green-400",
+                            )}
+                            style={{
+                              color: cell.isToday ? calendarColor : undefined,
+                            }}
+                          >
+                            {cell.date.getDate()}
+                          </span>
+                          {cell.holidayName && (
+                            <HolidayLabel
+                              name={cell.holidayName}
+                              className="truncate"
+                            />
                           )}
-                          style={{
-                            color: cell.isToday ? calendarColor : undefined,
-                          }}
-                        >
-                          {cell.date.getDate()}
-                        </span>
+                        </div>
                         {events.length ? (
                           <span className="text-[0.625rem] text-white/60">{`${events.length} 件`}</span>
                         ) : null}
@@ -404,6 +418,7 @@ function buildCalendarCells(baseDate: Date): CalendarCell[] {
       weekday,
       isCurrentMonth: date.getMonth() === month,
       isToday: isSameDay(date, new Date()),
+      holidayName: getHolidayName(date),
     });
   }
   return cells;

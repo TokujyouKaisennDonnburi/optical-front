@@ -59,6 +59,9 @@ importers:
       framer-motion:
         specifier: ^12.23.26
         version: 12.23.26(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      japanese-holidays:
+        specifier: ^1.0.10
+        version: 1.0.10
       lucide-react:
         specifier: ^0.542.0
         version: 0.542.0(react@19.1.0)
@@ -135,6 +138,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.13
+      '@types/japanese-holidays':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@types/node':
         specifier: ^20
         version: 20.19.13
@@ -2861,6 +2867,9 @@ packages:
   '@types/html-minifier-terser@6.1.0':
     resolution: {integrity: sha512-oh/6byDPnL1zeNXFrDXFLyZjkr1MsBG667IM792caf1L2UPOOMf65NFzjUH/ltyfwjAGfs1rsX1eftK0jC/KIg==}
 
+  '@types/japanese-holidays@1.0.3':
+    resolution: {integrity: sha512-IfAVHolZJ6xGC9S2D9+VYphDfq0tuZEe/nj4vB7oX14ZzvwGSO2UHqDKJfkcQBpd3WV8CAlmbb2YI2QE3E/ddQ==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -4384,6 +4393,9 @@ packages:
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
+
+  japanese-holidays@1.0.10:
+    resolution: {integrity: sha512-OiK5801c432ljumKnQ65TGw6HSEuetU0Fvlz1/BPPPqwxQZ2kPeCy3XHO6q5nf+6zJqIf1fqcpQjWp+/SimO6Q==}
 
   jest-worker@27.5.1:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
@@ -9043,6 +9055,8 @@ snapshots:
 
   '@types/html-minifier-terser@6.1.0': {}
 
+  '@types/japanese-holidays@1.0.3': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/mdast@4.0.4':
@@ -10645,6 +10659,8 @@ snapshots:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
+
+  japanese-holidays@1.0.10: {}
 
   jest-worker@27.5.1:
     dependencies:
