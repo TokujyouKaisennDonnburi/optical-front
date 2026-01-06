@@ -108,7 +108,6 @@ export const ScheduleEventCard = forwardRef<
           {subtitle ? (
             <Text
               as="span"
-              size="sm"
               className={cn(
                 "block truncate text-[9px] leading-tight",
                 isCompact || isSpan
