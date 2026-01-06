@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-
+import { HolidayLabel } from "@/components/atoms/HolidayLabel/HolidayLabel";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
 import { CalendarGrid } from "@/components/molecules/CalendarGrid";
@@ -8,11 +8,13 @@ import {
   isFullDayEventISO,
 } from "@/components/molecules/FullDayEvent";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
+import { useSettings } from "@/providers/SettingsProvider";
 import type {
   CalendarCell,
   CalendarEvent,
   ScheduleBoardItem,
 } from "@/types/schedule";
+import { getHolidayName } from "@/utils/holidays";
 import { cn } from "@/utils_constants_styles/utils";
 import styles from "./GeneralScheduleBoard.module.css";
 
@@ -47,6 +49,8 @@ export function GeneralScheduleBoard({
   const longPressStartPosRef = useRef<Map<string, { x: number; y: number }>>(
     new Map(),
   );
+
+  const { isGamingHoliday } = useSettings();
 
   const effectiveBaseDate = useMemo(() => {
     if (baseDate) {
@@ -216,19 +220,34 @@ export function GeneralScheduleBoard({
                         <span className="pointer-events-none absolute inset-0 rounded-sm bg-white/10" />
                       ) : null}
                       <div className="flex items-center justify-between text-[0.625rem]">
-                        <span
-                          className={cn(
-                            "font-medium text-white/90",
-                            !cell.isCurrentMonth && "text-muted-foreground/70",
-                            cell.isToday && "text-amber-300 font-semibold",
+                        <div className="flex min-w-0 items-baseline gap-1.5 overflow-hidden">
+                          <span
+                            className={cn(
+                              "font-medium text-white/90",
+                              !cell.isCurrentMonth &&
+                                "text-muted-foreground/70",
+                              cell.isToday && "text-amber-300 font-semibold",
+                              cell.holidayName &&
+                                !cell.isToday &&
+                                (isGamingHoliday
+                                  ? "animate-gaming-text font-bold"
+                                  : "text-green-400"),
+                            )}
+                          >
+                            {cell.isToday ? (
+                              <span>{cell.date.getDate()}</span>
+                            ) : (
+                              cell.date.getDate()
+                            )}
+                          </span>
+                          {cell.holidayName && (
+                            <HolidayLabel
+                              name={cell.holidayName}
+                              className="truncate"
+                              isGaming={isGamingHoliday}
+                            />
                           )}
-                        >
-                          {cell.isToday ? (
-                            <span>{cell.date.getDate()}</span>
-                          ) : (
-                            cell.date.getDate()
-                          )}
-                        </span>
+                        </div>
                         {events.length ? (
                           <span className="text-[0.625rem] text-white/60">{`${events.length} 件`}</span>
                         ) : null}
@@ -338,6 +357,7 @@ function buildCalendarCells(baseDate: Date): CalendarCell[] {
       weekday,
       isCurrentMonth: date.getMonth() === month,
       isToday: isSameDay(date, new Date()),
+      holidayName: getHolidayName(date),
     });
   }
   return cells;

@@ -7,6 +7,7 @@ export const runtime = "edge";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { MockInitializer } from "@/components/providers/MockInitializer";
+import { SettingsProvider } from "@/providers/SettingsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,8 +36,10 @@ export default function RootLayout({
       >
         <MockInitializer />
         <AuthProvider>
-          {children}
-          <Toaster position="bottom-right" richColors />
+          <SettingsProvider>
+            {children}
+            <Toaster position="bottom-right" richColors />
+          </SettingsProvider>
         </AuthProvider>
       </body>
     </html>
