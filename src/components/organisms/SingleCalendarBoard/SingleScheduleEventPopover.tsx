@@ -8,31 +8,95 @@ import {
   UserCircle2,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Text } from "@/components/atoms/Text";
 
-import type { GeneralScheduleBoardItem } from "./GeneralScheduleBoard";
+import type { SingleCalendarBoardItem } from "./SingleCalendarBoard";
 
-export type ScheduleEventDialogProps = {
-  item: GeneralScheduleBoardItem;
+export type SingleScheduleEventPopoverProps = {
+  item: SingleCalendarBoardItem;
   isOpen: boolean;
   onClose: () => void;
+  /** クリックした要素の位置情報 */
+  anchorPosition: { x: number; y: number };
 };
 
-export function ScheduleEventDialog({
+/** ダイアログのサイズ（位置計算用） */
+const DIALOG_WIDTH = 380;
+const DIALOG_HEIGHT = 320;
+const MARGIN = 16;
+
+/**
+ * 単体カレンダー用のスケジュール詳細ポップオーバー
+ */
+export function SingleScheduleEventPopover({
   item,
   isOpen,
   onClose,
-}: ScheduleEventDialogProps) {
+  anchorPosition,
+}: SingleScheduleEventPopoverProps) {
   const [mounted, setMounted] = useState(false);
+  const [dialogPosition, setDialogPosition] = useState<{
+    top: number;
+    left: number;
+    showOnRight: boolean;
+  } | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // ダイアログの位置を計算（必ず左右どちらかに配置）
+  const calculatePosition = useCallback(() => {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // 画面の中心より左にクリックした場合は右側に、右にクリックした場合は左側に表示
+    const showOnRight = anchorPosition.x < viewportWidth / 2;
+
+    let left: number;
+    if (showOnRight) {
+      // 右側に表示
+      left = anchorPosition.x + MARGIN;
+      // 右端からはみ出す場合は調整
+      if (left + DIALOG_WIDTH + MARGIN > viewportWidth) {
+        left = viewportWidth - DIALOG_WIDTH - MARGIN;
+      }
+    } else {
+      // 左側に表示
+      left = anchorPosition.x - DIALOG_WIDTH - MARGIN;
+      // 左端からはみ出す場合は調整
+      if (left < MARGIN) {
+        left = MARGIN;
+      }
+    }
+
+    // 縦位置はクリック位置を中心に
+    let top = anchorPosition.y - DIALOG_HEIGHT / 2;
+
+    // 上端からはみ出す場合
+    if (top < MARGIN) {
+      top = MARGIN;
+    }
+
+    // 下端からはみ出す場合
+    if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
+      top = viewportHeight - DIALOG_HEIGHT - MARGIN;
+    }
+
+    return { top, left, showOnRight };
+  }, [anchorPosition]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDialogPosition(calculatePosition());
+    }
+  }, [isOpen, calculatePosition]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -49,16 +113,7 @@ export function ScheduleEventDialog({
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
-  if (!mounted || !isOpen) {
+  if (!mounted || !isOpen || !dialogPosition) {
     return null;
   }
 
@@ -70,11 +125,35 @@ export function ScheduleEventDialog({
   const members = item.members ?? [];
   const calendarName = item.calendarName?.trim().length
     ? item.calendarName
-    : "登録カレンダー";
+    : "カレンダー";
+
+  // スライドアニメーションの方向（右から来るか左から来るか）
+  const slideDirection = dialogPosition.showOnRight
+    ? "animate-slide-in-right"
+    : "animate-slide-in-left";
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur">
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 text-white shadow-2xl">
+    // biome-ignore lint/a11y/noStaticElementInteractions: Backdrop overlay for closing dialog on click
+    <div
+      className="fixed inset-0 z-50"
+      onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+      role="presentation"
+    >
+      <div
+        ref={dialogRef}
+        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm ${slideDirection}`}
+        style={{
+          top: dialogPosition.top,
+          left: dialogPosition.left,
+        }}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
         <div
           className="relative flex flex-col gap-2.5 px-5 py-4 text-white"
           style={{ backgroundColor: headerColor }}
@@ -101,13 +180,14 @@ export function ScheduleEventDialog({
             variant="ghost"
             size="icon"
             onClick={onClose}
+            aria-label="閉じる"
             className="absolute right-3 top-3 h-8 w-8 rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:bg-black/40"
           >
             <Icon icon={X} size="sm" />
           </Button>
         </div>
 
-        <div className="space-y-4 px-5 py-4 text-sm text-white/90">
+        <div className="max-h-[300px] space-y-4 overflow-y-auto px-5 py-4 text-sm text-white/90">
           {item.memo ? (
             <div className="flex items-start gap-2 text-white/85">
               <Icon
@@ -170,7 +250,7 @@ export function ScheduleEventDialog({
               className="mt-0.5 text-white/60"
             />
             <span className="text-xs uppercase tracking-wide text-white/70">
-              {calendarName || "メインカレンダー"}
+              {calendarName}
             </span>
           </div>
         </div>

@@ -16,12 +16,12 @@ import type {
 } from "@/types/schedule";
 import { getHolidayName } from "@/utils/holidays";
 import { cn } from "@/utils_constants_styles/utils";
-import styles from "./GeneralScheduleBoard.module.css";
+import styles from "./GeneralCalendarBoard.module.css";
 
 /** @deprecated Use ScheduleBoardItem instead */
-export type GeneralScheduleBoardItem = ScheduleBoardItem;
+export type GeneralCalendarBoardItem = ScheduleBoardItem;
 
-export type GeneralScheduleBoardProps = {
+export type GeneralCalendarBoardProps = {
   title?: string;
   items: ScheduleBoardItem[];
   isLoading?: boolean;
@@ -29,11 +29,15 @@ export type GeneralScheduleBoardProps = {
   errorMessage?: string;
   className?: string;
   baseDate?: Date;
-  onSelectItem?: (item: ScheduleBoardItem) => void;
+  /** 予定選択時のコールバック。positionにはクリックした位置が含まれる */
+  onSelectItem?: (
+    item: ScheduleBoardItem,
+    position: { x: number; y: number },
+  ) => void;
   onCreateItem?: (date: Date) => void;
 };
 
-export function GeneralScheduleBoard({
+export function GeneralCalendarBoard({
   title: _title = "総合スケジュール",
   items,
   isLoading = false,
@@ -43,7 +47,7 @@ export function GeneralScheduleBoard({
   baseDate,
   onSelectItem,
   onCreateItem,
-}: GeneralScheduleBoardProps) {
+}: GeneralCalendarBoardProps) {
   // 長押し判定用の参照
   const longPressTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const longPressStartPosRef = useRef<Map<string, { x: number; y: number }>>(
@@ -260,9 +264,12 @@ export function GeneralScheduleBoard({
                         )}
                       >
                         {events.map((event) => {
-                          const handleClick = () => {
+                          const handleClick = (e: React.MouseEvent) => {
                             if (onSelectItem) {
-                              onSelectItem(event.item);
+                              onSelectItem(event.item, {
+                                x: e.clientX,
+                                y: e.clientY,
+                              });
                             }
                           };
 

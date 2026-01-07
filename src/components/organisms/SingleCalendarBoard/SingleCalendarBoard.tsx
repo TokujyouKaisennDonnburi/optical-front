@@ -44,8 +44,11 @@ export type SingleCalendarBoardProps = {
   className?: string;
   /** 表示基準日 */
   baseDate?: Date;
-  /** アイテム選択時のコールバック */
-  onSelectItem?: (item: ScheduleBoardItem) => void;
+  /** アイテム選択時のコールバック。positionにはクリックした位置が含まれる */
+  onSelectItem?: (
+    item: ScheduleBoardItem,
+    position: { x: number; y: number },
+  ) => void;
   /** 新規予定作成時のコールバック (日付セルクリック時) */
   onCreateItem?: (date: Date) => void;
 };
@@ -80,7 +83,7 @@ function getPositionFromEvent(
 /**
  * 単体カレンダー用のスケジュールボードコンポーネント
  *
- * GeneralScheduleBoard と異なり、単一のカレンダーに特化した表示を行います。
+ * GeneralCalendarBoard と異なり、単一のカレンダーに特化した表示を行います。
  * カレンダーカラーを統一して表示し、よりシンプルなUIを提供します。
  */
 export function SingleCalendarBoard({
@@ -330,9 +333,12 @@ export function SingleCalendarBoard({
                         )}
                       >
                         {events.map((event) => {
-                          const handleClick = () => {
+                          const handleClick = (e: React.MouseEvent) => {
                             if (onSelectItem) {
-                              onSelectItem(event.item);
+                              onSelectItem(event.item, {
+                                x: e.clientX,
+                                y: e.clientY,
+                              });
                             }
                           };
 

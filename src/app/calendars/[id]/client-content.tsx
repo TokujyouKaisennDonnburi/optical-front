@@ -22,7 +22,7 @@ import {
   SingleCalendarBoard,
   type SingleCalendarBoardItem,
   SingleCreateScheduleDialog,
-  SingleScheduleEventDialog,
+  SingleScheduleEventPopover,
 } from "@/components/organisms/SingleCalendarBoard";
 import { useAuth } from "@/hooks/useAuth";
 import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
@@ -420,8 +420,10 @@ function BoardArea({
   calendarColor?: string;
   onScheduleCreated?: () => void;
 }) {
-  const [selectedItem, setSelectedItem] =
-    useState<SingleCalendarBoardItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    item: SingleCalendarBoardItem;
+    position: { x: number; y: number };
+  } | null>(null);
   const [createDialogDate, setCreateDialogDate] = useState<Date | null>(null);
 
   const boardItems = useMemo(() => {
@@ -498,8 +500,11 @@ function BoardArea({
     onChangeViewDate(new Date());
   };
 
-  const handleSelectItem = (item: SingleCalendarBoardItem) => {
-    setSelectedItem(item);
+  const handleSelectItem = (
+    item: SingleCalendarBoardItem,
+    position: { x: number; y: number },
+  ) => {
+    setSelectedItem({ item, position });
   };
 
   const handleCloseDialog = () => {
@@ -601,10 +606,11 @@ function BoardArea({
         />
       </CardContent>
       {selectedItem ? (
-        <SingleScheduleEventDialog
-          item={selectedItem}
+        <SingleScheduleEventPopover
+          item={selectedItem.item}
           isOpen
           onClose={handleCloseDialog}
+          anchorPosition={selectedItem.position}
         />
       ) : null}
       {createDialogDate ? (

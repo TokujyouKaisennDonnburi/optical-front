@@ -22,7 +22,7 @@ import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/General
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
 import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useAuth } from "@/hooks/useAuth";
-import { useGeneralSchedule } from "@/hooks/useGeneralSchedule";
+import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 
 function HomeContent() {
   const { user, isLoading: authLoading } = useAuth();
@@ -42,7 +42,7 @@ function HomeContent() {
 
   // カレンダーグリッド用のスケジュール（viewDateに基づく）
   const { items, calendars, isLoading, error, refresh } =
-    useGeneralSchedule(viewDate);
+    useGeneralCalendar(viewDate);
 
   // 今日の予定パネル用のスケジュール（常に今日の月）
   const {
@@ -50,7 +50,7 @@ function HomeContent() {
     dateLabel,
     isLoading: isTodayLoading,
     refresh: refreshToday,
-  } = useGeneralSchedule();
+  } = useGeneralCalendar();
 
   // 両方のスケジュールを更新するための統合refresh関数
   const handleRefreshAll = useCallback(() => {

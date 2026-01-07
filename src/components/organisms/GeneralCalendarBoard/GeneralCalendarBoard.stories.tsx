@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { GeneralScheduleBoard } from "@/components/organisms/GeneralScheduleBoard";
+import { GeneralCalendarBoard } from "@/components/organisms/GeneralCalendarBoard";
 
-const meta: Meta<typeof GeneralScheduleBoard> = {
-  title: "Organisms/GeneralScheduleBoard",
-  component: GeneralScheduleBoard,
+const meta: Meta<typeof GeneralCalendarBoard> = {
+  title: "Organisms/GeneralCalendarBoard",
+  component: GeneralCalendarBoard,
   tags: ["autodocs"],
   args: {
     title: "総合",
@@ -71,7 +71,7 @@ const meta: Meta<typeof GeneralScheduleBoard> = {
 
 export default meta;
 
-type Story = StoryObj<typeof GeneralScheduleBoard>;
+type Story = StoryObj<typeof GeneralCalendarBoard>;
 
 export const Default: Story = {};
 

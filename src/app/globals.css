@@ -137,9 +137,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -162,4 +164,37 @@
   color: transparent;
   animation: rainbow-move 4s linear infinite;
   /* フォールバック: グラデーション非対応ブラウザ用は考慮不要だが、念のため */
+}
+
+/* スライドアニメーション（ポップオーバーダイアログ用） */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out forwards;
+}
+
+@utility animate-slide-in-left {
+  animation: slide-in-left 0.2s ease-out forwards;
 }

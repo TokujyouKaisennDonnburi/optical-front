@@ -34,7 +34,7 @@ export type SingleCreateScheduleDialogProps = {
 /**
  * 単体カレンダー用の新規予定作成ダイアログ
  *
- * GeneralScheduleBoard の CreateScheduleDialog と異なり、
+ * GeneralCalendarBoard の CreateScheduleDialog と異なり、
  * カレンダーは固定（選択不可）で、よりシンプルなUIを提供します。
  */
 export function SingleCreateScheduleDialog({

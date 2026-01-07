@@ -5,19 +5,19 @@ import { Card, CardContent } from "@/components/atoms/Card";
 import { toast } from "@/components/atoms/Toast";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import {
-  CreateScheduleDialog,
-  GeneralScheduleBoard,
-  type GeneralScheduleBoardItem,
-  ScheduleEventDialog,
-} from "@/components/organisms/GeneralScheduleBoard";
-import type { useGeneralSchedule } from "@/hooks/useGeneralSchedule";
+  GeneralCalendarBoard,
+  type GeneralCalendarBoardItem,
+  GeneralCalendarEventPopover,
+  GeneralCreateCalendarDialog,
+} from "@/components/organisms/GeneralCalendarBoard";
+import type { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 import { createSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 type HomeBoardAreaProps = {
   className?: string;
-  items: ReturnType<typeof useGeneralSchedule>["items"];
-  calendars: ReturnType<typeof useGeneralSchedule>["calendars"];
+  items: ReturnType<typeof useGeneralCalendar>["items"];
+  calendars: ReturnType<typeof useGeneralCalendar>["calendars"];
   isLoading: boolean;
   error: Error | null;
   viewDate: Date;
@@ -35,8 +35,10 @@ export function HomeBoardArea({
   onChangeViewDate,
   onRefresh,
 }: HomeBoardAreaProps) {
-  const [selectedItem, setSelectedItem] =
-    useState<GeneralScheduleBoardItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    item: GeneralCalendarBoardItem;
+    position: { x: number; y: number };
+  } | null>(null);
   const [createDate, setCreateDate] = useState<Date | null>(null);
 
   const boardItems = useMemo(() => {
@@ -113,8 +115,11 @@ export function HomeBoardArea({
     onChangeViewDate(new Date());
   };
 
-  const handleSelectItem = (item: GeneralScheduleBoardItem) => {
-    setSelectedItem(item);
+  const handleSelectItem = (
+    item: GeneralCalendarBoardItem,
+    position: { x: number; y: number },
+  ) => {
+    setSelectedItem({ item, position });
   };
 
   const handleCloseDialog = () => {
@@ -220,7 +225,7 @@ export function HomeBoardArea({
         onToday={handleResetToday}
       />
       <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
-        <GeneralScheduleBoard
+        <GeneralCalendarBoard
           title="総合"
           items={boardItems}
           isLoading={isLoading}
@@ -232,14 +237,15 @@ export function HomeBoardArea({
         />
       </CardContent>
       {selectedItem ? (
-        <ScheduleEventDialog
-          item={selectedItem}
+        <GeneralCalendarEventPopover
+          item={selectedItem.item}
           isOpen
           onClose={handleCloseDialog}
+          anchorPosition={selectedItem.position}
         />
       ) : null}
       {createDate ? (
-        <CreateScheduleDialog
+        <GeneralCreateCalendarDialog
           date={createDate}
           isOpen
           onClose={handleCloseCreateDialog}
