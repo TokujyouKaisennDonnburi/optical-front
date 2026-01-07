@@ -1,4 +1,4 @@
-import { apiPost } from "@/lib/api-client";
+import { apiGet, apiPost } from "@/lib/api-client";
 import type {
   GitHubReviewOptionsResponse,
   GithubAppInstallRequest,
@@ -30,12 +30,11 @@ export async function getGitHubReviewOptions(): Promise<GitHubReviewOptionsRespo
 
 /**
  * マイルストーン進捗を取得
- * TODO: バックエンドは GET /github/calendars/{calendarId}/review-load-status を使用
- * 現在はフロント側でモックデータを返す
  */
-export async function getMilestoneProgress(): Promise<MilestoneProgressResponse> {
-  // バックエンド未実装のため、モックデータを返す
-  return Promise.resolve({
-    milestones: [],
-  });
+export async function getMilestoneProgress(
+  calendarId: string,
+): Promise<MilestoneProgressResponse> {
+  return apiGet<MilestoneProgressResponse>(
+    `/github/calendars/${calendarId}/milestones`,
+  );
 }
