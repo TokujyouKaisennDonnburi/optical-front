@@ -43,6 +43,7 @@ export function SingleScheduleEventDialog({
   const [dialogPosition, setDialogPosition] = useState<{
     top: number;
     left: number;
+    showOnRight: boolean;
   } | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +51,7 @@ export function SingleScheduleEventDialog({
     setMounted(true);
   }, []);
 
-  // ダイアログの位置を計算
+  // ダイアログの位置を計算（必ず左右どちらかに配置）
   const calculatePosition = useCallback(() => {
     if (!anchorPosition) {
       return null;
@@ -59,18 +60,28 @@ export function SingleScheduleEventDialog({
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    let left = anchorPosition.x + MARGIN;
-    let top = anchorPosition.y - DIALOG_HEIGHT / 2;
+    // 画面の中心より左にクリックした場合は右側に、右にクリックした場合は左側に表示
+    const showOnRight = anchorPosition.x < viewportWidth / 2;
 
-    // 右端からはみ出す場合は左側に配置
-    if (left + DIALOG_WIDTH + MARGIN > viewportWidth) {
+    let left: number;
+    if (showOnRight) {
+      // 右側に表示
+      left = anchorPosition.x + MARGIN;
+      // 右端からはみ出す場合は調整
+      if (left + DIALOG_WIDTH + MARGIN > viewportWidth) {
+        left = viewportWidth - DIALOG_WIDTH - MARGIN;
+      }
+    } else {
+      // 左側に表示
       left = anchorPosition.x - DIALOG_WIDTH - MARGIN;
+      // 左端からはみ出す場合は調整
+      if (left < MARGIN) {
+        left = MARGIN;
+      }
     }
 
-    // 左端からはみ出す場合は調整
-    if (left < MARGIN) {
-      left = MARGIN;
-    }
+    // 縦位置はクリック位置を中心に
+    let top = anchorPosition.y - DIALOG_HEIGHT / 2;
 
     // 上端からはみ出す場合
     if (top < MARGIN) {
@@ -82,7 +93,7 @@ export function SingleScheduleEventDialog({
       top = viewportHeight - DIALOG_HEIGHT - MARGIN;
     }
 
-    return { top, left };
+    return { top, left, showOnRight };
   }, [anchorPosition]);
 
   useEffect(() => {
@@ -123,6 +134,11 @@ export function SingleScheduleEventDialog({
   // ポップオーバースタイル or 中央配置
   const usePopover = anchorPosition && dialogPosition;
 
+  // スライドアニメーションの方向（右から来るか左から来るか）
+  const slideDirection = dialogPosition?.showOnRight
+    ? "animate-slide-in-right"
+    : "animate-slide-in-left";
+
   return createPortal(
     // biome-ignore lint/a11y/noStaticElementInteractions: Backdrop overlay for closing dialog on click
     <div
@@ -135,7 +151,7 @@ export function SingleScheduleEventDialog({
     >
       <div
         ref={dialogRef}
-        className="absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm"
+        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm ${usePopover ? slideDirection : ""}`}
         style={
           usePopover
             ? {
