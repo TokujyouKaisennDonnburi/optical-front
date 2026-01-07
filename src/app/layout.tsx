@@ -44,6 +44,11 @@ export const metadata: Metadata = {
   creator: "OptiCal Team",
   publisher: "OptiCal",
 
+  icons: {
+    icon: "/favicon.png",
+    apple: "/apple-touch-icon.png",
+  },
+
   // 検索エンジン設定
   robots: {
     index: true,
@@ -82,12 +87,6 @@ export const metadata: Metadata = {
     description:
       "オプション機能の自由設計により、シンプルな個人利用からエンジニアチーム向けの高度な運用まで対応できるカレンダーアプリ。",
     images: ["/images/og-image.png"],
-  },
-
-  // アイコン設定
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
   },
 
   // マニフェスト（PWA対応用）
