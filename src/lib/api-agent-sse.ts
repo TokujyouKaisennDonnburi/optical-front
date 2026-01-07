@@ -3,19 +3,42 @@
  * リアルタイムで処理ステータスを受信し、UXを向上させる
  */
 
-import type { AgentMessage } from "@/components/organisms/AgentChat/AgentMessageItem";
 import { getToken } from "@/lib/auth";
+
+export type AgentResponse = {
+  error?: string;
+  content?: string;
+  status?: string;
+};
 
 /**
  * AIエージェントの処理ステージ
  */
-export type ProcessingStage =
-  | "connecting"
-  | "analyzing"
-  | "fetching"
-  | "generating"
-  | "complete"
-  | "error";
+export const AllProcessingStage = [
+  "connecting",
+  "analyzing",
+  "creating_events",
+  "fetching_calendars",
+  "fetching_events",
+  "generating",
+  "complete",
+  "error",
+] as const;
+export type ProcessingStage = (typeof AllProcessingStage)[number];
+
+/**
+ * 処理ステージの日本語メッセージ
+ */
+export const STAGE_MESSAGES: Record<ProcessingStage, string> = {
+  connecting: "接続中...",
+  analyzing: "メッセージを分析中...",
+  creating_events: "予定を作成中...",
+  fetching_calendars: "カレンダーデータを取得中...",
+  fetching_events: "予定データを取得中...",
+  generating: "応答を生成中...",
+  complete: "完了",
+  error: "エラーが発生しました",
+};
 
 /**
  * ステータスイベントの型
@@ -29,12 +52,10 @@ export type StatusEvent = {
  * SSEコールバック関数の型
  */
 export type SSECallbacks = {
-  /** ステータス更新時に呼ばれる */
   onStatus: (status: StatusEvent) => void;
-  /** 処理完了時に呼ばれる */
-  onComplete: (response: AgentMessage) => void;
-  /** エラー発生時に呼ばれる */
+  onMessage: (message: string) => void;
   onError: (error: Error) => void;
+  onFinish: (isCalendarEdited: boolean) => void;
 };
 
 /**
@@ -42,18 +63,6 @@ export type SSECallbacks = {
  */
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_OPTICAL_API_URL || "http://localhost:8000";
-
-/**
- * 処理ステージの日本語メッセージ
- */
-export const STAGE_MESSAGES: Record<ProcessingStage, string> = {
-  connecting: "接続中...",
-  analyzing: "メッセージを分析中...",
-  fetching: "カレンダーデータを取得中...",
-  generating: "応答を生成中...",
-  complete: "完了",
-  error: "エラーが発生しました",
-};
 
 /**
  * SSEを使用してチャットメッセージを送信する
@@ -70,7 +79,7 @@ export function sendChatMessageSSE(
   callbacks: SSECallbacks,
 ): AbortController {
   const controller = new AbortController();
-  const { onStatus, onComplete, onError } = callbacks;
+  const { onStatus, onMessage, onError, onFinish } = callbacks;
 
   // 接続開始を通知
   onStatus({ stage: "connecting", message: STAGE_MESSAGES.connecting });
@@ -87,11 +96,14 @@ export function sendChatMessageSSE(
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
+      const apiUrl = calendarId
+        ? `${API_BASE_URL}/agents/${calendarId}/chat`
+        : `${API_BASE_URL}/agents/chat`;
 
-      const response = await fetch(`${API_BASE_URL}/agent/chat`, {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers,
-        body: JSON.stringify({ message, calendarId }),
+        body: JSON.stringify({ message }),
         signal: controller.signal,
       });
 
@@ -106,8 +118,10 @@ export function sendChatMessageSSE(
         await handleSSEResponse(response, callbacks, controller.signal);
       } else {
         // 通常のJSONレスポンスの場合（フォールバック）
-        const data = (await response.json()) as AgentMessage;
-        onComplete(data);
+        const data = (await response.json()) as AgentResponse;
+        if (data.content) {
+          onMessage(data.content);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -119,6 +133,8 @@ export function sendChatMessageSSE(
       } else {
         onError(new Error("予期しないエラーが発生しました"));
       }
+    } finally {
+      onFinish(false);
     }
   };
 
@@ -135,7 +151,7 @@ async function handleSSEResponse(
   callbacks: SSECallbacks,
   signal: AbortSignal,
 ): Promise<void> {
-  const { onStatus, onComplete, onError } = callbacks;
+  const { onStatus, onMessage, onError, onFinish } = callbacks;
   const reader = response.body?.getReader();
 
   if (!reader) {
@@ -144,55 +160,62 @@ async function handleSSEResponse(
 
   const decoder = new TextDecoder();
   let buffer = "";
-
+  let isEdited = false;
   try {
     while (true) {
       if (signal.aborted) {
         break;
       }
-
       const { done, value } = await reader.read();
-
       if (done) {
         break;
       }
-
       buffer += decoder.decode(value, { stream: true });
-
-      // SSEイベントをパース
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || ""; // 最後の不完全な行を保持
-
-      let currentEvent = "";
-      let currentData = "";
-
-      for (const line of lines) {
-        if (line.startsWith("event:")) {
-          currentEvent = line.slice(6).trim();
-        } else if (line.startsWith("data:")) {
-          currentData = line.slice(5).trim();
-        } else if (line === "" && currentData) {
-          // 空行でイベント完了
-          try {
-            const data = JSON.parse(currentData);
-
-            if (currentEvent === "status") {
-              onStatus(data as StatusEvent);
-            } else if (currentEvent === "complete") {
-              onComplete(data as AgentMessage);
-            } else if (currentEvent === "error") {
-              onError(new Error(data.message || "エラーが発生しました"));
+      while (true) {
+        const lineEnd = buffer.indexOf("\n");
+        if (lineEnd === -1) {
+          break;
+        }
+        const line = buffer.slice(0, lineEnd).trim();
+        buffer = buffer.slice(lineEnd + 1);
+        if (!line.startsWith("data: ")) {
+          continue;
+        }
+        const data = line.slice(6);
+        if (data === "[DONE]") {
+          break;
+        }
+        try {
+          const response = JSON.parse(data) as AgentResponse;
+          if (response.status) {
+            const status = AllProcessingStage.find(
+              (stage) => stage === response.status,
+            );
+            if (!status) {
+              continue;
             }
-          } catch {
-            console.warn("[SSE] Failed to parse event data:", currentData);
+            if (status === "creating_events") {
+              isEdited = true;
+            }
+            onStatus({
+              stage: status,
+              message: STAGE_MESSAGES[status],
+            });
+            continue;
           }
-
-          currentEvent = "";
-          currentData = "";
+          if (response.content) {
+            onMessage(response.content);
+          }
+          if (response.error) {
+            onError(new Error(response.error));
+          }
+        } catch {
+          console.warn("[SSE] Failed to parse event data:", line);
         }
       }
     }
   } finally {
     reader.releaseLock();
+    onFinish(isEdited);
   }
 }
