@@ -83,8 +83,12 @@ function HomeContent() {
     const calendarFilter = new Set(selectedCalendars);
 
     return items.filter((item) => {
+      // 検索対象: タイトル、場所、メモ
       const matchesSearch =
-        !normalized || item.title.toLowerCase().includes(normalized);
+        !normalized ||
+        item.title.toLowerCase().includes(normalized) ||
+        item.location?.toLowerCase().includes(normalized) ||
+        item.memo?.toLowerCase().includes(normalized);
 
       if (!matchesSearch) {
         return false;

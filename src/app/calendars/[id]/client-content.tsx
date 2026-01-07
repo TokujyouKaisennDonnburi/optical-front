@@ -115,8 +115,12 @@ export function CalendarDetailClient({
     const normalized = searchTerm.trim().toLowerCase();
     if (!normalized) return items;
 
-    return items.filter((item) =>
-      item.title.toLowerCase().includes(normalized),
+    // 検索対象: タイトル、場所、メモ
+    return items.filter(
+      (item) =>
+        item.title.toLowerCase().includes(normalized) ||
+        item.location?.toLowerCase().includes(normalized) ||
+        item.memo?.toLowerCase().includes(normalized),
     );
   }, [items, searchTerm]);
 

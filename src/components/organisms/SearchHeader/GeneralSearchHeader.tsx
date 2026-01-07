@@ -80,7 +80,7 @@ export function GeneralSearchHeader({
             value={search}
             onChange={handleSearchChange}
             onSelect={handleSearchChange}
-            placeholder="スケジュール、参加者、場所を検索..."
+            placeholder="タイトル、場所、メモを検索..."
           />
         </div>
 
