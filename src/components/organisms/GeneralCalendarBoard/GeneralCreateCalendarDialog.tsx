@@ -17,7 +17,7 @@ import {
 import { Switch } from "@/components/atoms/Switch";
 import { Text } from "@/components/atoms/Text";
 
-export type CreateScheduleDialogProps = {
+export type GeneralCreateCalendarDialogProps = {
   date: Date;
   isOpen: boolean;
   onClose: () => void;
@@ -36,13 +36,13 @@ export type CreateScheduleDialogProps = {
   }) => void;
 };
 
-export function CreateScheduleDialog({
+export function GeneralCreateCalendarDialog({
   date,
   isOpen,
   onClose,
   calendars,
   onConfirm,
-}: CreateScheduleDialogProps) {
+}: GeneralCreateCalendarDialogProps) {
   const formatDateInput = (target: Date) => {
     const y = target.getFullYear();
     const m = String(target.getMonth() + 1).padStart(2, "0");

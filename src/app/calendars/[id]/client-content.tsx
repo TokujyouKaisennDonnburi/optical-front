@@ -22,7 +22,7 @@ import {
   SingleCalendarBoard,
   type SingleCalendarBoardItem,
   SingleCreateScheduleDialog,
-  SingleScheduleEventDialog,
+  SingleScheduleEventPopover,
 } from "@/components/organisms/SingleCalendarBoard";
 import { useAuth } from "@/hooks/useAuth";
 import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
@@ -606,7 +606,7 @@ function BoardArea({
         />
       </CardContent>
       {selectedItem ? (
-        <SingleScheduleEventDialog
+        <SingleScheduleEventPopover
           item={selectedItem.item}
           isOpen
           onClose={handleCloseDialog}

@@ -83,7 +83,7 @@ function getPositionFromEvent(
 /**
  * 単体カレンダー用のスケジュールボードコンポーネント
  *
- * GeneralScheduleBoard と異なり、単一のカレンダーに特化した表示を行います。
+ * GeneralCalendarBoard と異なり、単一のカレンダーに特化した表示を行います。
  * カレンダーカラーを統一して表示し、よりシンプルなUIを提供します。
  */
 export function SingleCalendarBoard({

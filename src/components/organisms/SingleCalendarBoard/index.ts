@@ -8,6 +8,6 @@ export {
   type SingleCreateScheduleDialogProps,
 } from "./SingleCreateScheduleDialog";
 export {
-  SingleScheduleEventDialog,
-  type SingleScheduleEventDialogProps,
-} from "./SingleScheduleEventDialog";
+  SingleScheduleEventPopover,
+  type SingleScheduleEventPopoverProps,
+} from "./SingleScheduleEventPopover";

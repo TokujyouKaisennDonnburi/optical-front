@@ -178,11 +178,9 @@ export function AgentChatView({
     // SSEリクエストを送信
     abortControllerRef.current = sendChatMessageSSE(text, selectedCalendarId, {
       onStatus: (status: StatusEvent) => {
-        console.log("status", status);
         setProcessingStatus(status);
       },
       onMessage: (content: string) => {
-        console.log("onMessage", content);
         setMessages((prev) =>
           prev.map((message) => {
             if (message.id !== agentMessage.id) {

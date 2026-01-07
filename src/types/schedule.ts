@@ -13,7 +13,7 @@ export type ScheduleItem = {
   endAt: string;
 };
 
-/** UI表示用のスケジュールボードアイテム型（GeneralScheduleBoard/SingleCalendarBoard共通） */
+/** UI表示用のスケジュールボードアイテム型（GeneralCalendarBoard/SingleCalendarBoard共通） */
 export type ScheduleBoardItem = {
   id: string;
   title: string;
@@ -106,7 +106,7 @@ export type CreateCalendarResponse = {
   calendar: CalendarDetail;
 };
 
-/** カレンダーグリッドのセル情報（GeneralScheduleBoard/SingleCalendarBoard共通） */
+/** カレンダーグリッドのセル情報（GeneralCalendarBoard/SingleCalendarBoard共通） */
 export type CalendarCell = {
   date: Date;
   key: string;
@@ -116,7 +116,7 @@ export type CalendarCell = {
   holidayName?: string;
 };
 
-/** カレンダーイベント表示用の型（GeneralScheduleBoard/SingleCalendarBoard共通） */
+/** カレンダーイベント表示用の型（GeneralCalendarBoard/SingleCalendarBoard共通） */
 export type CalendarEvent = {
   id: string;
   title: string;

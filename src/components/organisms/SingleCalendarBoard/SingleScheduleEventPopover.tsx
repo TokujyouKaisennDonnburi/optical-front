@@ -17,12 +17,12 @@ import { Text } from "@/components/atoms/Text";
 
 import type { SingleCalendarBoardItem } from "./SingleCalendarBoard";
 
-export type SingleScheduleEventDialogProps = {
+export type SingleScheduleEventPopoverProps = {
   item: SingleCalendarBoardItem;
   isOpen: boolean;
   onClose: () => void;
   /** クリックした要素の位置情報 */
-  anchorPosition?: { x: number; y: number };
+  anchorPosition: { x: number; y: number };
 };
 
 /** ダイアログのサイズ（位置計算用） */
@@ -31,14 +31,14 @@ const DIALOG_HEIGHT = 320;
 const MARGIN = 16;
 
 /**
- * 単体カレンダー用のスケジュール詳細ダイアログ
+ * 単体カレンダー用のスケジュール詳細ポップオーバー
  */
-export function SingleScheduleEventDialog({
+export function SingleScheduleEventPopover({
   item,
   isOpen,
   onClose,
   anchorPosition,
-}: SingleScheduleEventDialogProps) {
+}: SingleScheduleEventPopoverProps) {
   const [mounted, setMounted] = useState(false);
   const [dialogPosition, setDialogPosition] = useState<{
     top: number;
@@ -53,10 +53,6 @@ export function SingleScheduleEventDialog({
 
   // ダイアログの位置を計算（必ず左右どちらかに配置）
   const calculatePosition = useCallback(() => {
-    if (!anchorPosition) {
-      return null;
-    }
-
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
@@ -97,10 +93,10 @@ export function SingleScheduleEventDialog({
   }, [anchorPosition]);
 
   useEffect(() => {
-    if (isOpen && anchorPosition) {
+    if (isOpen) {
       setDialogPosition(calculatePosition());
     }
-  }, [isOpen, anchorPosition, calculatePosition]);
+  }, [isOpen, calculatePosition]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -117,7 +113,7 @@ export function SingleScheduleEventDialog({
     };
   }, [isOpen, onClose]);
 
-  if (!mounted || !isOpen) {
+  if (!mounted || !isOpen || !dialogPosition) {
     return null;
   }
 
@@ -131,11 +127,8 @@ export function SingleScheduleEventDialog({
     ? item.calendarName
     : "カレンダー";
 
-  // ポップオーバースタイル or 中央配置
-  const usePopover = anchorPosition && dialogPosition;
-
   // スライドアニメーションの方向（右から来るか左から来るか）
-  const slideDirection = dialogPosition?.showOnRight
+  const slideDirection = dialogPosition.showOnRight
     ? "animate-slide-in-right"
     : "animate-slide-in-left";
 
@@ -151,19 +144,11 @@ export function SingleScheduleEventDialog({
     >
       <div
         ref={dialogRef}
-        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm ${usePopover ? slideDirection : ""}`}
-        style={
-          usePopover
-            ? {
-                top: dialogPosition.top,
-                left: dialogPosition.left,
-              }
-            : {
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }
-        }
+        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm ${slideDirection}`}
+        style={{
+          top: dialogPosition.top,
+          left: dialogPosition.left,
+        }}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
         role="dialog"

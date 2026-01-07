@@ -6,7 +6,7 @@ import { getCalendarList } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
-export function useGeneralSchedule(viewDate?: Date) {
+export function useGeneralCalendar(viewDate?: Date) {
   const [calendars, setCalendars] = useState<CalendarDetail[]>([]);
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
