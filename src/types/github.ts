@@ -169,7 +169,6 @@ export type Milestone = {
 
 /**
  * /api/github/milestone-progress のレスポンス
+ * バックエンドは配列を直接返す
  */
-export type MilestoneProgressResponse = {
-  milestones: Milestone[];
-};
+export type MilestoneProgressResponse = Milestone[];

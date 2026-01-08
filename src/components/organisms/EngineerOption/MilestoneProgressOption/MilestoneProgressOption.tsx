@@ -27,7 +27,7 @@ export function MilestoneProgressOption({ calendarId }: Props) {
       try {
         setIsLoading(true);
         const data = await getMilestoneProgress(calendarId);
-        setMilestones(data.milestones);
+        setMilestones(data);
       } catch (err) {
         setError("マイルストーンの取得に失敗しました。");
         console.error(err);
