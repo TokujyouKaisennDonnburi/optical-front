@@ -22,14 +22,16 @@ const LandingPage = () => {
 
   // ローディング中
   if (isLoading) {
-    <div
-      className="light min-h-screen flex items-center justify-center bg-white"
-      data-theme="light"
-    >
-      <div className="text-center">
-        <p className="text-gray-600">読み込み中...</p>
+    return (
+      <div
+        className="light min-h-screen flex items-center justify-center bg-white"
+        data-theme="light"
+      >
+        <div className="text-center">
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
       </div>
-    </div>;
+    );
   }
 
   // 未認証の場合のみランディングページを表示
