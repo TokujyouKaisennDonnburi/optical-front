@@ -349,7 +349,7 @@ export function CalendarDetailClient({
                       </Text>
                     </div>
                   ) : (
-                    <MilestoneProgressOption />
+                    <MilestoneProgressOption calendarId={calendarId} />
                   )}
                 </CardContent>
               </>

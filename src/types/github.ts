@@ -158,12 +158,13 @@ export type GithubAppInstallRequest = {
 
 /**
  * 単一のマイルストーン情報
+ * バックエンドの GithubMilestonesResponse に対応
  */
 export type Milestone = {
-  name: string;
-  openIssues: number;
-  closedIssues: number;
-  url: string;
+  title: string;
+  progress: number;
+  open: number;
+  close: number;
 };
 
 /**
