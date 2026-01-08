@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
@@ -17,8 +18,10 @@ export const LandingHeaderV2 = () => {
           href="/"
           className="font-bold text-xl tracking-tight flex items-center gap-2"
         >
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          OptiCal
+          <Image src="/optical.png" alt="OptiCal" width={28} height={28} />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500">
+            OptiCal
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">

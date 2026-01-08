@@ -7,20 +7,20 @@ const steps = [
   {
     icon: UserRoundPlus,
     title: "1. アカウント作成",
-    description: "Googleアカウントでサインアップ。",
+    description: "GoogleまたはGitHubアカウントでサインアップ。",
     color: "from-blue-500 to-cyan-500",
   },
   {
     icon: Share2,
     title: "2. カレンダーの共有",
     description:
-      "招待したい相手のメールアドレスを入力して、招待メールを送るだけ。",
+      "招待したい人のメールアドレスを入力して、招待メールを送るだけ。",
     color: "from-purple-500 to-pink-500",
   },
   {
     icon: Plus,
     title: "3. カレンダーのオプション",
-    description: "欲しい機能だけ追加して、あなただけのカレンダーに。",
+    description: "シンプルに欲しい機能だけを。",
     color: "from-orange-500 to-red-500",
   },
   {

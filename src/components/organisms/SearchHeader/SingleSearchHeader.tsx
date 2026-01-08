@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { BadgeButton } from "@/components/molecules/BadgeButton";
@@ -69,6 +70,11 @@ export function SingleSearchHeader({
       <Button variant="outline" onClick={handleClear}>
         クリア
       </Button>
+
+      {/* OptiCal ロゴ */}
+      <div className="flex items-center ml-auto">
+        <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
+      </div>
 
       {/* 通知バッチ */}
       <BadgeButton

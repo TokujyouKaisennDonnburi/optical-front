@@ -111,7 +111,7 @@ export function GeneralSearchHeader({
 
           {/* OptiCal ロゴ */}
           <div className="flex items-center">
-            <Image src="/optical.png" alt="OptiCal" width={24} height={24} />
+            <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
           </div>
 
           {/* 通知バッチ */}
