@@ -7,12 +7,16 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        allow: [
+          "/",
+          "/_next/static/", // レンダリングに必要な静的資産を許可
+        ],
         disallow: [
           "/api/", // APIエンドポイントは除外
           "/calendar/", // ログイン後のカレンダーページは除外
           "/schedule/", // スケジュール管理ページは除外
-          "/_next/", // Next.js内部ファイルは除外
+          "/_next/image", // 画像最適化APIは除外
+          "/_next/data/", // ISR/SSGデータは除外
         ],
       },
     ],
