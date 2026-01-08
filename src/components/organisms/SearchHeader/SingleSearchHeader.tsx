@@ -1,6 +1,8 @@
+import { RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
+
 import { BadgeButton } from "@/components/molecules/BadgeButton";
 import { DateSelector } from "@/components/molecules/DateSelector/DateSelector";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
@@ -46,7 +48,12 @@ export function SingleSearchHeader({
   };
 
   return (
-    <div className="flex gap-2 items-center flex-1">
+    <div className="flex gap-3 items-center flex-1">
+      {/* OptiCal ロゴ */}
+      <div className="flex items-center shrink-0">
+        <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
+      </div>
+
       {/* 検索バー */}
       <div className="w-[25rem]">
         <SearchInput
@@ -66,22 +73,20 @@ export function SingleSearchHeader({
         />
       </div>
 
-      {/* クリアボタン */}
+      {/* リセットボタン */}
       <Button variant="outline" onClick={handleClear}>
-        クリア
+        <RefreshCw className="w-4 h-4 mr-1" />
+        リセット
       </Button>
 
-      {/* OptiCal ロゴ */}
-      <div className="flex items-center ml-auto">
-        <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
+      <div className="ml-auto flex gap-2 items-center">
+        {/* 通知バッチ */}
+        <BadgeButton
+          count={0}
+          label="通知"
+          onClick={() => alert("通知クリック")}
+        />
       </div>
-
-      {/* 通知バッチ */}
-      <BadgeButton
-        count={0}
-        label="通知"
-        onClick={() => alert("通知クリック")}
-      />
     </div>
   );
 }

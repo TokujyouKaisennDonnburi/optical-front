@@ -30,13 +30,21 @@ export default function LoginPage() {
 
   // ローディング中
   if (isLoading) {
-    return <Loading variant="fullscreen" size="lg" message="読み込み中..." />;
+    return (
+      <div className="light" data-theme="light">
+        <Loading variant="fullscreen" size="lg" message="読み込み中..." />
+      </div>
+    );
   }
 
   // 未認証の場合のみログインフォームを表示
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-12">
+      <div
+        className="light min-h-screen flex items-center justify-center bg-white bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-12"
+        data-theme="light"
+        style={{ colorScheme: "light" }}
+      >
         <div className="w-full max-w-md space-y-8">
           {/* ヘッダー */}
           <div className="text-center space-y-4">

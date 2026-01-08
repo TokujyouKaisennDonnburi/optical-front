@@ -263,7 +263,8 @@ export function SingleCreateScheduleDialog({
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40 [&::-webkit-calendar-picker-indicator]:invert"
+                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
               <div className="space-y-1.5">
@@ -274,7 +275,8 @@ export function SingleCreateScheduleDialog({
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40 [&::-webkit-calendar-picker-indicator]:invert"
+                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
             </div>
@@ -296,7 +298,8 @@ export function SingleCreateScheduleDialog({
                       }
                     }
                   }}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40 [&::-webkit-calendar-picker-indicator]:invert"
+                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
               <div className="space-y-1.5">
@@ -316,7 +319,8 @@ export function SingleCreateScheduleDialog({
                       }
                     }
                   }}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40 [&::-webkit-calendar-picker-indicator]:invert"
+                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
             </div>

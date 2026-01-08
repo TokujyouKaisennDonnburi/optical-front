@@ -1,5 +1,9 @@
 .eventsScroll {
   scrollbar-width: thin;
+  scrollbar-color: rgba(120 113 108 / 0.25) transparent;
+}
+
+:root.dark .eventsScroll {
   scrollbar-color: rgba(255 255 255 / 0.2) transparent;
 }
 
@@ -12,6 +16,10 @@
 }
 
 .eventsScroll::-webkit-scrollbar-thumb {
-  background-color: rgba(255 255 255 / 0.2);
+  background-color: rgba(120 113 108 / 0.25);
   border-radius: 9999px;
+}
+
+:root.dark .eventsScroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255 255 255 / 0.2);
 }

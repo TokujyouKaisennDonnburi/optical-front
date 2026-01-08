@@ -1,10 +1,12 @@
-import { Gamepad2, Pencil } from "lucide-react";
+import { Gamepad2, Monitor, Moon, Pencil, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
 import { DropdownMenuItem } from "@/components/atoms/DropdownMenu";
 import { Switch } from "@/components/atoms/Switch";
 import { updateUserProfile, uploadAvatarImage } from "@/lib/api-profile";
 import { useSettings } from "@/providers/SettingsProvider";
+import { cn } from "@/utils_constants_styles/utils";
 
 // バリデーション関数
 const validateEmail = (email: string): boolean => {
@@ -36,11 +38,17 @@ export function AccountMenuItems({
   onRequestEmailSave,
   confirmSaveTrigger,
 }: AccountMenuItemsProps) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
   const { isGamingHoliday, setGamingHoliday } = useSettings();
   // 編集中のフィールドを管理（"name", "email", "icon"）
   const [editingField, setEditingField] = React.useState<
     "name" | "email" | "icon" | null
   >(null);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 編集された値を保持するステート
   const [editedName, setEditedName] = React.useState(name);
@@ -251,6 +259,59 @@ export function AccountMenuItems({
 
       {/* 区切り線 */}
       <hr className="my-2" />
+
+      {/* テーマ設定 */}
+      <div className="flex items-center justify-between px-4 py-3 text-sm">
+        <div className="flex items-center gap-3">
+          <Sun className="h-4 w-4" />
+          <span>テーマ</span>
+        </div>
+        {mounted ? (
+          <div className="flex gap-1 bg-muted/50 p-1 rounded-full border">
+            <button
+              type="button"
+              onClick={() => setTheme("light")}
+              className={cn(
+                "p-1.5 rounded-full transition-all duration-200",
+                theme === "light"
+                  ? "bg-white dark:bg-zinc-700 shadow-sm text-yellow-500 dark:text-yellow-400"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+              aria-label="ライトモード"
+            >
+              <Sun className="h-3 w-3" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme("dark")}
+              className={cn(
+                "p-1.5 rounded-full transition-all duration-200",
+                theme === "dark"
+                  ? "bg-white dark:bg-zinc-700 shadow-sm text-blue-500 dark:text-blue-400"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+              aria-label="ダークモード"
+            >
+              <Moon className="h-3 w-3" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme("system")}
+              className={cn(
+                "p-1.5 rounded-full transition-all duration-200",
+                theme === "system"
+                  ? "bg-white dark:bg-zinc-700 shadow-sm text-green-500 dark:text-green-400"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+              aria-label="システム設定"
+            >
+              <Monitor className="h-3 w-3" />
+            </button>
+          </div>
+        ) : (
+          <div className="w-24 h-8 bg-muted/20 rounded-full animate-pulse" />
+        )}
+      </div>
 
       {/* 設定トグル: 祝日ゲーミング */}
       <div className="flex items-center justify-between px-4 py-3 text-sm">

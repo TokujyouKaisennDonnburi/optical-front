@@ -212,7 +212,11 @@ export function HomeBoardArea({
   return (
     <Card
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 border border-primary/30 bg-slate-800/90 p-3",
+        "flex min-h-0 flex-1 flex-col gap-2 border p-3",
+        // ライトモード: 温かみのあるストーン系
+        "border-stone-300 bg-stone-100/90 text-stone-800",
+        // ダークモード
+        "dark:border-primary/30 dark:bg-slate-800/90 dark:text-white",
         className,
       )}
     >

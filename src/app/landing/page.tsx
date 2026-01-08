@@ -23,7 +23,10 @@ const LandingPage = () => {
   // ローディング中
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        className="light min-h-screen flex items-center justify-center bg-white"
+        data-theme="light"
+      >
         <div className="text-center">
           <p className="text-gray-600">読み込み中...</p>
         </div>
@@ -34,7 +37,10 @@ const LandingPage = () => {
   // 未認証の場合のみランディングページを表示
   if (!user) {
     return (
-      <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
+      <div
+        className="light min-h-screen bg-background text-foreground selection:bg-primary/20"
+        data-theme="light"
+      >
         <LandingHeaderV2 />
         <main>
           <LandingHeroV2 />

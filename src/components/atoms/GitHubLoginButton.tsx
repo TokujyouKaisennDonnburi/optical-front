@@ -40,7 +40,7 @@ export function GitHubLoginButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full flex items-center justify-center gap-2"
+      className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 border-gray-200"
       onClick={handleClick}
       disabled={isLoading}
     >

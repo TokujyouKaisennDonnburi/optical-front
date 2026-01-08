@@ -64,9 +64,9 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full border-0 shadow-xl">
+    <Card className="w-full border-0 shadow-xl bg-white/90 backdrop-blur-md">
       <CardHeader className="space-y-1 pb-4">
-        <CardTitle className="text-2xl font-bold text-center">
+        <CardTitle className="text-2xl font-bold text-center text-gray-900">
           ログイン
         </CardTitle>
       </CardHeader>
@@ -74,7 +74,10 @@ export function LoginForm() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* メールアドレス */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
               メールアドレス
             </Label>
             <Input
@@ -86,7 +89,7 @@ export function LoginForm() {
               disabled={isLoading}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "email-error" : undefined}
-              className="h-11"
+              className="h-11 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-gray-900 placeholder:text-gray-400"
             />
             {errors.email && (
               <p
@@ -101,7 +104,10 @@ export function LoginForm() {
 
           {/* パスワード */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
               パスワード
             </Label>
             <Input
@@ -113,7 +119,7 @@ export function LoginForm() {
               disabled={isLoading}
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? "password-error" : undefined}
-              className="h-11"
+              className="h-11 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-gray-900 placeholder:text-gray-400"
             />
             {errors.password && (
               <p
@@ -129,7 +135,7 @@ export function LoginForm() {
           {/* ログインボタン */}
           <Button
             type="submit"
-            className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-200"
+            className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-200 text-white"
             disabled={isLoading}
           >
             {isLoading ? (
