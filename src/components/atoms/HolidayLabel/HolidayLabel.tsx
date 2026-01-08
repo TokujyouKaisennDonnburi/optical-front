@@ -15,7 +15,7 @@ export function HolidayLabel({
     <span
       className={cn(
         "hidden text-[0.625rem] sm:inline-block",
-        isGaming ? "animate-gaming-text" : "text-green-400",
+        isGaming ? "animate-gaming-text" : "text-rose-500 dark:text-green-400",
         className,
       )}
     >

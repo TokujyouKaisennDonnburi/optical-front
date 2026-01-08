@@ -7,6 +7,7 @@ export const runtime = "edge";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { MockInitializer } from "@/components/providers/MockInitializer";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SettingsProvider } from "@/providers/SettingsProvider";
 
 const geistSans = Geist({
@@ -102,8 +103,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#f8f9fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a2e" },
   ],
 };
 
@@ -113,17 +114,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <MockInitializer />
-        <AuthProvider>
-          <SettingsProvider>
-            {children}
-            <Toaster position="bottom-right" richColors />
-          </SettingsProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <SettingsProvider>
+              {children}
+              <Toaster position="bottom-right" richColors />
+            </SettingsProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

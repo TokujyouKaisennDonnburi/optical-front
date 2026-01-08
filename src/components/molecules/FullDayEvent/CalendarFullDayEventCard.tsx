@@ -82,10 +82,11 @@ export const CalendarFullDayEventCard = forwardRef<
       <div
         ref={ref}
         className={cn(
-          "flex w-full min-w-0 items-center gap-0.5 rounded-sm border border-white/20 px-1 py-[1px] text-[9px] leading-tight shadow-sm transition-colors hover:brightness-110",
+          "flex w-full min-w-0 items-center gap-0.5 rounded-sm border px-1 py-[1px] text-[9px] leading-tight shadow-sm transition-colors hover:brightness-110",
+          "border-stone-400 dark:border-white/20",
           className,
         )}
-        style={{ backgroundColor: calendarColor, color: "#f5f5f5" }}
+        style={{ backgroundColor: calendarColor }}
         data-variant={variant}
         {...props}
       >
@@ -95,7 +96,8 @@ export const CalendarFullDayEventCard = forwardRef<
           <Text
             as="span"
             className={cn(
-              "block truncate text-[10px] font-bold leading-[1.2] text-white",
+              "block truncate text-[10px] font-bold leading-[1.2]",
+              "text-stone-800 dark:text-white",
               titleClassName,
             )}
           >
@@ -106,7 +108,8 @@ export const CalendarFullDayEventCard = forwardRef<
             <Text
               as="span"
               className={cn(
-                "block truncate text-[9px] font-medium leading-tight text-white/90",
+                "block truncate text-[9px] font-medium leading-tight",
+                "text-stone-600 dark:text-white/90",
                 subtitleClassName,
               )}
             >

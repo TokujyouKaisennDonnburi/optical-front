@@ -85,7 +85,7 @@ export function GeneralCalendarBoard({
             {calendarWeeks.map((week, weekIndex) => (
               <div
                 key={`week-${week[0]?.key ?? weekIndex}`}
-                className="grid min-h-0 flex-1 grid-cols-7 border-b border-white/5 last:border-b-0"
+                className="grid min-h-0 flex-1 grid-cols-7 border-b border-stone-200 dark:border-white/5 last:border-b-0"
               >
                 {week.map((cell, _dayIndex) => {
                   const events = eventsByDay.get(cell.key) ?? [];
@@ -214,28 +214,36 @@ export function GeneralCalendarBoard({
                         }
                       }}
                       className={cn(
-                        "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden bg-slate-950/40 p-0.5 transition-colors cursor-pointer",
+                        "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden p-0.5 transition-colors cursor-pointer",
+                        // ライトモード: 温かみのあるストーン系
+                        "bg-stone-50 dark:bg-slate-950/40",
+                        "border-r border-stone-200 dark:border-white/5 last:border-r-0",
                         !cell.isCurrentMonth &&
-                          "bg-slate-950/10 text-muted-foreground/70",
-                        isWeekend && cell.isCurrentMonth && "bg-slate-950/55",
+                          "bg-stone-100/60 dark:bg-slate-950/10 text-muted-foreground/70",
+                        isWeekend &&
+                          cell.isCurrentMonth &&
+                          "bg-stone-100/80 dark:bg-slate-950/55",
+                        cell.isCurrentMonth &&
+                          "hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
                       )}
                     >
                       {cell.isToday ? (
-                        <span className="pointer-events-none absolute inset-0 rounded-sm bg-white/10" />
+                        <span className="pointer-events-none absolute inset-0 rounded-sm bg-amber-200/50 dark:bg-white/10" />
                       ) : null}
                       <div className="flex items-center justify-between text-[0.625rem]">
                         <div className="flex min-w-0 items-baseline gap-1.5 overflow-hidden">
                           <span
                             className={cn(
-                              "font-medium text-white/90",
+                              "font-medium text-stone-800 dark:text-white/90",
                               !cell.isCurrentMonth &&
-                                "text-muted-foreground/70",
-                              cell.isToday && "text-amber-300 font-semibold",
+                                "text-stone-400 dark:text-muted-foreground/70",
+                              cell.isToday &&
+                                "text-amber-700 dark:text-amber-300 font-semibold",
                               cell.holidayName &&
                                 !cell.isToday &&
                                 (isGamingHoliday
                                   ? "animate-gaming-text font-bold"
-                                  : "text-green-400"),
+                                  : "text-rose-600 dark:text-green-400"),
                             )}
                           >
                             {cell.isToday ? (
@@ -253,13 +261,13 @@ export function GeneralCalendarBoard({
                           )}
                         </div>
                         {events.length ? (
-                          <span className="text-[0.625rem] font-medium text-white/80">{`${events.length} 件`}</span>
+                          <span className="text-[0.625rem] font-medium text-stone-500 dark:text-white/80">{`${events.length} 件`}</span>
                         ) : null}
                       </div>
 
                       <div
                         className={cn(
-                          "mt-0.5 flex min-h-0 w-full flex-1 flex-col gap-px overflow-y-auto pr-px",
+                          "relative z-10 mt-0.5 flex min-h-0 w-full flex-1 flex-col gap-px overflow-y-auto pr-px",
                           styles.eventsScroll,
                         )}
                       >
@@ -284,7 +292,7 @@ export function GeneralCalendarBoard({
                               key={event.id}
                               type="button"
                               onClick={handleClick}
-                              className="w-full cursor-pointer rounded-sm border border-transparent text-left transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                              className="w-full cursor-pointer rounded-sm border border-transparent text-left transition-colors hover:bg-stone-200/60 dark:hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                             >
                               {isAllDay ? (
                                 <CalendarFullDayEventCard
@@ -495,7 +503,7 @@ function CalendarSkeleton({ weeksCount = 5 }: { weeksCount?: number }) {
       {skeletonCellKeys.map((cellKey) => (
         <div
           key={cellKey}
-          className="flex min-h-0 flex-col gap-2 border-b border-white/5 bg-slate-950/40 p-2"
+          className="flex min-h-0 flex-col gap-2 border-b border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-slate-950/40 p-2"
         >
           <Skeleton className="h-3.5 w-7" />
           <Skeleton className="h-2.5 w-16" />
@@ -512,7 +520,7 @@ function OverlayMessage({ message }: { message: string }) {
       <Text
         as="span"
         size="sm"
-        className="rounded-full bg-white/10 px-3 py-1.5 text-xs text-white"
+        className="rounded-full bg-stone-200 dark:bg-white/10 px-3 py-1.5 text-xs text-stone-600 dark:text-white"
       >
         {message}
       </Text>
