@@ -13,7 +13,11 @@ import type { Milestone } from "@/types/github";
 
 const skeletonItems = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
-export function MilestoneProgressOption() {
+type Props = {
+  calendarId: string;
+};
+
+export function MilestoneProgressOption({ calendarId }: Props) {
   const [milestones, setMilestones] = useState<Milestone[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +26,8 @@ export function MilestoneProgressOption() {
     const fetchMilestones = async () => {
       try {
         setIsLoading(true);
-        const data = await getMilestoneProgress();
-        setMilestones(data.milestones);
+        const data = await getMilestoneProgress(calendarId);
+        setMilestones(data);
       } catch (err) {
         setError("マイルストーンの取得に失敗しました。");
         console.error(err);
@@ -32,7 +36,7 @@ export function MilestoneProgressOption() {
       }
     };
     void fetchMilestones();
-  }, []);
+  }, [calendarId]);
 
   return (
     <Card>
@@ -56,11 +60,11 @@ export function MilestoneProgressOption() {
           // 取得したマイルストーンを縦に並べて表示
           milestones.map((milestone) => (
             <MilestoneProgress
-              key={milestone.name}
-              openIssues={milestone.openIssues}
-              closedIssues={milestone.closedIssues}
-              name={milestone.name}
-              url={milestone.url}
+              key={milestone.title}
+              title={milestone.title}
+              progress={milestone.progress}
+              open={milestone.open}
+              close={milestone.close}
             />
           ))
         ) : (

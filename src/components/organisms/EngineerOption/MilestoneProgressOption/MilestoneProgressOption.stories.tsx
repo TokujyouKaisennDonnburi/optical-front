@@ -5,6 +5,9 @@ import MilestoneProgressOption from "./MilestoneProgressOption";
 const meta: Meta<typeof MilestoneProgressOption> = {
   title: "Components/Organisms/EngineerOption/MilestoneProgressOption",
   component: MilestoneProgressOption,
+  args: {
+    calendarId: "mock-calendar-id",
+  },
 };
 export default meta;
 
@@ -16,30 +19,31 @@ export const Default: Story = {
   parameters: {
     msw: {
       handlers: [
-        http.get(`${API_PREFIX}/api/github/milestone-progress`, async () => {
-          return HttpResponse.json({
-            milestones: [
+        http.get(
+          `${API_PREFIX}/github/calendars/:calendarId/milestones`,
+          async () => {
+            return HttpResponse.json([
               {
-                name: "2025 Q1 Sprint",
-                openIssues: 8,
-                closedIssues: 22,
-                url: "https://github.com/mock/repo/milestones/1",
+                title: "2025 Q1 Sprint",
+                progress: 73,
+                open: 8,
+                close: 22,
               },
               {
-                name: "2025 Q2 Infrastructure",
-                openIssues: 2,
-                closedIssues: 10,
-                url: "https://github.com/mock/repo/milestones/2",
+                title: "2025 Q2 Infrastructure",
+                progress: 83,
+                open: 2,
+                close: 10,
               },
               {
-                name: "2025 Q2 New Features",
-                openIssues: 15,
-                closedIssues: 5,
-                url: "https://github.com/mock/repo/milestones/3",
+                title: "2025 Q2 New Features",
+                progress: 25,
+                open: 15,
+                close: 5,
               },
-            ],
-          });
-        }),
+            ]);
+          },
+        ),
       ],
     },
   },
@@ -49,10 +53,13 @@ export const Loading: Story = {
   parameters: {
     msw: {
       handlers: [
-        http.get(`${API_PREFIX}/api/github/milestone-progress`, async () => {
-          await new Promise((resolve) => setTimeout(resolve, 10000)); // 10秒待機
-          return HttpResponse.json({ milestones: [] });
-        }),
+        http.get(
+          `${API_PREFIX}/github/calendars/:calendarId/milestones`,
+          async () => {
+            await new Promise((resolve) => setTimeout(resolve, 10000)); // 10秒待機
+            return HttpResponse.json([]);
+          },
+        ),
       ],
     },
   },
@@ -62,9 +69,12 @@ export const ErrorState: Story = {
   parameters: {
     msw: {
       handlers: [
-        http.get(`${API_PREFIX}/api/github/milestone-progress`, () => {
-          return new HttpResponse(null, { status: 500 });
-        }),
+        http.get(
+          `${API_PREFIX}/github/calendars/:calendarId/milestones`,
+          () => {
+            return new HttpResponse(null, { status: 500 });
+          },
+        ),
       ],
     },
   },
