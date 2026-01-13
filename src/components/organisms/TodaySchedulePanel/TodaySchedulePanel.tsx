@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
+import { EventSection } from "@/components/molecules/EventSection/EventSection";
 import {
   TodayScheduleHeader,
   type TodayScheduleHeaderProps,
@@ -50,6 +51,29 @@ export type TodaySchedulePanelProps = {
   contentClassName?: string;
 };
 
+/* ===== 終日判定 ===== */
+function isAllDay(item: TodaySchedulePanelItem) {
+  if (!item.startsAt || !item.endsAt) return false;
+
+  const start = new Date(item.startsAt);
+  const end = new Date(item.endsAt);
+
+  const isStartMidnight = start.getHours() === 0 && start.getMinutes() === 0;
+
+  const isEndEndOfDay =
+    (end.getHours() === 23 && end.getMinutes() === 59) ||
+    (end.getHours() === 23 &&
+      end.getMinutes() === 59 &&
+      end.getSeconds() === 59);
+
+  const sameDay =
+    start.getFullYear() === end.getFullYear() &&
+    start.getMonth() === end.getMonth() &&
+    start.getDate() === end.getDate();
+
+  return isStartMidnight && isEndEndOfDay && sameDay;
+}
+
 export function TodaySchedulePanel({
   header,
   items,
@@ -59,12 +83,20 @@ export function TodaySchedulePanel({
   className,
   contentClassName,
 }: TodaySchedulePanelProps) {
+  const [isAllDayOpen, setIsAllDayOpen] = useState(true);
+
+  /** 終日 / 通常 振り分け */
+  const fullDayItems = useMemo(() => items.filter(isAllDay), [items]);
+  const timedItems = useMemo(() => items.filter((i) => !isAllDay(i)), [items]);
+
   const derivedSlots = useMemo(() => {
     if (timeline?.slots?.length) {
       return markCurrentSlot(timeline.slots);
     }
-    return markCurrentSlot(buildSlotsFromItems(items));
-  }, [items, timeline?.slots]);
+    return markCurrentSlot(buildSlotsFromItems(timedItems));
+  }, [timedItems, timeline?.slots]);
+
+  const timelineWrapRef = useRef<HTMLDivElement>(null);
 
   return (
     <Card
@@ -93,18 +125,47 @@ export function TodaySchedulePanel({
               <Skeleton className="h-full min-h-0 w-full" />
             ) : (
               <>
-                <TodayScheduleTimeline
-                  slots={derivedSlots}
-                  className={cn("flex-1", timeline?.className)}
-                  contentClassName={timeline?.contentClassName}
+                {/* 終日イベント */}
+                <EventSection
+                  items={fullDayItems.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                    calendarColor: item.calendarColor,
+                    location: item.location,
+                    memo: item.memo,
+                  }))}
+                  isOpen={isAllDayOpen}
+                  onToggle={() => setIsAllDayOpen((v) => !v)}
+                  maxHeight={
+                    timelineWrapRef.current?.offsetHeight
+                      ? timelineWrapRef.current.offsetHeight
+                      : 240
+                  }
                 />
-                {!items.length ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                    <Text as="span" size="sm" className="text-muted-foreground">
-                      {emptyMessage}
-                    </Text>
-                  </div>
-                ) : null}
+
+                {/* ===== タイムライン ===== */}
+                <div
+                  ref={timelineWrapRef}
+                  className="relative flex flex-1 min-h-0"
+                >
+                  <TodayScheduleTimeline
+                    slots={derivedSlots}
+                    className={cn("flex-1", timeline?.className)}
+                    contentClassName={timeline?.contentClassName}
+                  />
+
+                  {!items.length && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                      <Text
+                        as="span"
+                        size="sm"
+                        className="text-muted-foreground"
+                      >
+                        {emptyMessage}
+                      </Text>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -121,8 +182,6 @@ function buildSlotsFromItems(
     return defaultSlots();
   }
 
-  let minStart = Number.POSITIVE_INFINITY;
-  let maxEnd = Number.NEGATIVE_INFINITY;
   const slots = new Map<number, TodayScheduleTimelineSlot>();
 
   for (const item of items) {
@@ -130,15 +189,10 @@ function buildSlotsFromItems(
     if (startMinutes === undefined) {
       continue;
     }
-    minStart = Math.min(minStart, startMinutes);
-
-    const endMinutes = timeLabelToMinutes(
-      item.timeRange.end ?? item.timeRange.start,
-    );
-    maxEnd = Math.max(maxEnd, endMinutes ?? startMinutes);
 
     const existing = slots.get(startMinutes);
     const events = existing?.events ? [...existing.events] : [];
+
     events.push({
       id: item.id,
       title: item.title,
@@ -155,14 +209,7 @@ function buildSlotsFromItems(
     });
   }
 
-  if (!Number.isFinite(minStart) || !Number.isFinite(maxEnd)) {
-    return defaultSlots();
-  }
-
-  const startHour = 0;
-  const endHour = 24 * 60;
-
-  for (let minute = startHour; minute < endHour; minute += 60) {
+  for (let minute = 0; minute < 24 * 60; minute += 60) {
     if (!slots.has(minute)) {
       slots.set(minute, {
         time: minutesToTimeLabel(minute),
@@ -173,21 +220,7 @@ function buildSlotsFromItems(
 
   return Array.from(slots.entries())
     .sort((a, b) => a[0] - b[0])
-    .map(([, slot]) => {
-      const events = slot.events ? [...slot.events] : [];
-      events.sort((a, b) => {
-        const aMinutes = timeLabelToMinutes(a.timeRange?.start ?? "") ?? 0;
-        const bMinutes = timeLabelToMinutes(b.timeRange?.start ?? "") ?? 0;
-        return aMinutes - bMinutes;
-      });
-      return {
-        ...slot,
-        events,
-        description: events.length
-          ? events.map((event) => event.title).join(" / ")
-          : slot.description,
-      };
-    });
+    .map(([, slot]) => slot);
 }
 
 function defaultSlots(): TodayScheduleTimelineSlot[] {
@@ -203,14 +236,10 @@ function markCurrentSlot(
 ): TodayScheduleTimelineSlot[] {
   const now = new Date();
   const currentMinutes = now.getHours() * 60;
-  return slots.map((slot) =>
-    slot.isCurrent !== undefined
-      ? slot
-      : {
-          ...slot,
-          isCurrent: timeLabelToMinutes(slot.time) === currentMinutes,
-        },
-  );
+  return slots.map((slot) => ({
+    ...slot,
+    isCurrent: timeLabelToMinutes(slot.time) === currentMinutes,
+  }));
 }
 
 function minutesToTimeLabel(totalMinutes: number) {
