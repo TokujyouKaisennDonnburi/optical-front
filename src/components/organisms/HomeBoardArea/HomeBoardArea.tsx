@@ -235,7 +235,13 @@ export function HomeBoardArea({
           title="総合"
           items={boardItems}
           isLoading={isLoading}
-          errorMessage={error ? "予定を取得できませんでした" : undefined}
+          errorMessage={
+            error
+              ? "予定を取得できませんでした"
+              : !isLoading && calendars.length === 0
+                ? "カレンダーがありません。下の＋ボタンからカレンダーを作成しましょう。"
+                : undefined
+          }
           className="flex h-full min-h-0 flex-col"
           baseDate={viewDate}
           onSelectItem={handleSelectItem}

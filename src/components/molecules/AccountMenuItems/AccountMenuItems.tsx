@@ -1,12 +1,17 @@
 import { Gamepad2, Monitor, Moon, Pencil, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
 import { DropdownMenuItem } from "@/components/atoms/DropdownMenu";
 import { Switch } from "@/components/atoms/Switch";
 import { updateUserProfile, uploadAvatarImage } from "@/lib/api-profile";
 import { useSettings } from "@/providers/SettingsProvider";
 import { cn } from "@/utils_constants_styles/utils";
+
+// アバターアップロードの制限
+const MAX_AVATAR_SIZE = 20 * 1024 * 1024; // 20MB
+const ALLOWED_EXTENSIONS = [".png", ".jpg", ".jpeg"];
 
 // バリデーション関数
 const validateEmail = (email: string): boolean => {
@@ -132,9 +137,41 @@ export function AccountMenuItems({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const response = await uploadAvatarImage(file);
-    setAvatarUrl(response.url);
-    setEditedAvatar(response.url);
+    // ファイルサイズチェック
+    if (file.size > MAX_AVATAR_SIZE) {
+      toast.error("ファイルサイズが大きすぎます", {
+        description: "20MB以下の画像を選択してください",
+        duration: 2000,
+      });
+      e.target.value = ""; // 入力をリセット
+      return;
+    }
+
+    // 拡張子チェック
+    const ext = `.${file.name.split(".").pop()?.toLowerCase()}`;
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      toast.error("サポートされていないファイル形式です", {
+        description: "PNG, JPG, JPEG形式の画像を選択してください",
+        duration: 2000,
+      });
+      e.target.value = ""; // 入力をリセット
+      return;
+    }
+
+    try {
+      const response = await uploadAvatarImage(file);
+      setAvatarUrl(response.url);
+      setEditedAvatar(response.url);
+      toast.success("アバターを更新しました", { duration: 2000 });
+    } catch (error) {
+      console.error("Avatar upload failed:", error);
+      toast.error("アバターのアップロードに失敗しました", {
+        description: "もう一度お試しください",
+        duration: 2000,
+      });
+    } finally {
+      e.target.value = ""; // 入力をリセット（同じファイルを再選択可能に）
+    }
   };
 
   React.useEffect(() => {
@@ -171,7 +208,7 @@ export function AccountMenuItems({
             <Pencil className="h-3 w-3 text-gray-600" />
             <input
               type="file"
-              accept="image/*"
+              accept=".png,.jpg,.jpeg"
               onChange={handleFileChange}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
