@@ -90,9 +90,6 @@ export const metadata: Metadata = {
     images: ["/images/og-image.png"],
   },
 
-  // マニフェスト（PWA対応用）
-  manifest: "/manifest.json",
-
   // その他
   category: "productivity",
 };

@@ -135,13 +135,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         saveRefreshToken(response.refreshToken);
         setUser(response.user);
 
-        toast.success("ログインしました");
+        toast.success("ログインしました", { duration: 2000 });
         router.push("/");
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("ログインに失敗しました");
         setError(error);
-        toast.error(error.message);
+        toast.error(error.message, { duration: 2000 });
         throw error;
       } finally {
         setIsLoading(false);
@@ -165,13 +165,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         saveToken(response.accessToken);
         setUser(response.user);
 
-        toast.success("アカウントを作成しました");
+        toast.success("アカウントを作成しました", { duration: 2000 });
         router.push("/");
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("サインアップに失敗しました");
         setError(error);
-        toast.error(error.message);
+        toast.error(error.message, { duration: 2000 });
         throw error;
       } finally {
         setIsLoading(false);
@@ -199,7 +199,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       window.location.href = response.url;
     } catch (err) {
       console.error("GitHub認証URLの取得に失敗しました:", err);
-      toast.error("GitHub認証の開始に失敗しました");
+      toast.error("GitHub認証の開始に失敗しました", { duration: 2000 });
       // エラーを再スローして呼び出し側でキャッチできるようにする
       throw err;
     }
@@ -228,7 +228,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       setIsLoading(false);
 
-      toast.success("ログアウトしました");
+      toast.success("ログアウトしました", { duration: 2000 });
       router.push("/landing");
     }
   }, [router]);

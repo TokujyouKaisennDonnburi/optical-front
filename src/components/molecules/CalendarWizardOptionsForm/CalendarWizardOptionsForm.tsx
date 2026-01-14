@@ -1,31 +1,12 @@
-"use client";
-
 import { Icon } from "@/components/atoms/Icon";
 import {
   Activity,
-  Baby,
   Calendar,
-  CalendarDays,
   Check,
   CheckCircle2,
-  CloudSun,
   Code2,
-  GitBranch,
-  GitCommit,
   GitPullRequest,
-  Heart,
-  HeartHandshake,
-  Home,
-  Image,
-  Mail,
-  MapPin,
-  Rocket,
-  ShoppingCart,
-  Star,
-  Timer,
-  Trash2,
-  UserCircle2,
-  Users,
+  Minus,
   Zap,
 } from "@/components/ui/icons";
 import { cn } from "@/utils_constants_styles/utils";
@@ -46,7 +27,7 @@ export type CalendarWizardCustomOption = {
   id: string;
   label: string;
   description: string;
-  category: "engineer" | "family" | "couple" | "general";
+  category: "engineer" | "general";
 };
 
 export type CalendarWizardOptionsFormProps = {
@@ -58,47 +39,16 @@ export type CalendarWizardOptionsFormProps = {
   onToggleCustomOption: (optionId: string) => void;
 };
 
-const getOptionIcon = (id: string, category: string) => {
+const getOptionIcon = (id: string, _category: string) => {
   // ID specific icons take priority
   switch (id) {
-    case "reminder_digest":
-      return Mail;
-    case "git_integration":
-      return GitBranch;
     case "pull_request_review_wait_count":
       return GitPullRequest;
     case "team_review_load":
       return Activity;
-    case "github_issues":
-      return GitCommit;
-    case "sprint_management":
-      return CalendarDays;
-    case "release_notification":
-      return Rocket;
-    case "garbage_reminder":
-      return Trash2;
-    case "shopping_list":
-      return ShoppingCart;
-    case "kids_pickup":
-      return Baby;
-    case "location_sharing":
-      return MapPin;
-    case "kids_schedule":
-      return Users;
-    case "anniversary_countdown":
-      return Timer;
-    case "date_suggestion":
-      return Star;
-    case "exchange_diary":
-      return HeartHandshake;
-    case "album_sharing":
-      return Image;
-    case "weather_forecast":
-      return CloudSun;
+    case "milestone_progress":
+      return Calendar;
     default:
-      // Category-specific fallback
-      if (category === "family") return UserCircle2;
-      if (category === "couple") return Heart;
       return Zap;
   }
 };
@@ -107,10 +57,10 @@ const getTemplateIcon = (id: string) => {
   switch (id) {
     case "engineer":
       return Code2;
-    case "family":
-      return Home;
-    case "couple":
-      return Heart;
+    case "general":
+      return Calendar;
+    case "simple":
+      return Minus;
     default:
       return Calendar;
   }
@@ -118,8 +68,6 @@ const getTemplateIcon = (id: string) => {
 
 const CATEGORY_LABELS = {
   engineer: "エンジニア・開発",
-  family: "ファミリー・生活",
-  couple: "カップル・パートナー",
   general: "一般・便利機能",
 };
 
@@ -145,7 +93,7 @@ export function CalendarWizardOptionsForm({
   );
 
   // Order of categories to display
-  const categoryOrder = ["engineer", "family", "couple", "general"];
+  const categoryOrder = ["engineer", "general"];
 
   return (
     <div className="space-y-10">
@@ -159,7 +107,7 @@ export function CalendarWizardOptionsForm({
             チームやプロジェクトの目的に最適なプリセットを選んでください（任意）。クリックで選択・解除できます。
           </p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
           {templates.map((template) => {
             const isSelected = template.id === selectedTemplateId;
             const TemplateIcon = getTemplateIcon(template.id);
@@ -219,7 +167,12 @@ export function CalendarWizardOptionsForm({
                   )}
                 </div>
 
-                <div className="mb-2">
+                <div
+                  className={cn(
+                    "mb-2",
+                    template.features.length === 0 && "flex-1 flex flex-col",
+                  )}
+                >
                   <h3
                     className={cn(
                       "text-lg font-bold transition-colors duration-200",
@@ -228,44 +181,52 @@ export function CalendarWizardOptionsForm({
                   >
                     {template.name}
                   </h3>
-                  <p className="mt-1 text-xs text-muted-foreground/90 line-clamp-2 min-h-[2.5em]">
+                  <p
+                    className={cn(
+                      "mt-1 text-muted-foreground/90",
+                      template.features.length === 0
+                        ? "text-sm leading-relaxed whitespace-pre-line"
+                        : "text-xs line-clamp-2 min-h-[2.5em]",
+                    )}
+                  >
                     {template.description}
                   </p>
                 </div>
 
-                <div className="mt-auto space-y-2 pt-4">
-                  <div className="h-px w-full bg-border/50" />
-                  <ul className="space-y-1.5">
-                    {template.features.map((feature) => (
-                      <li
-                        key={`${template.id}-${feature.label}`}
-                        className="flex items-start gap-2"
-                      >
-                        <div className="mt-0.5 shrink-0">
-                          {feature.included ? (
-                            <Icon
-                              icon={Check}
-                              size={14}
-                              className="text-primary"
-                            />
-                          ) : (
-                            <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30 translate-y-1 translate-x-1" />
-                          )}
-                        </div>
-                        <span
-                          className={cn(
-                            "text-xs",
-                            feature.included
-                              ? "font-medium text-foreground"
-                              : "text-muted-foreground/60 line-through decoration-muted-foreground/40",
-                          )}
+                {template.features.length > 0 && (
+                  <div className="mt-auto space-y-2 pt-4">
+                    <ul className="space-y-1.5">
+                      {template.features.map((feature) => (
+                        <li
+                          key={`${template.id}-${feature.label}`}
+                          className="flex items-start gap-2"
                         >
-                          {feature.label}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          <div className="mt-0.5 shrink-0">
+                            {feature.included ? (
+                              <Icon
+                                icon={Check}
+                                size={14}
+                                className="text-primary"
+                              />
+                            ) : (
+                              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30 translate-y-1 translate-x-1" />
+                            )}
+                          </div>
+                          <span
+                            className={cn(
+                              "text-xs",
+                              feature.included
+                                ? "font-medium text-foreground"
+                                : "text-muted-foreground/60 line-through decoration-muted-foreground/40",
+                            )}
+                          >
+                            {feature.label}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </button>
             );
           })}

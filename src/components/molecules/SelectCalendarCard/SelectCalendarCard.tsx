@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Image from "next/image";
 import { Card } from "@/components/atoms/Card";
 import { cn } from "@/utils_constants_styles/utils";
@@ -174,9 +174,6 @@ export function SelectCalendarAddCard({
         aria-label="単体スケジュールを作成"
       >
         <Plus className="h-6 w-6" strokeWidth={2.25} />
-        <div className="pointer-events-none absolute bottom-1 right-1 rounded-md bg-black/10 p-0.5">
-          <ChevronDown className="h-3.5 w-3.5" />
-        </div>
       </button>
     </Card>
   );

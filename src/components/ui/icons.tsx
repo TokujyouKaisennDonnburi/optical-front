@@ -48,6 +48,7 @@ export {
   Mail,
   MapPin,
   Menu,
+  Minus,
   MoreHorizontal,
   MoreVertical,
   Pencil,

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Loading } from "@/components/atoms/Loading";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
+import { CalendarSwitcher } from "@/components/molecules/CalendarSwitcher";
 import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { AgentChatView } from "@/components/organisms/AgentChat";
@@ -25,6 +26,7 @@ import {
   SingleScheduleEventPopover,
 } from "@/components/organisms/SingleCalendarBoard";
 import { useAuth } from "@/hooks/useAuth";
+import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
 import { getGitHubReviewOptions } from "@/lib/api-github";
 import { createSchedule } from "@/lib/api-schedule";
@@ -55,6 +57,10 @@ export function CalendarDetailClient({
 
   const { calendar, items, isLoading, error, hasGitHubOptions, refresh } =
     useSingleCalendarSchedule(calendarId);
+
+  // 全カレンダー一覧を取得（カレンダー切り替え用）
+  const { calendars: allCalendars, isLoading: calendarsLoading } =
+    useGeneralCalendar();
 
   // 検索機能
   const [searchTerm, setSearchTerm] = useState("");
@@ -168,18 +174,19 @@ export function CalendarDetailClient({
             <ArrowLeft className="h-5 w-5" />
           </Button>
 
-          {/* カレンダー名 */}
-          <div className="flex items-center gap-2">
-            {calendar?.color && (
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: calendar.color }}
-              />
-            )}
-            <Text size="lg" weight="semibold">
-              {calendar?.name ?? "読み込み中..."}
-            </Text>
-          </div>
+          {/* カレンダー切り替え */}
+          <CalendarSwitcher
+            currentCalendarId={calendarId}
+            currentCalendarName={calendar?.name}
+            currentCalendarColor={calendar?.color}
+            calendars={allCalendars.map((c) => ({
+              id: c.id,
+              name: c.name,
+              color: c.color,
+            }))}
+            onSelect={(id) => router.push(`/calendars/${id}`)}
+            isLoading={calendarsLoading}
+          />
 
           {/* 検索バー */}
           <div className="flex gap-2 items-center ml-4 flex-1">
@@ -386,6 +393,7 @@ export function CalendarDetailClient({
         <RightSidebar
           selectedId={selectedSidebarItem}
           onSelect={handleSidebarSelect}
+          installedOptions={calendar?.options}
         />
       </div>
 
@@ -573,11 +581,12 @@ function BoardArea({
       });
       toast.success("予定を追加しました", {
         description: payload.title,
+        duration: 2000,
       });
       onScheduleCreated?.();
     } catch (err) {
       console.error("Failed to create schedule:", err);
-      toast.error("予定の追加に失敗しました");
+      toast.error("予定の追加に失敗しました", { duration: 2000 });
     }
   };
 
