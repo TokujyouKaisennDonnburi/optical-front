@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      {
+        // Cloudflare R2（カレンダー画像、アバター画像）
+        protocol: "https",
+        hostname: "pub-f6ed18ab1ffc407eb708446791aa0984.r2.dev",
+      },
     ],
   },
   // Cloudflare Pages対応
