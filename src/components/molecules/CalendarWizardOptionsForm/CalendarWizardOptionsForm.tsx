@@ -24,7 +24,8 @@ export type CalendarWizardTemplate = {
 };
 
 export type CalendarWizardCustomOption = {
-  id: string;
+  id: number;
+  name: string;
   label: string;
   description: string;
   category: "engineer" | "general";
@@ -36,7 +37,7 @@ export type CalendarWizardOptionsFormProps = {
   onSelectTemplate: (templateId: string | null) => void;
   customOptions: CalendarWizardCustomOption[];
   selectedCustomOptions: Record<string, boolean>;
-  onToggleCustomOption: (optionId: string) => void;
+  onToggleCustomOption: (optionId: number) => void;
 };
 
 const getOptionIcon = (id: string, _category: string) => {
@@ -260,7 +261,10 @@ export function CalendarWizardOptionsForm({
               <div className="grid gap-4 md:grid-cols-2">
                 {options.map((option) => {
                   const isChecked = Boolean(selectedCustomOptions[option.id]);
-                  const OptionIcon = getOptionIcon(option.id, option.category);
+                  const OptionIcon = getOptionIcon(
+                    option.name,
+                    option.category,
+                  );
 
                   return (
                     <button

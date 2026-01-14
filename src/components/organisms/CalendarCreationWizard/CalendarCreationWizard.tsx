@@ -39,7 +39,7 @@ type CalendarCreationState = {
   imageId: string | null;
   members: MemberInvite[];
   selectedTemplateId: string | null;
-  customOptions: Record<string, boolean>;
+  customOptions: Record<number, boolean>;
   useSolo: boolean;
 };
 
@@ -103,19 +103,22 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
 > = [
   // Engineer - 実装済みオプションのみ
   {
-    id: "pull_request_review_wait_count",
+    id: 1,
+    name: "pull_request_review_wait_count",
     label: "PRレビュー待ち件数",
     description: "自分のレビュー待ちPR数を表示します。",
     category: "engineer",
   },
   {
-    id: "team_review_load",
+    id: 2,
+    name: "team_review_load",
     label: "チームレビュー負荷",
     description: "チーム全体のレビュー状況を可視化します。",
     category: "engineer",
   },
   {
-    id: "milestone_progress",
+    id: 5,
+    name: "milestone_progress",
     label: "マイルストーン進捗",
     description:
       "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
@@ -127,12 +130,8 @@ const CUSTOM_OPTION_ITEMS: CalendarWizardCustomOption[] =
   CUSTOM_OPTIONS_WITH_DEFAULT.map(({ defaultChecked, ...rest }) => rest);
 
 // テンプレートIDとカスタムオプションIDのマッピング
-const TEMPLATE_OPTION_MAPPING: Record<string, string[]> = {
-  engineer: [
-    "pull_request_review_wait_count",
-    "team_review_load",
-    "milestone_progress",
-  ],
+const TEMPLATE_OPTION_MAPPING: Record<string, number[]> = {
+  engineer: [1, 2, 5],
   general: [], // 一般テンプレートは特定のオプションを持たない
   simple: [], // シンプルテンプレートはオプションなし
 };
@@ -295,7 +294,7 @@ export function CalendarCreationWizard() {
     });
   };
 
-  const handleToggleCustomOption = (optionId: string) => {
+  const handleToggleCustomOption = (optionId: number) => {
     setState((prev) => {
       const newValue = !prev.customOptions[optionId];
       const updatedOptions = {
@@ -413,9 +412,9 @@ export function CalendarCreationWizard() {
           : state.members
               .map((member) => member.email.trim())
               .filter((email) => email.length > 0),
-        options: Object.entries(state.customOptions)
+        optionIds: Object.entries(state.customOptions)
           .filter(([, enabled]) => enabled)
-          .map(([key]) => key),
+          .map(([id]) => Number(id)),
         imageId: state.imageId,
       };
 
@@ -464,7 +463,7 @@ export function CalendarCreationWizard() {
   // 固定配列のフィルタリングなのでメモ化不要
   const activeCustomOptions = CUSTOM_OPTIONS_WITH_DEFAULT.filter(
     (option) => state.customOptions[option.id],
-  ).map(({ id, label }) => ({ id, label }));
+  ).map(({ name, label }) => ({ name, label }));
 
   // 単純なカウントなのでメモ化不要
   const invitedMembersCount = state.useSolo
