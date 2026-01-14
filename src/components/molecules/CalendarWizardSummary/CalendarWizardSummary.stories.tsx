@@ -12,8 +12,8 @@ const meta: Meta<typeof CalendarWizardSummary> = {
     imagePreviewUrl: null,
     templateName: "Dev",
     customOptions: [
-      { id: "reminder_digest", label: "リマインダーサマリメール" },
-      { id: "task_inbox", label: "インボックス連携" },
+      { name: "reminder_digest", label: "リマインダーサマリメール" },
+      { name: "task_inbox", label: "インボックス連携" },
     ],
     members: [
       { id: "1", email: "owner@example.com" },

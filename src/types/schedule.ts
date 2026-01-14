@@ -97,7 +97,7 @@ export type CreateCalendarRequest = {
   name: string;
   color: string;
   members: string[];
-  options: string[];
+  optionIds: number[];
   imageId: string | null;
 };
 

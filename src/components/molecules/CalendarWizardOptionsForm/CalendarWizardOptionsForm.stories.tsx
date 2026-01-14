@@ -59,19 +59,22 @@ const TEMPLATES: CalendarWizardTemplate[] = [
 
 const CUSTOM_OPTIONS: CalendarWizardCustomOption[] = [
   {
-    id: "reminder_digest",
+    id: 91,
+    name: "reminder_digest",
     label: "リマインダーサマリメール",
     description: "翌日の予定をまとめてメール通知します。",
     category: "general",
   },
   {
-    id: "task_inbox",
+    id: 92,
+    name: "task_inbox",
     label: "インボックス連携",
     description: "メール経由で受け取ったタスクを自動で追加します。",
     category: "general",
   },
   {
-    id: "weekly_report",
+    id: 93,
+    name: "weekly_report",
     label: "週次レポート",
     description: "毎週のアクティビティをまとめて配信します。",
     category: "general",
@@ -81,21 +84,24 @@ const CUSTOM_OPTIONS: CalendarWizardCustomOption[] = [
 const CUSTOM_OPTIONS_WITH_GITHUB: CalendarWizardCustomOption[] = [
   ...CUSTOM_OPTIONS,
   {
-    id: "webhook",
+    id: 94,
+    name: "webhook",
     label: "Webhook連携",
     description:
       "他サービスとの自動連携用にカスタムWebhookを設定できるようにします。",
     category: "engineer",
   },
   {
-    id: "pull_request_review_wait_count",
+    id: 1,
+    name: "pull_request_review_wait_count",
     label: "PRレビュー待ち件数",
     description:
       "GitHub連携により、あなたがレビュー待ちのPull Request件数をプレビューに表示します。",
     category: "engineer",
   },
   {
-    id: "team_review_load",
+    id: 2,
+    name: "team_review_load",
     label: "チームレビュー負荷",
     description:
       "GitHub連携により、チームメンバーのレビュー負荷状況をプレビューに表示します。",

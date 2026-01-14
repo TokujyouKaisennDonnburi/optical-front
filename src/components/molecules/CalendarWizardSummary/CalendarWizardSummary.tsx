@@ -22,7 +22,7 @@ export type CalendarWizardSummaryProps = {
   color: string;
   imagePreviewUrl: string | null;
   templateName: string;
-  customOptions: Array<{ id: string; label: string }>;
+  customOptions: Array<{ name: string; label: string }>;
   members: Array<{ id: string; email: string }>;
 };
 
@@ -113,7 +113,7 @@ export function CalendarWizardSummary({
             <div className="mt-1 flex flex-wrap gap-1">
               {customOptions.map((option) => (
                 <span
-                  key={option.id}
+                  key={option.name}
                   className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
                 >
                   <Check className="h-3 w-3" />
