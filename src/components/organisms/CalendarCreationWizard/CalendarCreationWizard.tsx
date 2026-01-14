@@ -64,42 +64,36 @@ const COLOR_OPTIONS = [
 
 const TEMPLATE_OPTIONS: CalendarWizardTemplate[] = [
   {
+    id: "simple",
+    name: "ミニマリスト",
+    badge: "Minimal",
+    description:
+      "オプションなしの最もシンプルなカレンダー。\n新規予定の追加のみ。",
+    accentColor: "#64748b",
+    features: [],
+  },
+  {
+    id: "general",
+    name: "一般",
+    badge: "Basic",
+    description: "シンプルで汎用的なカレンダーテンプレート。",
+    accentColor: "#22c55e",
+    features: [
+      { label: "予定管理", included: true },
+      { label: "メンバー共有", included: true },
+      { label: "リマインダー", included: true },
+    ],
+  },
+  {
     id: "engineer",
     name: "エンジニア",
     badge: "Tech",
     description: "開発サイクルとリリース管理に最適化されたテンプレート。",
     accentColor: "#a855f7",
     features: [
-      { label: "Git連携", included: true },
-      { label: "レビュー負荷可視化", included: true },
-      { label: "スプリント管理", included: true },
-      { label: "リリース通知", included: true },
-    ],
-  },
-  {
-    id: "family",
-    name: "ファミリー",
-    badge: "Home",
-    description: "家族の予定共有と家事分担をスムーズにするテンプレート。",
-    accentColor: "#f472b6",
-    features: [
-      { label: "ゴミ出しリマインダー", included: true },
-      { label: "買い物リスト共有", included: true },
-      { label: "位置情報共有", included: true },
-      { label: "子供の予定管理", included: true },
-    ],
-  },
-  {
-    id: "couple",
-    name: "カップル",
-    badge: "Love",
-    description: "二人の大切な時間と思い出を共有するためのテンプレート。",
-    accentColor: "#ef4444",
-    features: [
-      { label: "デート調整", included: true },
-      { label: "記念日カウントダウン", included: true },
-      { label: "交換日記", included: true },
-      { label: "アルバム共有", included: true },
+      { label: "PRレビュー待ち件数", included: true },
+      { label: "チームレビュー負荷可視化", included: true },
+      { label: "マイルストーン進捗", included: true },
     ],
   },
 ];
@@ -107,28 +101,7 @@ const TEMPLATE_OPTIONS: CalendarWizardTemplate[] = [
 const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   CalendarWizardCustomOption & { defaultChecked?: boolean }
 > = [
-  // Generic
-  {
-    id: "reminder_digest",
-    label: "リマインダーサマリ",
-    description: "翌日の予定を毎晩通知します。",
-    category: "general",
-    defaultChecked: true,
-  },
-  {
-    id: "weather_forecast",
-    label: "天気予報連携",
-    description: "カレンダーに週間天気予報を表示します。",
-    category: "general",
-  },
-
-  // Engineer
-  {
-    id: "git_integration",
-    label: "Git連携",
-    description: "GitHub/GitLabのコミット・PRをカレンダーに表示。",
-    category: "engineer",
-  },
+  // Engineer - 実装済みオプションのみ
   {
     id: "pull_request_review_wait_count",
     label: "PRレビュー待ち件数",
@@ -142,92 +115,27 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
     category: "engineer",
   },
   {
-    id: "github_issues",
-    label: "Issue期限管理",
-    description: "担当Issueの期限をカレンダーに表示します。",
-    category: "engineer",
-  },
-  {
-    id: "sprint_management",
-    label: "スプリント管理",
-    description: "スプリントの開始・終了をカレンダーで管理。",
-    category: "engineer",
-  },
-  {
-    id: "release_notification",
-    label: "リリース通知",
-    description: "リリース予定日をチームに通知します。",
-    category: "engineer",
-  },
-  {
     id: "milestone_progress",
     label: "マイルストーン進捗",
     description:
       "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
     category: "engineer",
   },
-
-  // Family
-  {
-    id: "garbage_reminder",
-    label: "ゴミ出し通知",
-    description: "燃えるゴミ・資源ゴミの日を前日に通知。",
-    category: "family",
-  },
-  {
-    id: "shopping_list",
-    label: "買い物リスト",
-    description: "切らした食材や日用品を家族で共有。",
-    category: "family",
-  },
-  {
-    id: "kids_pickup",
-    label: "送迎分担",
-    description: "保育園や習い事の送迎担当を管理。",
-    category: "family",
-  },
-  {
-    id: "location_sharing",
-    label: "位置情報共有",
-    description: "家族の現在地をリアルタイムで共有。",
-    category: "family",
-  },
-  {
-    id: "kids_schedule",
-    label: "子供の予定管理",
-    description: "子供の学校行事や習い事を一元管理。",
-    category: "family",
-  },
-
-  // Couple
-  {
-    id: "anniversary_countdown",
-    label: "記念日カウント",
-    description: "付き合ってからの日数を表示します。",
-    category: "couple",
-  },
-  {
-    id: "date_suggestion",
-    label: "デートプラン提案",
-    description: "週末のデートスポットをAIが提案。",
-    category: "couple",
-  },
-  {
-    id: "exchange_diary",
-    label: "交換日記",
-    description: "1日1言、お互いへのメッセージを記録。",
-    category: "couple",
-  },
-  {
-    id: "album_sharing",
-    label: "アルバム共有",
-    description: "二人の写真を共有アルバムで管理。",
-    category: "couple",
-  },
 ];
 
 const CUSTOM_OPTION_ITEMS: CalendarWizardCustomOption[] =
   CUSTOM_OPTIONS_WITH_DEFAULT.map(({ defaultChecked, ...rest }) => rest);
+
+// テンプレートIDとカスタムオプションIDのマッピング
+const TEMPLATE_OPTION_MAPPING: Record<string, string[]> = {
+  engineer: [
+    "pull_request_review_wait_count",
+    "team_review_load",
+    "milestone_progress",
+  ],
+  general: [], // 一般テンプレートは特定のオプションを持たない
+  simple: [], // シンプルテンプレートはオプションなし
+};
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // メールアドレス形式チェック
 
@@ -359,20 +267,59 @@ export function CalendarCreationWizard() {
   };
 
   const handleSelectTemplate = (templateId: string | null) => {
-    setState((prev) => ({
-      ...prev,
-      selectedTemplateId: templateId,
-    }));
+    setState((prev) => {
+      const updatedOptions = { ...prev.customOptions };
+
+      // 以前選択されていたテンプレートがあれば、そのオプションをOFFにする
+      if (prev.selectedTemplateId) {
+        const prevOptionIds =
+          TEMPLATE_OPTION_MAPPING[prev.selectedTemplateId] || [];
+        for (const optionId of prevOptionIds) {
+          updatedOptions[optionId] = false;
+        }
+      }
+
+      // 新しいテンプレートが選択されていれば、そのオプションをONにする
+      if (templateId) {
+        const optionIds = TEMPLATE_OPTION_MAPPING[templateId] || [];
+        for (const optionId of optionIds) {
+          updatedOptions[optionId] = true;
+        }
+      }
+
+      return {
+        ...prev,
+        selectedTemplateId: templateId,
+        customOptions: updatedOptions,
+      };
+    });
   };
 
   const handleToggleCustomOption = (optionId: string) => {
-    setState((prev) => ({
-      ...prev,
-      customOptions: {
+    setState((prev) => {
+      const newValue = !prev.customOptions[optionId];
+      const updatedOptions = {
         ...prev.customOptions,
-        [optionId]: !prev.customOptions[optionId],
-      },
-    }));
+        [optionId]: newValue,
+      };
+
+      // オプションをOFFにした場合、そのオプションが選択中のテンプレートに含まれているかチェック
+      let newTemplateId = prev.selectedTemplateId;
+      if (!newValue && prev.selectedTemplateId) {
+        const templateOptionIds =
+          TEMPLATE_OPTION_MAPPING[prev.selectedTemplateId] || [];
+        // テンプレートに含まれるオプションをOFFにした場合、テンプレートを解除
+        if (templateOptionIds.includes(optionId)) {
+          newTemplateId = null;
+        }
+      }
+
+      return {
+        ...prev,
+        selectedTemplateId: newTemplateId,
+        customOptions: updatedOptions,
+      };
+    });
   };
 
   const handleToggleUseSolo = (checked: boolean) => {
@@ -479,19 +426,33 @@ export function CalendarCreationWizard() {
       await createCalendar(payload);
       setIsSubmitting(false);
       setIsComplete(true);
-      toast.success("カレンダーを作成しました");
+      toast.success("カレンダーを作成しました", { duration: 2000 });
     } catch (error) {
       setIsSubmitting(false);
       const errorMessage =
         error instanceof ApiClientError
           ? error.message
           : "カレンダーの作成に失敗しました";
-      toast.error(errorMessage);
+      toast.error(errorMessage, { duration: 2000 });
       console.error("Failed to create calendar:", error);
     }
   };
 
   const handleConfirmSubmit = () => {
+    // テンプレートもカスタムオプションも選択されていない場合
+    const hasSelectedTemplate = state.selectedTemplateId !== null;
+    const hasSelectedOptions = Object.values(state.customOptions).some(
+      (enabled) => enabled,
+    );
+
+    if (!hasSelectedTemplate && !hasSelectedOptions) {
+      toast.info(
+        "オプションが選択されていません。\nミニマリストテンプレートを選択することをおすすめします。",
+        { duration: 2000 },
+      );
+      return;
+    }
+
     setIsConfirmModalOpen(true);
   };
 
@@ -568,9 +529,9 @@ export function CalendarCreationWizard() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col h-full">
       <CalendarWizardStepIndicator steps={STEPS} currentIndex={step} />
-      <div className="space-y-6">
+      <div className="flex-1 overflow-y-auto space-y-6 pb-4">
         {step === 0 ? (
           <CalendarWizardDetailsForm
             name={state.name}
@@ -607,7 +568,7 @@ export function CalendarCreationWizard() {
           />
         ) : null}
       </div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="sticky bottom-0 bg-background/95 backdrop-blur border-t border-border py-4 px-2 -mx-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="button"
           variant="ghost"

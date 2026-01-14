@@ -10,6 +10,7 @@ function Toaster(props: ToasterProps) {
       richColors
       theme="system"
       toastOptions={{
+        duration: 2000,
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border",

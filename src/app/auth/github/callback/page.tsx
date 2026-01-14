@@ -31,7 +31,7 @@ function CallbackPageContent() {
       if (!code) {
         const errorMessage = "認証コードが見つかりません";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error(errorMessage, { duration: 2000 });
         setTimeout(() => {
           router.push("/auth/login");
         }, 3000);
@@ -41,7 +41,7 @@ function CallbackPageContent() {
       if (!state) {
         const errorMessage = "stateが見つかりません";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error(errorMessage, { duration: 2000 });
         setTimeout(() => {
           router.push("/auth/login");
         }, 3000);
@@ -56,10 +56,12 @@ function CallbackPageContent() {
             state: state,
             installationId: installationId,
           });
-          toast.success("カレンダーにGitHub組織を紐づけました");
+          toast.success("カレンダーにGitHub組織を紐づけました", {
+            duration: 2000,
+          });
           router.push("/");
         } catch (_) {
-          toast.error("認証に失敗しました");
+          toast.error("認証に失敗しました", { duration: 2000 });
           router.push("/auth/login");
         }
       } else {
@@ -74,18 +76,18 @@ function CallbackPageContent() {
             response.refreshToken.length === 0
           ) {
             // 既存ユーザーに紐づけ
-            toast.success("GitHubアカウントを紐づけました");
+            toast.success("GitHubアカウントを紐づけました", { duration: 2000 });
             router.push("/");
           } else {
             // OAuthでログイン
             saveToken(response.accessToken);
             saveRefreshToken(response.refreshToken);
             await refreshAuth();
-            toast.success("GitHubでログインしました");
+            toast.success("GitHubでログインしました", { duration: 2000 });
             router.push("/");
           }
         } catch (_) {
-          toast.error("認証に失敗しました");
+          toast.error("認証に失敗しました", { duration: 2000 });
           router.push("/auth/login");
         }
       }

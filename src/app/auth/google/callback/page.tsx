@@ -30,7 +30,7 @@ function CallbackPageContent() {
       if (errorParam) {
         const errorMessage = "Google認証に失敗しました";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error(errorMessage, { duration: 2000 });
 
         // 数秒後にログインページにリダイレクト
         setTimeout(() => {
@@ -43,7 +43,7 @@ function CallbackPageContent() {
       if (!token) {
         const errorMessage = "認証トークンが見つかりません";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error(errorMessage, { duration: 2000 });
 
         // 数秒後にログインページにリダイレクト
         setTimeout(() => {
@@ -59,7 +59,7 @@ function CallbackPageContent() {
       await refreshAuth();
 
       // 成功メッセージ
-      toast.success("Googleでログインしました");
+      toast.success("Googleでログインしました", { duration: 2000 });
 
       // カレンダーページにリダイレクト
       router.push("/");

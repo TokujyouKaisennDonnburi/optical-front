@@ -386,6 +386,7 @@ export function CalendarDetailClient({
         <RightSidebar
           selectedId={selectedSidebarItem}
           onSelect={handleSidebarSelect}
+          installedOptions={calendar?.options}
         />
       </div>
 
@@ -573,11 +574,12 @@ function BoardArea({
       });
       toast.success("予定を追加しました", {
         description: payload.title,
+        duration: 2000,
       });
       onScheduleCreated?.();
     } catch (err) {
       console.error("Failed to create schedule:", err);
-      toast.error("予定の追加に失敗しました");
+      toast.error("予定の追加に失敗しました", { duration: 2000 });
     }
   };
 

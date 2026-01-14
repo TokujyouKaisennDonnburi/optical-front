@@ -1,4 +1,5 @@
 import { GitPullRequest, Milestone, Plus, Sparkles, Users } from "lucide-react";
+import { useMemo } from "react";
 import { Button } from "@/components/atoms/Button";
 import { cn } from "@/utils_constants_styles/utils";
 
@@ -8,35 +9,55 @@ export interface SidebarItem {
   label: string;
 }
 
+// オプションIDとサイドバー表示のマッピング
+const OPTION_CONFIG: Record<
+  string,
+  { sidebarId: string; icon: React.ReactNode; label: string }
+> = {
+  pull_request_review_wait_count: {
+    sidebarId: "pr-review",
+    icon: <GitPullRequest size={20} />,
+    label: "PR Reviews",
+  },
+  team_review_load: {
+    sidebarId: "team-load",
+    icon: <Users size={20} />,
+    label: "Team Load",
+  },
+  milestone_progress: {
+    sidebarId: "milestone",
+    icon: <Milestone size={20} />,
+    label: "Milestones",
+  },
+};
+
 interface RightSidebarProps {
   selectedId: string | null;
   onSelect: (id: string) => void;
   className?: string;
+  installedOptions?: string[];
 }
 
 export function RightSidebar({
   selectedId,
   onSelect,
   className,
+  installedOptions = [],
 }: RightSidebarProps) {
-  // TODO: These should eventually come from props or a hook based on installed options
-  const optionItems: SidebarItem[] = [
-    {
-      id: "pr-review",
-      icon: <GitPullRequest size={20} />,
-      label: "PR Reviews",
-    },
-    {
-      id: "team-load",
-      icon: <Users size={20} />,
-      label: "Team Load",
-    },
-    {
-      id: "milestone",
-      icon: <Milestone size={20} />,
-      label: "Milestones",
-    },
-  ];
+  // installedOptions から表示するアイテムを動的に生成
+  const optionItems: SidebarItem[] = useMemo(() => {
+    return installedOptions
+      .map((optionId) => {
+        const config = OPTION_CONFIG[optionId];
+        if (!config) return null;
+        return {
+          id: config.sidebarId,
+          icon: config.icon,
+          label: config.label,
+        };
+      })
+      .filter((item): item is SidebarItem => item !== null);
+  }, [installedOptions]);
 
   return (
     <div

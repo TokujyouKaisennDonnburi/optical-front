@@ -586,10 +586,15 @@ function OverlayMessage({
       <Text
         as="span"
         size="sm"
-        className="rounded-full px-3 py-1.5 text-xs text-white"
-        style={{
-          backgroundColor: color ? `${color}30` : "rgba(255,255,255,0.1)",
-        }}
+        className="rounded-full px-3 py-1.5 text-xs text-stone-600 dark:text-white bg-stone-200/80 dark:bg-white/10"
+        style={
+          color
+            ? {
+                backgroundColor: undefined,
+                background: `linear-gradient(to right, ${color}20, ${color}30)`,
+              }
+            : undefined
+        }
       >
         {message}
       </Text>

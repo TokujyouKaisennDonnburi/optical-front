@@ -130,6 +130,7 @@ export function HomeBoardArea({
     if (calendars.length === 0) {
       toast.info("まずはカレンダーを作成しましょう", {
         description: "予定を追加するにはカレンダーが必要です",
+        duration: 2000,
       });
       return;
     }
@@ -199,10 +200,11 @@ export function HomeBoardArea({
       });
       toast.success("予定を追加しました", {
         description: title || "新規予定",
+        duration: 2000,
       });
       onRefresh();
     } catch (err) {
-      toast.error("予定の作成に失敗しました");
+      toast.error("予定の作成に失敗しました", { duration: 2000 });
       console.error("Failed to create schedule", err);
     } finally {
       handleCloseCreateDialog();
