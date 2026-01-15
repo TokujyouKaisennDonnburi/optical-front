@@ -92,7 +92,7 @@ export function CalendarWizardMembersForm({
       <div
         role="radiogroup"
         aria-label="利用スタイルを選択"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 p-1"
       >
         {/* Solo Option */}
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>

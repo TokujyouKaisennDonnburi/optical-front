@@ -1,5 +1,4 @@
 import { RefreshCw } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 
@@ -8,7 +7,7 @@ import { DateSelector } from "@/components/molecules/DateSelector/DateSelector";
 import { MultiSelectDropdown } from "@/components/molecules/MultiSelectDropdown/MultiSelectDropdown";
 import { SearchInput } from "@/components/molecules/SearchInput/SearchInput";
 
-type LabeledOption = { label: string; value: string };
+type LabeledOption = { label: string; value: string; color?: string };
 
 type GeneralSearchHeaderProps = {
   searchValue?: string;
@@ -76,11 +75,6 @@ export function GeneralSearchHeader({
   return (
     <div className="space-y-4">
       <div className="flex gap-3 items-center">
-        {/* OptiCal ロゴ */}
-        <div className="flex items-center shrink-0">
-          <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
-        </div>
-
         {/* 検索バー */}
         <div className="w-[31.25rem]">
           <SearchInput

@@ -75,7 +75,7 @@ export const ScheduleEventCard = forwardRef<
           (isStart || !isSpan) && (
             <span
               className={cn(
-                "inline-flex h-1 w-1 shrink-0 rounded-full",
+                "inline-flex h-2 w-2 shrink-0 rounded-full",
                 indicatorClassName,
               )}
               style={{ backgroundColor: calendarColor ?? "#38bdf8" }}

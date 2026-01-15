@@ -2,60 +2,83 @@
 
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
-  Calendar,
-  Cloud,
-  Shield,
-  Smartphone,
+  BarChart3,
+  CalendarCheck,
+  CheckSquare,
+  GitPullRequest,
+  Lightbulb,
   Sparkles,
-  Users,
-  Zap,
+  Target,
 } from "lucide-react";
 import type { MouseEvent } from "react";
 
-const features = [
+const featureCategories = [
   {
-    icon: Calendar,
-    title: "スマートスケジューリング",
-    description:
-      "AIがあなたの時間を最適化し、最も生産的なスケジュールを自動提案します。",
-    className: "col-span-1 md:col-span-2 lg:col-span-2",
+    title: "標準機能",
+    description: "最初から使える、あなたの生活を支える基盤機能。",
+    features: [
+      {
+        icon: Sparkles,
+        title: "AIエージェント (予定作成)",
+        description:
+          "バイトやゴミ出しなどのルーチンワークを学習し、あなたの代わりに予定を自動で作成します。",
+        className: "col-span-1 md:col-span-1 lg:col-span-1",
+      },
+      {
+        icon: Lightbulb,
+        title: "AIエージェント (機能提案)",
+        description:
+          "あなたの使い方を分析し、最適なカレンダー機能や設定をAIが能動的に提案します。",
+        className: "col-span-1 md:col-span-1 lg:col-span-1",
+      },
+    ],
   },
   {
-    icon: Users,
-    title: "チーム同期機能",
-    description: "リアルタイムでチーム全員の予定を把握。",
-    className: "col-span-1 md:col-span-1 lg:col-span-1",
+    title: "一般オプション",
+    description: "必要に応じて追加できる、便利な拡張機能。",
+    features: [
+      {
+        icon: CalendarCheck,
+        title: "スケジューラー機能",
+        description:
+          "メンバー間で候補日を調整し、確定した予定を自動追加。面倒な日程調整をスムーズに。",
+        className: "col-span-1 md:col-span-1 lg:col-span-1",
+      },
+      {
+        icon: CheckSquare,
+        title: "ToDo機能",
+        description:
+          "個人のタスクもチームの課題も一元管理。カレンダーと連動し、期限切れを防ぎます。",
+        className: "col-span-1 md:col-span-1 lg:col-span-1",
+      },
+    ],
   },
   {
-    icon: Zap,
-    title: "超高速アクション",
-    description: "キーボードショートカットで瞬時に操作。",
-    className: "col-span-1 md:col-span-1 lg:col-span-1",
-  },
-  {
-    icon: Shield,
-    title: "エンタープライズ級セキュリティ",
-    description: "銀行レベルの暗号化で、あなたのデータを守ります。",
-    className: "col-span-1 md:col-span-2 lg:col-span-2",
-  },
-  {
-    icon: Cloud,
-    title: "クラウド同期",
-    description: "あらゆるデバイスから、いつでもアクセス。",
-    className: "col-span-1 md:col-span-1 lg:col-span-1",
-  },
-  {
-    icon: Smartphone,
-    title: "モバイル完全対応",
-    description: "外出先でもスムーズな操作感。",
-    className: "col-span-1 md:col-span-1 lg:col-span-1",
-  },
-  {
-    icon: Sparkles,
-    title: "自動調整",
-    description: "ダブルブッキングを自動で回避。",
-    className:
-      "col-span-1 md:col-span-1 lg:col-span-1 bg-primary/5 dark:bg-primary/10 border-primary/20",
+    title: "エンジニアオプション",
+    description: "開発者のための、GitHub連携による高度な生産性向上ツール。",
+    features: [
+      {
+        icon: BarChart3,
+        title: "レビュー負荷の可視化",
+        description:
+          "チームメンバーのレビュー抱え込み状況をグラフで可視化。アサインの偏りを防ぎ、健全な開発体制を維持します。",
+        className: "col-span-1 md:col-span-1 lg:col-span-1",
+      },
+      {
+        icon: GitPullRequest,
+        title: "レビュー待ちPR通知",
+        description:
+          "あなたがレビューすべきPull Requestをカレンダー上に表示。タスク漏れを防ぎ、スムーズな開発フローを実現します。",
+        className: "col-span-1 md:col-span-1 lg:col-span-1",
+      },
+      {
+        icon: Target,
+        title: "マイルストーン達成率",
+        description:
+          "現在のマイルストーンの進捗状況をリアルタイムで可視化。目標達成に向けたペース配分をサポートします。",
+        className: "col-span-1 md:col-span-2 lg:col-span-2",
+      },
+    ],
   },
 ];
 
@@ -76,12 +99,14 @@ function SpotlightCard({
   }
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Mouse tracking for spotlight visual effect only
+    // biome-ignore lint/a11y/noStaticElementInteractions: Mouse tracking for spotlight visual effect only, not for interactive functionality
     <div
-      className={`group relative border border-white/10 overflow-hidden rounded-[2rem] bg-background/50 backdrop-blur-md ${className}`}
+      role="presentation"
+      className={`group relative border border-black/10 dark:border-white/40 group-hover:border-primary/50 transition-colors duration-300 overflow-hidden rounded-[2rem] bg-background/50 backdrop-blur-md ${className}`}
       onMouseMove={handleMouseMove}
     >
       <motion.div
+        aria-hidden="true"
         className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 transition duration-300 group-hover:opacity-100"
         style={{
           background: useMotionTemplate`
@@ -128,41 +153,62 @@ export const LandingFeatureV2 = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            デザインとパフォーマンスを愛するあなたのための、
+            シンプル使いから高度な機能まで、
             <br />
-            究極のツールキット。
+            自分に合わせてカスタマイズ。
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
-            <SpotlightCard key={feature.title} className={feature.className}>
+        <div className="space-y-24">
+          {featureCategories.map((category, _categoryIndex) => (
+            <div key={category.title}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="p-8 h-full flex flex-col justify-between"
+                transition={{ duration: 0.6 }}
+                className="mb-10 text-center md:text-left"
               >
-                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500 pointer-events-none">
-                  <feature.icon className="w-24 h-24" />
-                </div>
-
-                <div className="mb-8 relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-inner flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 ring-1 ring-black/5">
-                    <feature.icon className="w-7 h-7" />
-                  </div>
-                </div>
-                <div className="relative z-10">
-                  <h3 className="text-xl font-bold mb-3 tracking-snug group-hover:text-primary transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
+                <h3 className="text-2xl font-bold mb-3 flex items-center justify-center md:justify-start gap-3">
+                  <span className="w-1.5 h-8 bg-primary rounded-full hidden md:block" />
+                  {category.title}
+                </h3>
+                <p className="text-muted-foreground">{category.description}</p>
               </motion.div>
-            </SpotlightCard>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                {category.features.map((feature, featureIndex) => (
+                  <SpotlightCard
+                    key={feature.title}
+                    className={feature.className}
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.5,
+                        delay: featureIndex * 0.1,
+                      }}
+                      className="p-8 h-full flex flex-col items-start gap-4 relative z-10"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition-transform duration-300">
+                        <feature.icon className="w-6 h-6" />
+                      </div>
+
+                      <div>
+                        <h3 className="text-xl font-bold mb-2 tracking-tight group-hover:text-primary transition-colors">
+                          {feature.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </motion.div>
+                  </SpotlightCard>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

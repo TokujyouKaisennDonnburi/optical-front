@@ -8,9 +8,13 @@ import {
   useState,
 } from "react";
 
+export type WeekdayLanguage = "ja" | "en";
+
 type SettingsContextType = {
   isGamingHoliday: boolean;
   setGamingHoliday: (value: boolean) => void;
+  weekdayLanguage: WeekdayLanguage;
+  setWeekdayLanguage: (value: WeekdayLanguage) => void;
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -20,11 +24,24 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 export function SettingsProvider({ children }: { children: ReactNode }) {
   // デフォルトはオフ
   const [isGamingHoliday, setIsGamingHoliday] = useState(false);
+  // 曜日表示: デフォルトは日本語
+  const [weekdayLanguage, setWeekdayLanguageState] =
+    useState<WeekdayLanguage>("ja");
+
   useEffect(() => {
     // ローカルストレージから読み込み
-    const saved = localStorage.getItem("calendar-settings-gaming-holiday");
-    if (saved !== null) {
-      setIsGamingHoliday(saved === "true");
+    const savedGaming = localStorage.getItem(
+      "calendar-settings-gaming-holiday",
+    );
+    if (savedGaming !== null) {
+      setIsGamingHoliday(savedGaming === "true");
+    }
+
+    const savedWeekday = localStorage.getItem(
+      "calendar-settings-weekday-language",
+    );
+    if (savedWeekday === "ja" || savedWeekday === "en") {
+      setWeekdayLanguageState(savedWeekday);
     }
   }, []);
 
@@ -33,11 +50,20 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("calendar-settings-gaming-holiday", String(value));
   };
 
-  // 初期ロード完了まではデフォルト値を返す（SSRとの不整合を防ぐため、必要ならレンダリングを遅延させるが、今回はCSSクラスの付け替えだけなので許容）
-  // ちらつき防止が重要なら isLoaded を使う
+  const setWeekdayLanguage = (value: WeekdayLanguage) => {
+    setWeekdayLanguageState(value);
+    localStorage.setItem("calendar-settings-weekday-language", value);
+  };
 
   return (
-    <SettingsContext.Provider value={{ isGamingHoliday, setGamingHoliday }}>
+    <SettingsContext.Provider
+      value={{
+        isGamingHoliday,
+        setGamingHoliday,
+        weekdayLanguage,
+        setWeekdayLanguage,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, CalendarDays, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -164,7 +165,7 @@ export function CalendarDetailClient({
       {/* ヘッダー */}
       <header className="border-b border-border bg-card/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2.5 px-4 py-2.5 lg:px-8">
-          {/* 戻るボタン */}
+          {/* 戻るボタン - 最左 */}
           <Button
             variant="ghost"
             size="icon"
@@ -173,6 +174,11 @@ export function CalendarDetailClient({
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
+
+          {/* OptiCal ロゴ */}
+          <div className="flex items-center shrink-0">
+            <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
+          </div>
 
           {/* カレンダー切り替え */}
           <CalendarSwitcher

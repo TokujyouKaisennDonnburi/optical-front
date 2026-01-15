@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
 
-type Option = string | { label: string; value: string };
+type Option = string | { label: string; value: string; color?: string };
 
 interface MultiSelectDropdownProps {
   options: Option[];
@@ -28,10 +28,13 @@ export function MultiSelectDropdown({
   const [open, setOpen] = useState(false);
   const normalized = useMemo(() => {
     const arr = options.map((o) =>
-      typeof o === "string" ? { label: o, value: o } : o,
+      typeof o === "string" ? { label: o, value: o, color: undefined } : o,
     );
     // de-duplicate by value while keeping first label
-    const map = new Map<string, { label: string; value: string }>();
+    const map = new Map<
+      string,
+      { label: string; value: string; color?: string }
+    >();
     for (const opt of arr) {
       if (!map.has(opt.value)) map.set(opt.value, opt);
     }
@@ -99,7 +102,14 @@ export function MultiSelectDropdown({
                     handleTempChange(option.value, checked)
                   }
                   onSelect={(e) => e.preventDefault()} // チェックで閉じない
+                  className="flex items-center gap-2"
                 >
+                  {option.color && (
+                    <span
+                      className="inline-block w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: option.color }}
+                    />
+                  )}
                   {option.label}
                 </DropdownMenuCheckboxItem>
               ))}

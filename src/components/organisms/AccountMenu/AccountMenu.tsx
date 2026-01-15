@@ -31,7 +31,7 @@ export function AccountMenu({
   user,
   isLoading,
   error,
-  menuWidthClass = "w-52",
+  menuWidthClass = "w-64",
   avatarSizeClass = "h-10 w-10",
   onRequestEmailSave,
   confirmSaveTrigger,
