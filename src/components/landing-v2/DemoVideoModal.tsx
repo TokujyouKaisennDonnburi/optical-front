@@ -13,10 +13,7 @@ export const DemoVideoModal = ({ isOpen, onClose }: DemoVideoModalProps) => {
       <DialogContent className="sm:max-w-[50rem] p-0 bg-black/90 border-white/10 overflow-hidden">
         <div className="aspect-video w-full relative">
           <video className="w-full h-full" controls autoPlay muted loop>
-            <source
-              src="/20260112_2210_01kes507sxe1trq4h87vwhvx2x.mp4"
-              type="video/mp4"
-            />
+            <source src="/optical-demo.mp4" type="video/mp4" />
             お使いのブラウザは動画タグをサポートしていません。
           </video>
         </div>

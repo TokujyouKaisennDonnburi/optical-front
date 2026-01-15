@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, CalendarDays, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -176,7 +177,7 @@ export function CalendarDetailClient({
 
           {/* OptiCal ロゴ */}
           <div className="flex items-center shrink-0">
-            <img src="/optical.png" alt="OptiCal" width={36} height={36} />
+            <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
           </div>
 
           {/* カレンダー切り替え */}

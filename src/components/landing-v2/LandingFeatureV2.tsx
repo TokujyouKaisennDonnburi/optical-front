@@ -99,12 +99,14 @@ function SpotlightCard({
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Mouse tracking for spotlight visual effect only, not for interactive functionality
     <div
-      aria-hidden="true"
+      role="presentation"
       className={`group relative border border-black/10 dark:border-white/40 group-hover:border-primary/50 transition-colors duration-300 overflow-hidden rounded-[2rem] bg-background/50 backdrop-blur-md ${className}`}
       onMouseMove={handleMouseMove}
     >
       <motion.div
+        aria-hidden="true"
         className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 transition duration-300 group-hover:opacity-100"
         style={{
           background: useMotionTemplate`
@@ -153,7 +155,7 @@ export const LandingFeatureV2 = () => {
           >
             シンプル使いから高度な機能まで、
             <br />
-            自身に合わせてカスタマイズ。
+            自分に合わせてカスタマイズ。
           </motion.p>
         </div>
 
