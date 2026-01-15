@@ -1,4 +1,4 @@
-import { Gamepad2, Monitor, Moon, Pencil, Sun } from "lucide-react";
+import { Gamepad2, Globe, Monitor, Moon, Pencil, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
 import { toast } from "sonner";
@@ -45,7 +45,12 @@ export function AccountMenuItems({
 }: AccountMenuItemsProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
-  const { isGamingHoliday, setGamingHoliday } = useSettings();
+  const {
+    isGamingHoliday,
+    setGamingHoliday,
+    weekdayLanguage,
+    setWeekdayLanguage,
+  } = useSettings();
   // 編集中のフィールドを管理（"name", "email", "icon"）
   const [editingField, setEditingField] = React.useState<
     "name" | "email" | "icon" | null
@@ -350,6 +355,39 @@ export function AccountMenuItems({
         )}
       </div>
 
+      {/* 設定トグル: 曜日表示 */}
+      <div className="flex items-center justify-between px-4 py-3 text-sm">
+        <div className="flex items-center gap-3">
+          <Globe className="h-4 w-4" />
+          <span>曜日表示</span>
+        </div>
+        <div className="flex gap-1 bg-muted/50 p-1 rounded-full border">
+          <button
+            type="button"
+            onClick={() => setWeekdayLanguage("ja")}
+            className={cn(
+              "px-2 py-0.5 text-xs rounded-full transition-all duration-200",
+              weekdayLanguage === "ja"
+                ? "bg-white dark:bg-zinc-700 shadow-sm font-medium"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted",
+            )}
+          >
+            日本語
+          </button>
+          <button
+            type="button"
+            onClick={() => setWeekdayLanguage("en")}
+            className={cn(
+              "px-2 py-0.5 text-xs rounded-full transition-all duration-200",
+              weekdayLanguage === "en"
+                ? "bg-white dark:bg-zinc-700 shadow-sm font-medium"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted",
+            )}
+          >
+            English
+          </button>
+        </div>
+      </div>
       {/* 設定トグル: 祝日ゲーミング */}
       <div className="flex items-center justify-between px-4 py-3 text-sm">
         <div className="flex items-center gap-3">
@@ -371,7 +409,7 @@ export function AccountMenuItems({
             e.preventDefault();
             item.onSelect?.();
           }}
-          className="flex items-center gap-3 px-4 py-3 text-sm cursor-pointer hover:bg-muted"
+          className="flex items-center gap-3 px-4 py-3 text-sm cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-500 dark:hover:bg-red-950 dark:hover:text-red-400"
         >
           {item.icon}
           <span className="text-sm">{item.label}</span>

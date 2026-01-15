@@ -129,6 +129,7 @@ function HomeContent() {
     return calendars.map((calendar) => ({
       label: calendar.name,
       value: calendar.id,
+      color: calendar.color,
     }));
   }, [calendars]);
 
@@ -186,6 +187,10 @@ function HomeContent() {
     <div className="flex h-screen flex-col overflow-hidden bg-muted/10">
       <header className="border-b border-border bg-card/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2.5 px-4 py-2.5 lg:px-8">
+          {/* OptiCal ロゴ - 常に最左 */}
+          <div className="flex items-center shrink-0">
+            <img src="/optical.png" alt="OptiCal" width={36} height={36} />
+          </div>
           <GeneralSearchHeader
             searchValue={searchTerm}
             onSearchChange={(value) => setSearchTerm(value)}

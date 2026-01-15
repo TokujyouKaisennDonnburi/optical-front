@@ -87,11 +87,7 @@ export const LandingHeroV2 = () => {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-tight selection:bg-primary/30"
           >
-            誰でも、
-            <br className="md:hidden" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70">
-              使える体験を。
-            </span>
+            すべての人の「最適」解
           </motion.h1>
         </motion.div>
 
@@ -126,7 +122,7 @@ export const LandingHeroV2 = () => {
             onClick={() => setIsDemoOpen(true)}
             className="h-16 px-10 text-lg rounded-full backdrop-blur-md bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105"
           >
-            <Play className="mr-2 w-5 h-5 fill-current" /> デモを見る
+            <Play className="mr-2 w-5 h-5 fill-current" /> CMを見る
           </Button>
         </motion.div>
       </div>

@@ -83,7 +83,7 @@ export function CalendarBoardHeader({
           )}
           onClick={onToday}
         >
-          今日
+          今月
         </Button>
       </div>
     </div>

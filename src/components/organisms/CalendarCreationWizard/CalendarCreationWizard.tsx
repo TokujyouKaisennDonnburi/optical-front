@@ -530,7 +530,7 @@ export function CalendarCreationWizard() {
   return (
     <div className="flex flex-col h-full">
       <CalendarWizardStepIndicator steps={STEPS} currentIndex={step} />
-      <div className="flex-1 overflow-y-auto space-y-6 pb-4">
+      <div className="flex-1 overflow-y-auto space-y-6 pb-4 px-1">
         {step === 0 ? (
           <CalendarWizardDetailsForm
             name={state.name}

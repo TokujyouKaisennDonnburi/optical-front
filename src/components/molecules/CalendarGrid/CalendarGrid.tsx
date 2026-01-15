@@ -1,8 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 
+import { useSettings } from "@/providers/SettingsProvider";
 import { cn } from "@/utils_constants_styles/utils";
 
-const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+const WEEKDAYS_EN = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+const WEEKDAYS_JA = ["日", "月", "火", "水", "木", "金", "土"] as const;
 
 export type CalendarGridProps = {
   children: ReactNode;
@@ -10,6 +14,9 @@ export type CalendarGridProps = {
 };
 
 export function CalendarGrid({ children, className }: CalendarGridProps) {
+  const { weekdayLanguage } = useSettings();
+  const weekdays = weekdayLanguage === "ja" ? WEEKDAYS_JA : WEEKDAYS_EN;
+
   return (
     <div
       className={cn(
@@ -30,7 +37,7 @@ export function CalendarGrid({ children, className }: CalendarGridProps) {
           "dark:border-white/10 dark:bg-white/5 dark:text-muted-foreground",
         )}
       >
-        {WEEKDAYS.map((label, index) => (
+        {weekdays.map((label, index) => (
           <div
             key={`weekday-${label}`}
             className={cn(
