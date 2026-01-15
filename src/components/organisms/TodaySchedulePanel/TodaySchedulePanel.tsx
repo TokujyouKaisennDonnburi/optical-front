@@ -150,6 +150,7 @@ export function TodaySchedulePanel({
                 >
                   <TodayScheduleTimeline
                     slots={derivedSlots}
+                    items={timedItems}
                     className={cn("flex-1", timeline?.className)}
                     contentClassName={timeline?.contentClassName}
                   />
@@ -176,51 +177,9 @@ export function TodaySchedulePanel({
 }
 
 function buildSlotsFromItems(
-  items: TodaySchedulePanelItem[],
+  _items: TodaySchedulePanelItem[],
 ): TodayScheduleTimelineSlot[] {
-  if (!items.length) {
-    return defaultSlots();
-  }
-
-  const slots = new Map<number, TodayScheduleTimelineSlot>();
-
-  for (const item of items) {
-    const startMinutes = timeLabelToMinutes(item.timeRange.start);
-    if (startMinutes === undefined) {
-      continue;
-    }
-
-    const existing = slots.get(startMinutes);
-    const events = existing?.events ? [...existing.events] : [];
-
-    events.push({
-      id: item.id,
-      title: item.title,
-      memo: item.memo,
-      location: item.location,
-      calendarColor: item.calendarColor,
-      statusVariant: item.statusVariant,
-      timeRange: item.timeRange,
-    });
-
-    slots.set(startMinutes, {
-      time: minutesToTimeLabel(startMinutes),
-      events,
-    });
-  }
-
-  for (let minute = 0; minute < 24 * 60; minute += 60) {
-    if (!slots.has(minute)) {
-      slots.set(minute, {
-        time: minutesToTimeLabel(minute),
-        events: [],
-      });
-    }
-  }
-
-  return Array.from(slots.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map(([, slot]) => slot);
+  return defaultSlots();
 }
 
 function defaultSlots(): TodayScheduleTimelineSlot[] {

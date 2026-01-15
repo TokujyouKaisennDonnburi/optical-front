@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRef } from "react";
+import { Badge } from "@/components/atoms/Badge";
 import {
   HoverCard,
   HoverCardContent,
@@ -55,9 +56,9 @@ export function EventSection({
 
         <div className="relative flex items-center">
           {/* 件数バッジ */}
-          <span className="absolute -top-2 -right-3 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-black">
+          <Badge className="absolute -top-2 -right-3 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-semibold">
             {items.length}
-          </span>
+          </Badge>
 
           {isOpen ? (
             <ChevronUp className="h-4 w-4 text-muted-foreground" />
