@@ -241,6 +241,7 @@ export function SingleCreateScheduleDialog({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="予定のタイトル"
               className="h-10 border-white/15 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+              autoFocus
             />
           </div>
 
@@ -365,10 +366,7 @@ export function SingleCreateScheduleDialog({
           <Button
             type="button"
             onClick={handleConfirm}
-            className="flex-1"
-            style={{
-              backgroundColor: calendarColor ?? "#3b82f6",
-            }}
+            className="flex-1 bg-blue-600 hover:bg-blue-700"
           >
             作成する
           </Button>

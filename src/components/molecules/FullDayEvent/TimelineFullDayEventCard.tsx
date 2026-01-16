@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Text } from "@/components/atoms/Text";
-import { cn } from "@/utils_constants_styles/utils";
+import { cn, getContrastTextColor } from "@/utils_constants_styles/utils";
 
 /**
  * カレンダー（月・週）グリッド用の終日判定
@@ -75,6 +75,8 @@ export const TimelineFullDayEventCard = forwardRef<
     },
     ref,
   ) => {
+    const textColor = getContrastTextColor(calendarColor);
+
     return (
       <div
         ref={ref}
@@ -82,7 +84,7 @@ export const TimelineFullDayEventCard = forwardRef<
           "flex w-full min-w-0 items-center gap-2 rounded-sm border border-white/20 px-2 py-1 text-sm shadow-sm transition-colors hover:brightness-110",
           className,
         )}
-        style={{ backgroundColor: calendarColor, color: "#f5f5f5" }}
+        style={{ backgroundColor: calendarColor, color: textColor }}
         data-variant={variant}
         {...props}
       >
@@ -93,10 +95,8 @@ export const TimelineFullDayEventCard = forwardRef<
             <Text
               as="span"
               weight="medium"
-              className={cn(
-                "block truncate leading-normal text-white",
-                titleClassName,
-              )}
+              className={cn("block truncate leading-normal", titleClassName)}
+              style={{ color: textColor }}
             >
               {title}
             </Text>
@@ -108,9 +108,10 @@ export const TimelineFullDayEventCard = forwardRef<
                 as="span"
                 size="sm"
                 className={cn(
-                  "block truncate text-[0.5rem] leading-tight text-white/90",
+                  "block truncate text-[0.5rem] leading-tight opacity-90",
                   subtitleClassName,
                 )}
+                style={{ color: textColor }}
               >
                 {subtitle}
               </Text>

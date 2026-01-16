@@ -20,9 +20,25 @@ export function useGeneralCalendar(viewDate?: Date) {
   }, []);
 
   // viewDateから月のパラメータを生成
-  const monthParam = viewDate
-    ? `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}`
-    : undefined;
+  const getMonthParam = useCallback((date: Date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  }, []);
+
+  const currentMonthParam = viewDate ? getMonthParam(viewDate) : undefined;
+
+  const prevMonthParam = useMemo(() => {
+    if (!viewDate) return undefined;
+    const prev = new Date(viewDate);
+    prev.setMonth(prev.getMonth() - 1);
+    return getMonthParam(prev);
+  }, [viewDate, getMonthParam]);
+
+  const nextMonthParam = useMemo(() => {
+    if (!viewDate) return undefined;
+    const next = new Date(viewDate);
+    next.setMonth(next.getMonth() + 1);
+    return getMonthParam(next);
+  }, [viewDate, getMonthParam]);
 
   // refreshTrigger または monthParam で再取得させる。
   // biome-ignore lint/correctness/useExhaustiveDependencies: refresh trigger to refetch
@@ -30,9 +46,35 @@ export function useGeneralCalendar(viewDate?: Date) {
     let isMounted = true;
 
     const fetchSchedule = async () => {
-      const schedules = await getMonthSchedule(monthParam);
+      // 3ヶ月分取得（viewDateがない場合はundefinedのみの配列になるのでフィルタリング）
+      const params = [prevMonthParam, currentMonthParam, nextMonthParam].filter(
+        (p): p is string | undefined => true, // 型定義維持のためそのまま残すが、実際はundefinedも許容される
+      );
+
+      // パラメータが全てundefinedの場合は1回だけ呼ぶ（デフォルト動作）
+      const targetParams = params.every((p) => p === undefined)
+        ? [undefined]
+        : params;
+
+      const results = await Promise.all(
+        targetParams.map((param) => getMonthSchedule(param)),
+      );
+
       if (isMounted) {
-        setSchedules(schedules.items);
+        // 結果を結合し、重複を除去
+        const allItems: ScheduleItem[] = [];
+        const addedIds = new Set<string>();
+
+        for (const res of results) {
+          const items = res.items ?? [];
+          for (const item of items) {
+            if (!addedIds.has(item.id)) {
+              allItems.push(item);
+              addedIds.add(item.id);
+            }
+          }
+        }
+        setSchedules(allItems);
       }
     };
 
@@ -69,7 +111,7 @@ export function useGeneralCalendar(viewDate?: Date) {
     return () => {
       isMounted = false;
     };
-  }, [refreshTrigger, monthParam]);
+  }, [refreshTrigger, currentMonthParam, prevMonthParam, nextMonthParam]);
 
   const items: TodaySchedulePanelItem[] = useMemo(() => {
     if (schedules.length === 0) return [];

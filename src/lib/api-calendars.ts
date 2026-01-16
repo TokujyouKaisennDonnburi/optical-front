@@ -31,17 +31,20 @@ export async function getCalendarDetail(
   );
 
   // フロントエンド用の形式に変換
+  const options =
+    apiResponse.option
+      ?.filter((opt) => !opt.deprecated)
+      .map((opt) => opt.name) ?? [];
+
+  console.log("[getCalendarDetail] Parsed options:", options);
+
   return {
     calendar: {
       id: apiResponse.id,
       name: apiResponse.name,
       color: apiResponse.color,
       imageUrl: apiResponse.imageUrl,
-      // option 配列から name を抽出して options 配列に変換
-      options:
-        apiResponse.option
-          ?.filter((opt) => !opt.deprecated)
-          .map((opt) => opt.name) ?? [],
+      options,
     },
   };
 }

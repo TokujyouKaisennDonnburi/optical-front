@@ -74,63 +74,82 @@ export function CalendarWizardDetailsForm({
     imageUrl: imagePreviewUrl ?? undefined,
   };
 
-  const isInlinePreview =
-    typeof imagePreviewUrl === "string" &&
-    (imagePreviewUrl.startsWith("data:") ||
-      imagePreviewUrl.startsWith("blob:"));
-
   return (
-    <section className="space-y-6">
-      <div className="space-y-4">
-        <div className="space-y-2">
+    <section className="grid gap-8 lg:grid-cols-[1fr_340px] items-start h-full">
+      {/* Left Column: Inputs */}
+      <div className="space-y-7 pt-6">
+        {/* Name Input */}
+        <div className="space-y-3">
           <label
             htmlFor="calendar-name"
-            className="text-sm font-medium text-foreground"
+            className="text-base font-semibold text-foreground flex items-center gap-2"
           >
             カレンダー名
+            <span className="text-[10px] font-normal text-muted-foreground bg-muted cx-2 py-0.5 rounded px-1.5">
+              必須
+            </span>
           </label>
           <Input
             id="calendar-name"
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
-            placeholder="名前を追加"
+            placeholder="例: プロジェクトA, 旅行の計画"
+            className="h-11 text-base px-4 border-muted-foreground/20 focus-visible:border-primary focus-visible:ring-primary/20 bg-background"
+            autoFocus
           />
         </div>
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">
-            カレンダーカラー
+
+        {/* Color Picker */}
+        <div className="space-y-3">
+          <p className="text-base font-semibold text-foreground">
+            テーマカラー
           </p>
-          <div className="flex flex-wrap gap-2">
-            {colorOptions.map((option) => {
-              const isActive = option === color;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => onSelectColor(option)}
-                  className={cn(
-                    "h-9 w-9 rounded-full border-2 transition",
-                    isActive
-                      ? "border-primary shadow focus-visible:ring-2 focus-visible:ring-offset-2"
-                      : "border-transparent hover:-translate-y-0.5",
-                  )}
-                  style={{ backgroundColor: option }}
-                  aria-label={`色 ${option}`}
-                >
-                  <span className="sr-only">{option}</span>
-                </button>
-              );
-            })}
+          <div className="p-4 rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex flex-wrap gap-3">
+              {colorOptions.map((option) => {
+                const isActive = option === color;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => onSelectColor(option)}
+                    className={cn(
+                      "group relative h-9 w-9 rounded-full transition-all duration-200 outline-none",
+                      isActive
+                        ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background"
+                        : "hover:scale-110 hover:shadow-md",
+                    )}
+                    aria-label={`色 ${option}`}
+                  >
+                    <span
+                      className="absolute inset-0 rounded-full border border-black/5 dark:border-white/10"
+                      style={{ backgroundColor: option }}
+                    />
+                    {isActive && (
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="h-2.5 w-2.5 rounded-full bg-white shadow-sm" />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {/* Image Upload */}
         <div className="space-y-3">
           <label
             id="calendar-image-label"
             htmlFor="calendar-image"
-            className="text-sm font-medium text-foreground"
+            className="text-base font-semibold text-foreground flex items-center justify-between"
           >
-            カバー画像 (任意 / PNG・JPG)
+            <span>カバー画像</span>
+            <span className="text-[10px] font-normal text-muted-foreground">
+              任意 (PNG / JPG)
+            </span>
           </label>
+
           <input
             id="calendar-image"
             ref={imageInputRef}
@@ -140,117 +159,114 @@ export function CalendarWizardDetailsForm({
             className="sr-only"
             aria-describedby="calendar-image-hint"
           />
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(13.75rem,17.5rem)] lg:items-start">
-            <div className="flex flex-col gap-3">
-              <div
-                className={cn(
-                  "relative flex min-h-[10rem] w-full overflow-hidden rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 text-center transition hover:border-primary/70 hover:bg-primary/5",
-                  imagePreviewUrl
-                    ? "min-h-[12rem] border-primary/60 bg-background"
-                    : "",
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={handleOpenImageDialog}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={handleDrop}
-                  className={cn(
-                    "group relative flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 p-6 text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                    imagePreviewUrl ? "p-0" : "",
-                  )}
-                  aria-labelledby="calendar-image-label"
-                  aria-describedby="calendar-image-hint"
-                >
-                  {imagePreviewUrl ? (
-                    <>
-                      <div className="absolute inset-0 flex items-center justify-center bg-background">
-                        <Image
-                          src={imagePreviewUrl}
-                          alt="選択したカバー画像のプレビュー"
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 768px) 100vw, 768px"
-                          unoptimized={isInlinePreview}
-                        />
-                      </div>
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 bg-gradient-to-t from-background/90 via-background/60 to-transparent px-4 pb-4 pt-8 text-sm text-muted-foreground transition opacity-0 group-hover:opacity-100">
-                        <FileImage
-                          className="h-5 w-5 text-primary"
-                          aria-hidden
-                        />
-                        <p className="font-medium text-foreground">
-                          クリックして差し替え
-                        </p>
-                        <p id="calendar-image-hint" className="text-xs">
-                          任意 / PNG・JPG、推奨サイズ 1200×630px
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <UploadCloud
-                        className="h-10 w-10 text-muted-foreground"
-                        aria-hidden
-                      />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-foreground">
-                          任意: クリックまたはドロップでアップロード
-                        </p>
-                        <p
-                          id="calendar-image-hint"
-                          className="text-xs text-muted-foreground"
-                        >
-                          任意 / PNG・JPG、推奨サイズ 1200×630px
-                        </p>
-                      </div>
-                      <Button asChild size="sm" variant="secondary">
-                        <span>画像を選択</span>
-                      </Button>
-                    </>
-                  )}
-                </button>
-                {imagePreviewUrl ? (
-                  <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-end gap-2 p-3">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      className="pointer-events-auto"
-                      onClick={handleOpenImageDialog}
-                    >
-                      別の画像を選ぶ
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="pointer-events-auto"
-                      onClick={onRemoveImage}
-                    >
-                      画像をクリア
-                    </Button>
+
+          <div
+            className={cn(
+              "group relative overflow-hidden rounded-xl border-2 border-dashed transition-all duration-200",
+              imagePreviewUrl
+                ? "border-primary/20 bg-background"
+                : "border-muted-foreground/25 bg-muted/30 hover:border-primary/50 hover:bg-primary/5",
+            )}
+          >
+            <button
+              type="button"
+              onClick={handleOpenImageDialog}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={handleDrop}
+              className="relative w-full h-65 flex flex-col items-center justify-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              aria-labelledby="calendar-image-label"
+            >
+              {imagePreviewUrl ? (
+                <>
+                  <Image
+                    src={imagePreviewUrl}
+                    alt="プレビュー"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center text-white">
+                    <FileImage className="w-8 h-8 mb-2" />
+                    <span className="font-medium">画像を変更する</span>
                   </div>
-                ) : null}
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-3 p-6 text-muted-foreground">
+                  <div className="p-3 rounded-full bg-background shadow-sm border border-border group-hover:border-primary/30 group-hover:text-primary transition-colors">
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="font-medium text-foreground">
+                      クリックして画像を選択
+                    </p>
+                    <p className="text-xs">またはここにファイルをドロップ</p>
+                  </div>
+                </div>
+              )}
+            </button>
+
+            {/* Image Actions (Only when image exists) */}
+            {imagePreviewUrl && (
+              <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  className="h-8 px-2 shadow-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveImage();
+                  }}
+                >
+                  削除
+                </Button>
               </div>
-              {imageError ? (
-                <p className="text-sm text-destructive">{imageError}</p>
-              ) : null}
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium text-muted-foreground">
-                プレビュー
-              </p>
-              <SelectCalendarCard
-                calendar={previewCalendar}
-                className={cn(
-                  "pointer-events-none select-none opacity-95",
-                  imagePreviewUrl ? "" : "opacity-80",
-                )}
-              />
-            </div>
+            )}
+          </div>
+
+          {imageError && (
+            <p className="text-sm font-medium text-destructive flex items-center gap-2">
+              <span className="inline-block w-1 h-1 rounded-full bg-destructive" />
+              {imageError}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Right Column: Sticky Preview */}
+      <div className="hidden lg:block sticky top-0 pt-1 space-y-5">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">
+              プレビュー
+            </h3>
+            <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              Live
+            </span>
+          </div>
+
+          <div className="p-1 rounded-xl border border-border bg-card/50 shadow-sm">
+            <SelectCalendarCard
+              calendar={previewCalendar}
+              className="w-full shadow-md pointer-events-none"
+            />
+          </div>
+
+          <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4 text-sm text-blue-600 dark:text-blue-300">
+            <p className="leading-relaxed">
+              ダッシュボードでの表示イメージです。
+            </p>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Preview */}
+      <div className="lg:hidden space-y-3 mt-6 pt-6 border-t border-border">
+        <p className="text-sm font-medium text-muted-foreground">プレビュー</p>
+        <SelectCalendarCard
+          calendar={previewCalendar}
+          className="w-full opacity-90 pointer-events-none"
+        />
       </div>
     </section>
   );

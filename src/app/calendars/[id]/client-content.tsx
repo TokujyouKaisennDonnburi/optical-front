@@ -18,6 +18,7 @@ import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrap
 import MilestoneProgressOption from "@/components/organisms/EngineerOption/MilestoneProgressOption";
 import { PullRequestReviewOption } from "@/components/organisms/EngineerOption/PullRequestReviewOption";
 import { TeamReviewLoadOption } from "@/components/organisms/EngineerOption/TeamReviewLoadOption";
+import { GitHubConnectView } from "@/components/organisms/GitHubConnectView";
 import { RightSidebar } from "@/components/organisms/RightSidebar";
 import { SingleSearchHeader } from "@/components/organisms/SearchHeader/SingleSearchHeader";
 import {
@@ -29,7 +30,13 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
-import { getGitHubReviewOptions } from "@/lib/api-github";
+import {
+  connectGitHubAccount,
+  getGitHubAccountLinked,
+  getGitHubOrganizationLinked,
+  getGitHubReviewOptions,
+  startGitHubAppInstall,
+} from "@/lib/api-github";
 import { createSchedule } from "@/lib/api-schedule";
 import type {
   GitHubPullRequest,
@@ -56,16 +63,16 @@ export function CalendarDetailClient({
     }
   }, [user, authLoading, router]);
 
+  // 検索機能とビュー日付（フックより前に定義）
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
+
   const { calendar, items, isLoading, error, hasGitHubOptions, refresh } =
-    useSingleCalendarSchedule(calendarId);
+    useSingleCalendarSchedule(calendarId, viewDate);
 
   // 全カレンダー一覧を取得（カレンダー切り替え用）
   const { calendars: allCalendars, isLoading: calendarsLoading } =
     useGeneralCalendar();
-
-  // 検索機能
-  const [searchTerm, setSearchTerm] = useState("");
-  const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
 
   // サイドバーの選択状態
   const [selectedSidebarItem, setSelectedSidebarItem] = useState<string | null>(
@@ -90,6 +97,74 @@ export function CalendarDetailClient({
   const [allPrsUrl, setAllPrsUrl] = useState<string>("");
   const [isGitHubLoading, setIsGitHubLoading] = useState(false);
 
+  // GitHub 連携ステータス
+  const [isAccountConnected, setIsAccountConnected] = useState<boolean | null>(
+    null,
+  );
+  const [isOrganizationLinked, setIsOrganizationLinked] = useState<
+    boolean | null
+  >(null);
+  const [isConnectionCheckLoading, setIsConnectionCheckLoading] =
+    useState(false);
+
+  // GitHub接続状態を確認（2段階）
+  const checkGitHubConnectionStatus = useCallback(async () => {
+    setIsConnectionCheckLoading(true);
+    try {
+      // Step 1: アカウント連携確認
+      const accountStatus = await getGitHubAccountLinked();
+      setIsAccountConnected(accountStatus.linked);
+
+      if (!accountStatus.linked) {
+        // アカウント未連携なら終了
+        setIsOrganizationLinked(null);
+        return;
+      }
+
+      // Step 2: 組織連携確認
+      const orgStatus = await getGitHubOrganizationLinked(calendarId);
+      setIsOrganizationLinked(orgStatus.linked);
+    } catch (err) {
+      console.error("Error checking GitHub connection status:", err);
+      toast.error("GitHubの接続状態を確認できませんでした", { duration: 3000 });
+      setIsAccountConnected(false);
+      setIsOrganizationLinked(false);
+    } finally {
+      setIsConnectionCheckLoading(false);
+    }
+  }, [calendarId]);
+
+  // アカウント連携ハンドラー
+  const handleConnectAccount = useCallback(async () => {
+    try {
+      const { oauthUrl } = await connectGitHubAccount();
+      // 本来はoauthUrlへリダイレクト、今回はモックなのでトースト表示
+      toast.success("GitHubアカウント連携を開始します（モック）", {
+        description: oauthUrl,
+      });
+      // モック: 連携成功をシミュレート
+      setIsAccountConnected(true);
+      // 次に組織連携チェック
+      const orgStatus = await getGitHubOrganizationLinked(calendarId);
+      setIsOrganizationLinked(orgStatus.linked);
+    } catch (err) {
+      console.error("Error connecting GitHub account:", err);
+      toast.error("連携に失敗しました");
+    }
+  }, [calendarId]);
+
+  // 組織連携ハンドラー（GitHub App インストールフロー）
+  const handleLinkOrganization = useCallback(async () => {
+    try {
+      const { installUrl } = await startGitHubAppInstall(calendarId);
+      // GitHub App インストールページへリダイレクト
+      window.location.href = installUrl;
+    } catch (err) {
+      console.error("Error starting GitHub App install:", err);
+      toast.error("連携の開始に失敗しました");
+    }
+  }, [calendarId]);
+
   // GitHub レビューオプションを取得
   const fetchGitHubReviewOptions = useCallback(async () => {
     setIsGitHubLoading(true);
@@ -100,12 +175,13 @@ export function CalendarDetailClient({
       setAllPrsUrl(data.allPullRequestsUrl);
     } catch (err) {
       console.error("Error fetching GitHub review options:", err);
+      toast.error("GitHubデータの取得に失敗しました", { duration: 3000 });
     } finally {
       setIsGitHubLoading(false);
     }
   }, []);
 
-  // GitHub オプションが有効で、関連するサイドバーアイテムが選択された場合のみデータを取得
+  // GitHub オプションが有効で、関連するサイドバーアイテムが選択された場合
   useEffect(() => {
     if (
       hasGitHubOptions &&
@@ -113,9 +189,22 @@ export function CalendarDetailClient({
         selectedSidebarItem === "team-load" ||
         selectedSidebarItem === "milestone")
     ) {
-      fetchGitHubReviewOptions();
+      // まず接続状態を確認
+      if (isAccountConnected === null) {
+        checkGitHubConnectionStatus();
+      } else if (isAccountConnected && isOrganizationLinked) {
+        // 両方連携済みならデータ取得
+        fetchGitHubReviewOptions();
+      }
     }
-  }, [selectedSidebarItem, hasGitHubOptions, fetchGitHubReviewOptions]);
+  }, [
+    selectedSidebarItem,
+    hasGitHubOptions,
+    isAccountConnected,
+    isOrganizationLinked,
+    checkGitHubConnectionStatus,
+    fetchGitHubReviewOptions,
+  ]);
 
   // 検索フィルタリング
   const filteredItems = useMemo(() => {
@@ -287,12 +376,22 @@ export function CalendarDetailClient({
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
-                  {isGitHubLoading ? (
+                  {isConnectionCheckLoading || isGitHubLoading ? (
                     <div className="flex items-center justify-center h-full">
                       <Text className="text-muted-foreground">
                         読み込み中...
                       </Text>
                     </div>
+                  ) : !isAccountConnected ? (
+                    <GitHubConnectView
+                      step="account"
+                      onConnect={handleConnectAccount}
+                    />
+                  ) : !isOrganizationLinked ? (
+                    <GitHubConnectView
+                      step="organization"
+                      onConnect={handleLinkOrganization}
+                    />
                   ) : (
                     <PullRequestReviewOption
                       pullRequests={pullRequests}
@@ -321,12 +420,22 @@ export function CalendarDetailClient({
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
-                  {isGitHubLoading ? (
+                  {isConnectionCheckLoading || isGitHubLoading ? (
                     <div className="flex items-center justify-center h-full">
                       <Text className="text-muted-foreground">
                         読み込み中...
                       </Text>
                     </div>
+                  ) : !isAccountConnected ? (
+                    <GitHubConnectView
+                      step="account"
+                      onConnect={handleConnectAccount}
+                    />
+                  ) : !isOrganizationLinked ? (
+                    <GitHubConnectView
+                      step="organization"
+                      onConnect={handleLinkOrganization}
+                    />
                   ) : (
                     <TeamReviewLoadOption
                       members={teamMembers}
@@ -355,12 +464,22 @@ export function CalendarDetailClient({
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
-                  {isGitHubLoading ? (
+                  {isConnectionCheckLoading || isGitHubLoading ? (
                     <div className="flex items-center justify-center h-full">
                       <Text className="text-muted-foreground">
                         読み込み中...
                       </Text>
                     </div>
+                  ) : !isAccountConnected ? (
+                    <GitHubConnectView
+                      step="account"
+                      onConnect={handleConnectAccount}
+                    />
+                  ) : !isOrganizationLinked ? (
+                    <GitHubConnectView
+                      step="organization"
+                      onConnect={handleLinkOrganization}
+                    />
                   ) : (
                     <MilestoneProgressOption calendarId={calendarId} />
                   )}
@@ -448,6 +567,24 @@ function BoardArea({
     const viewYear = viewDate.getFullYear();
     const viewMonth = viewDate.getMonth();
 
+    // カレンダーグリッドに表示される日付範囲を計算
+    const firstDayOfMonth = new Date(viewYear, viewMonth, 1);
+    const lastDayOfMonth = new Date(viewYear, viewMonth + 1, 0);
+    const firstWeekday = firstDayOfMonth.getDay();
+    const lastWeekday = lastDayOfMonth.getDay();
+
+    // グリッドの開始日（前月の日付を含む）
+    const gridStart = new Date(firstDayOfMonth);
+    gridStart.setDate(gridStart.getDate() - firstWeekday);
+    gridStart.setHours(0, 0, 0, 0);
+
+    // グリッドの終了日（翌月の日付を含む）
+    const gridEnd = new Date(lastDayOfMonth);
+    if (lastWeekday !== 6) {
+      gridEnd.setDate(gridEnd.getDate() + (6 - lastWeekday));
+    }
+    gridEnd.setHours(23, 59, 59, 999);
+
     return items
       .map((item) => {
         if (!item.startsAt) {
@@ -459,10 +596,8 @@ function BoardArea({
           return null;
         }
 
-        if (
-          originalStart.getFullYear() !== viewYear ||
-          originalStart.getMonth() !== viewMonth
-        ) {
+        // グリッドに表示される日付範囲内かチェック
+        if (originalStart < gridStart || originalStart > gridEnd) {
           return null;
         }
 

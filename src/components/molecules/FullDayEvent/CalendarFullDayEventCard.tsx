@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Text } from "@/components/atoms/Text";
-import { cn } from "@/utils_constants_styles/utils";
+import { cn, getContrastTextColor } from "@/utils_constants_styles/utils";
 
 /**
  * タイムライン（時間軸）用の終日判定
@@ -78,6 +78,9 @@ export const CalendarFullDayEventCard = forwardRef<
     },
     ref,
   ) => {
+    // 背景色に応じた文字色を計算
+    const textColor = getContrastTextColor(calendarColor);
+
     return (
       <div
         ref={ref}
@@ -86,7 +89,10 @@ export const CalendarFullDayEventCard = forwardRef<
           "border-stone-400 dark:border-white/20",
           className,
         )}
-        style={{ backgroundColor: calendarColor }}
+        style={{
+          backgroundColor: calendarColor,
+          color: textColor,
+        }}
         data-variant={variant}
         {...props}
       >
@@ -97,9 +103,9 @@ export const CalendarFullDayEventCard = forwardRef<
             as="span"
             className={cn(
               "block truncate text-[10px] font-bold leading-[1.2]",
-              "text-stone-800 dark:text-white",
               titleClassName,
             )}
+            style={{ color: textColor }}
           >
             {title}
           </Text>
@@ -109,9 +115,9 @@ export const CalendarFullDayEventCard = forwardRef<
               as="span"
               className={cn(
                 "block truncate text-[9px] font-medium leading-tight",
-                "text-stone-600 dark:text-white/90",
                 subtitleClassName,
               )}
+              style={{ color: textColor }}
             >
               {subtitle}
             </Text>

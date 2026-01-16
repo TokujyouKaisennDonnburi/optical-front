@@ -126,15 +126,24 @@ export async function apiRequest<T>(
     // エラーレスポンスのチェック
     if (!response.ok) {
       const errorData = data as ApiError;
-      throw new ApiClientError(
-        errorData.error?.code || response.status,
-        errorData.error?.message || "エラーが発生しました",
-      );
+      // バックエンドのエラー形式を両方サポート:
+      // 1. { error: { code, message } }
+      // 2. { code, message }
+      const errorCode =
+        errorData.error?.code ||
+        (errorData as unknown as { code?: number }).code ||
+        response.status;
+      const errorMessage =
+        errorData.error?.message ||
+        (errorData as unknown as { message?: string }).message ||
+        "エラーが発生しました";
+
+      throw new ApiClientError(errorCode, errorMessage);
     }
 
     return data as T;
   } catch (error) {
-    // ネットワークエラーまたはその他のエラー
+    // 既に ApiClientError の場合はそのまま処理
     if (error instanceof ApiClientError) {
       const refreshToken = getRefreshToken();
       // 401のときにトークンをリフレッシュして再実行
@@ -149,17 +158,27 @@ export async function apiRequest<T>(
           console.log("refresh failed", e);
         }
       }
+      // リフレッシュ失敗または他のApiClientError はそのままスロー
+      throw error;
     }
 
+    // ネットワークエラー（fetch自体が失敗した場合）
     if (error instanceof TypeError) {
-      // ネットワークエラー
       throw new ApiClientError(
         0,
-        "ネットワークエラーが発生しました。もう一度お試しください。",
+        "ネットワークエラーが発生しました。インターネット接続をご確認ください。",
       );
     }
 
-    // その他の予期しないエラー
+    // その他の予期しないエラー（詳細をログ出力）
+    console.error("[API Client] Unexpected error:", error);
+
+    // Error インスタンスの場合はメッセージを保持
+    if (error instanceof Error) {
+      throw new ApiClientError(500, `エラーが発生しました: ${error.message}`);
+    }
+
+    // 完全に不明なエラー
     throw new ApiClientError(
       500,
       "予期しないエラーが発生しました。しばらくしてからもう一度お試しください。",

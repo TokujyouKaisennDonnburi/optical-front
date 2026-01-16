@@ -287,6 +287,15 @@ function formatEventTimeLabel(start: Date, end: Date | null) {
 
   if (!start) return "";
 
+  // 終日判定 (00:00開始かつ23:59終了) - 日をまたぐ場合も含む
+  if (end) {
+    const isStartMidnight = start.getHours() === 0 && start.getMinutes() === 0;
+    const isEndDayEnd = end.getHours() === 23 && end.getMinutes() === 59;
+    if (isStartMidnight && isEndDayEnd) {
+      return "終日";
+    }
+  }
+
   if (!end || sameDay(start, end)) {
     return end
       ? `${formatter.format(start)} 〜 ${formatter.format(end)}`
