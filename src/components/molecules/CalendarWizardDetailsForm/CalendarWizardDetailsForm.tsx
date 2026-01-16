@@ -85,7 +85,7 @@ export function CalendarWizardDetailsForm({
             className="text-base font-semibold text-foreground flex items-center gap-2"
           >
             カレンダー名
-            <span className="text-[10px] font-normal text-muted-foreground bg-muted cx-2 py-0.5 rounded px-1.5">
+            <span className="text-[10px] font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded">
               必須
             </span>
           </label>
@@ -173,7 +173,7 @@ export function CalendarWizardDetailsForm({
               onClick={handleOpenImageDialog}
               onDragOver={(event) => event.preventDefault()}
               onDrop={handleDrop}
-              className="relative w-full h-65 flex flex-col items-center justify-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+              className="relative w-full h-64 flex flex-col items-center justify-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
               aria-labelledby="calendar-image-label"
             >
               {imagePreviewUrl ? (

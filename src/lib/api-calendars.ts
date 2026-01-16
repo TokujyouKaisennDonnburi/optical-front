@@ -36,8 +36,6 @@ export async function getCalendarDetail(
       ?.filter((opt) => !opt.deprecated)
       .map((opt) => opt.name) ?? [];
 
-  console.log("[getCalendarDetail] Parsed options:", options);
-
   return {
     calendar: {
       id: apiResponse.id,

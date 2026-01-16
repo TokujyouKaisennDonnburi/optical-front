@@ -138,12 +138,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toast.success("ログインしました", { duration: 2000 });
         router.push("/");
       } catch (err) {
-        // デバッグ: エラー内容を確認
-        console.log("[Login Error]", {
-          isApiClientError: err instanceof ApiClientError,
-          code: err instanceof ApiClientError ? err.code : "N/A",
-          message: err instanceof Error ? err.message : String(err),
-        });
+        // デバッグ: エラー内容を確認（本番環境では出力しない）
+        if (process.env.NODE_ENV !== "production") {
+          console.error("[Login Error]", {
+            isApiClientError: err instanceof ApiClientError,
+            code: err instanceof ApiClientError ? err.code : "N/A",
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
 
         if (err instanceof ApiClientError) {
           const lowerMessage = err.message.toLowerCase();
@@ -247,12 +249,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toast.success("アカウントを作成しました", { duration: 2000 });
         router.push("/");
       } catch (err) {
-        // デバッグ: エラー内容を確認
-        console.log("[Signup Error]", {
-          isApiClientError: err instanceof ApiClientError,
-          code: err instanceof ApiClientError ? err.code : "N/A",
-          message: err instanceof Error ? err.message : String(err),
-        });
+        // デバッグ: エラー内容を確認（本番環境では出力しない）
+        if (process.env.NODE_ENV !== "production") {
+          console.error("[Signup Error]", {
+            isApiClientError: err instanceof ApiClientError,
+            code: err instanceof ApiClientError ? err.code : "N/A",
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
 
         // メールアドレス重複エラーの検出
         if (err instanceof ApiClientError) {

@@ -72,10 +72,10 @@ export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
 
   // スケジュールを取得してカレンダーIDでフィルタリング
   // 3ヶ月分（先月・当月・来月）取得して結合する
+  // リフレッシュトリガーを依存配列に含めるために使用
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refreshTrigger is used to force re-fetch
   useEffect(() => {
     let isMounted = true;
-    // リフレッシュトリガーを依存配列に含めるために使用
-    void refreshTrigger;
 
     const fetchSchedule = async () => {
       if (!calendarId) return;
@@ -110,7 +110,6 @@ export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
           setScheduleItems(allItems);
         }
       } catch (err) {
-        console.error(err);
         if (isMounted) {
           setError(err instanceof Error ? err : new Error("Unknown error"));
         }

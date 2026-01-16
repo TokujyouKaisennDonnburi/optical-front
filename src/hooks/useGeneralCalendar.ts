@@ -46,10 +46,8 @@ export function useGeneralCalendar(viewDate?: Date) {
     let isMounted = true;
 
     const fetchSchedule = async () => {
-      // 3ヶ月分取得（viewDateがない場合はundefinedのみの配列になるのでフィルタリング）
-      const params = [prevMonthParam, currentMonthParam, nextMonthParam].filter(
-        (p): p is string | undefined => true, // 型定義維持のためそのまま残すが、実際はundefinedも許容される
-      );
+      // 3ヶ月分取得（viewDateがない場合は undefined のみの配列になる）
+      const params = [prevMonthParam, currentMonthParam, nextMonthParam];
 
       // パラメータが全てundefinedの場合は1回だけ呼ぶ（デフォルト動作）
       const targetParams = params.every((p) => p === undefined)
