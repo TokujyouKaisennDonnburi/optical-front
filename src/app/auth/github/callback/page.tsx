@@ -43,7 +43,7 @@ function CallbackPageContent() {
       if (installationId) {
         try {
           await postGithubAppInstall({
-            code: code ?? undefined,
+            code: code,
             state: state,
             installationId: installationId,
           });
