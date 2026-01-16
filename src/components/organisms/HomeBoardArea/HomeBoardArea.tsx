@@ -45,6 +45,24 @@ export function HomeBoardArea({
     const viewYear = viewDate.getFullYear();
     const viewMonth = viewDate.getMonth();
 
+    // カレンダーグリッドに表示される日付範囲を計算
+    const firstDayOfMonth = new Date(viewYear, viewMonth, 1);
+    const lastDayOfMonth = new Date(viewYear, viewMonth + 1, 0);
+    const firstWeekday = firstDayOfMonth.getDay();
+    const lastWeekday = lastDayOfMonth.getDay();
+
+    // グリッドの開始日（前月の日付を含む）
+    const gridStart = new Date(firstDayOfMonth);
+    gridStart.setDate(gridStart.getDate() - firstWeekday);
+    gridStart.setHours(0, 0, 0, 0);
+
+    // グリッドの終了日（翌月の日付を含む）
+    const gridEnd = new Date(lastDayOfMonth);
+    if (lastWeekday !== 6) {
+      gridEnd.setDate(gridEnd.getDate() + (6 - lastWeekday));
+    }
+    gridEnd.setHours(23, 59, 59, 999);
+
     return items
       .map((item) => {
         if (!item.startsAt) {
@@ -56,10 +74,8 @@ export function HomeBoardArea({
           return null;
         }
 
-        if (
-          originalStart.getFullYear() !== viewYear ||
-          originalStart.getMonth() !== viewMonth
-        ) {
+        // グリッドに表示される日付範囲内かチェック
+        if (originalStart < gridStart || originalStart > gridEnd) {
           return null;
         }
 
@@ -261,7 +277,11 @@ export function HomeBoardArea({
           date={createDate}
           isOpen
           onClose={handleCloseCreateDialog}
-          calendars={calendars.map((c) => ({ id: c.id, name: c.name }))}
+          calendars={calendars.map((c) => ({
+            id: c.id,
+            name: c.name,
+            color: c.color,
+          }))}
           onConfirm={handleConfirmCreate}
         />
       ) : null}

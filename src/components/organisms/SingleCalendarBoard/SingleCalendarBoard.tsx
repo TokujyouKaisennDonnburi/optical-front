@@ -160,7 +160,8 @@ export function SingleCalendarBoard({
         if (!startPos) return;
 
         // 移動距離が閾値以下なら長押し判定
-        if (onCreateItem && cell.isCurrentMonth) {
+        // 当月以外の日付もクリック可能にする（UX改善）
+        if (onCreateItem) {
           onCreateItem(cell.date);
         }
       }, LONG_PRESS_TIMEOUT_MS);
@@ -224,7 +225,8 @@ export function SingleCalendarBoard({
         if (!cell) return;
 
         e.preventDefault();
-        if (onCreateItem && cell.isCurrentMonth) {
+        // 当月以外の日付もクリック可能にする（UX改善）
+        if (onCreateItem) {
           onCreateItem(cell.date);
         }
       }
@@ -266,14 +268,8 @@ export function SingleCalendarBoard({
                     <div
                       key={cell.key}
                       data-cell-key={cell.key}
-                      role={
-                        onCreateItem && cell.isCurrentMonth
-                          ? "button"
-                          : undefined
-                      }
-                      tabIndex={
-                        onCreateItem && cell.isCurrentMonth ? 0 : undefined
-                      }
+                      role={onCreateItem ? "button" : undefined}
+                      tabIndex={onCreateItem ? 0 : undefined}
                       className={cn(
                         "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden p-0.5 transition-colors",
                         // ライトモード: 温かみのあるストーン系
@@ -284,9 +280,8 @@ export function SingleCalendarBoard({
                         isWeekend &&
                           cell.isCurrentMonth &&
                           "bg-stone-100/80 dark:bg-slate-950/55",
-                        // クリック可能な場合のみポインターカーソルを表示
+                        // クリック可能な場合はポインターカーソルを表示（当月以外も含む）
                         onCreateItem &&
-                          cell.isCurrentMonth &&
                           "cursor-pointer hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
                       )}
                     >

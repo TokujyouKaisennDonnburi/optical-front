@@ -21,7 +21,7 @@ export type GeneralCreateCalendarDialogProps = {
   date: Date;
   isOpen: boolean;
   onClose: () => void;
-  calendars: { id: string; name: string }[];
+  calendars: { id: string; name: string; color?: string }[];
   onConfirm: (payload: {
     date: Date;
     title: string;
@@ -225,6 +225,7 @@ export function GeneralCreateCalendarDialog({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="予定のタイトル"
               className="h-10 border-white/15 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+              autoFocus
             />
           </div>
 
@@ -241,19 +242,21 @@ export function GeneralCreateCalendarDialog({
                 <SelectValue placeholder="カレンダーを選択" />
               </SelectTrigger>
               <SelectContent className="border-white/15 bg-slate-900 text-white">
-                {calendars.length === 0 ? (
-                  <div className="px-2 py-1.5 text-sm text-white/50">
-                    カレンダーがありません
-                  </div>
-                ) : (
-                  calendars
-                    .filter((cal) => cal.id)
-                    .map((cal) => (
-                      <SelectItem key={cal.id} value={cal.id}>
-                        {cal.name}
-                      </SelectItem>
-                    ))
-                )}
+                {calendars
+                  .filter((cal) => cal.id)
+                  .map((cal) => (
+                    <SelectItem key={cal.id} value={cal.id}>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{
+                            backgroundColor: cal.color ?? "#d1d5db",
+                          }}
+                        />
+                        <span>{cal.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

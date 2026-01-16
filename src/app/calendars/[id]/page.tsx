@@ -13,7 +13,7 @@ export default async function CalendarDetailPage({
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <CalendarDetailClient calendarId={id} />
+      <CalendarDetailClient calendarId={id} key={id} />
     </Suspense>
   );
 }

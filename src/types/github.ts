@@ -172,3 +172,28 @@ export type Milestone = {
  * バックエンドは配列を直接返す
  */
 export type MilestoneProgressResponse = Milestone[];
+
+// ==================== GitHub連携ステータス ====================
+
+/**
+ * GitHubアカウント連携状態レスポンス
+ * GET /api/github/account/linked
+ */
+export type GitHubAccountLinkedResponse = {
+  /** アカウント連携済みか */
+  linked: boolean;
+};
+
+/**
+ * GitHub組織連携状態レスポンス
+ * GET /api/github/organization/linked?calendarId={id}
+ */
+export type GitHubOrganizationLinkedResponse = {
+  /** 組織連携済みか */
+  linked: boolean;
+  /** 連携済み組織情報（連携済みの場合） */
+  organization?: {
+    name: string;
+    avatarUrl?: string;
+  };
+};

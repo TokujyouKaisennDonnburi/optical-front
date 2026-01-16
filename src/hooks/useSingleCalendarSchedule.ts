@@ -9,7 +9,7 @@ import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 /**
  * 単体カレンダーのスケジュールとオプションを取得するフック
  */
-export function useSingleCalendarSchedule(calendarId: string) {
+export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
   const [calendar, setCalendar] = useState<CalendarDetail | null>(null);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +19,30 @@ export function useSingleCalendarSchedule(calendarId: string) {
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
+
+  // viewDateから月のパラメータを生成
+  const getMonthParam = useCallback(
+    (date: Date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+    [],
+  );
+
+  const currentMonthParam = viewDate ? getMonthParam(viewDate) : undefined;
+
+  // 前後の月のパラメータも計算（グリッドの前月・来月表示分のため）
+  const prevMonthParam = useMemo(() => {
+    if (!viewDate) return undefined;
+    const prev = new Date(viewDate);
+    prev.setMonth(prev.getMonth() - 1);
+    return getMonthParam(prev);
+  }, [viewDate, getMonthParam]);
+
+  const nextMonthParam = useMemo(() => {
+    if (!viewDate) return undefined;
+    const next = new Date(viewDate);
+    next.setMonth(next.getMonth() + 1);
+    return getMonthParam(next);
+  }, [viewDate, getMonthParam]);
 
   // カレンダー詳細と options を取得
   useEffect(() => {
@@ -47,7 +71,9 @@ export function useSingleCalendarSchedule(calendarId: string) {
   }, [calendarId]);
 
   // スケジュールを取得してカレンダーIDでフィルタリング
-  // biome-ignore lint/correctness/useExhaustiveDependencies: refreshTriggerの変更で再取得をトリガーする
+  // 3ヶ月分（先月・当月・来月）取得して結合する
+  // リフレッシュトリガーを依存配列に含めるために使用
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refreshTrigger is used to force re-fetch
   useEffect(() => {
     let isMounted = true;
 
@@ -58,15 +84,30 @@ export function useSingleCalendarSchedule(calendarId: string) {
       setError(null);
 
       try {
-        const json = await getMonthSchedule();
+        const params = [prevMonthParam, currentMonthParam, nextMonthParam];
+        // undefinedが含まれている場合は単体呼び出し（初期状態など）を想定するが、
+        // viewDateがある場合は全て存在するはず。
+        // API呼び出しを並列化
+        const results = await Promise.all(
+          params.map((param) => getMonthSchedule(param)),
+        );
 
         if (isMounted) {
-          // このカレンダーのスケジュールのみをフィルタリング
-          const filteredItems = (json.items ?? []).filter(
-            (item: ScheduleItem) => item.calendarId === calendarId,
-          );
+          // 全ての結果からアイテムを結合し、重複を除去しつつカレンダーIDでフィルタリング
+          const allItems: ScheduleItem[] = [];
+          const addedIds = new Set<string>();
 
-          setScheduleItems(filteredItems);
+          for (const res of results) {
+            const items = res.items ?? [];
+            for (const item of items) {
+              if (item.calendarId === calendarId && !addedIds.has(item.id)) {
+                allItems.push(item);
+                addedIds.add(item.id);
+              }
+            }
+          }
+
+          setScheduleItems(allItems);
         }
       } catch (err) {
         if (isMounted) {
@@ -84,7 +125,13 @@ export function useSingleCalendarSchedule(calendarId: string) {
     return () => {
       isMounted = false;
     };
-  }, [calendarId, refreshTrigger]);
+  }, [
+    calendarId,
+    refreshTrigger,
+    currentMonthParam,
+    prevMonthParam,
+    nextMonthParam,
+  ]);
 
   // TodaySchedulePanelItem 形式に変換
   const items: TodaySchedulePanelItem[] = useMemo(() => {

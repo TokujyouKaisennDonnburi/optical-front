@@ -138,6 +138,87 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toast.success("ログインしました", { duration: 2000 });
         router.push("/");
       } catch (err) {
+        // デバッグ: エラー内容を確認（本番環境では出力しない）
+        if (process.env.NODE_ENV !== "production") {
+          console.error("[Login Error]", {
+            isApiClientError: err instanceof ApiClientError,
+            code: err instanceof ApiClientError ? err.code : "N/A",
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+
+        if (err instanceof ApiClientError) {
+          const lowerMessage = err.message.toLowerCase();
+
+          // OAuth登録済みアカウントの検出
+          if (
+            err.code === 403 ||
+            lowerMessage.includes("google") ||
+            lowerMessage.includes("github") ||
+            lowerMessage.includes("oauth")
+          ) {
+            // Google登録の場合
+            if (lowerMessage.includes("google")) {
+              const oauthError = new Error(
+                "このメールアドレスはGoogleアカウントで登録されています",
+              );
+              setError(oauthError);
+              toast.error(
+                "このメールアドレスはGoogleアカウントで登録されています",
+                {
+                  description: "Googleでログインボタンをご利用ください",
+                  duration: 5000,
+                },
+              );
+              throw oauthError;
+            }
+
+            // GitHub登録の場合
+            if (lowerMessage.includes("github")) {
+              const oauthError = new Error(
+                "このメールアドレスはGitHubアカウントで登録されています",
+              );
+              setError(oauthError);
+              toast.error(
+                "このメールアドレスはGitHubアカウントで登録されています",
+                {
+                  description: "GitHubでログインボタンをご利用ください",
+                  duration: 5000,
+                },
+              );
+              throw oauthError;
+            }
+
+            // 一般的なOAuthエラー
+            const oauthError = new Error(
+              "このメールアドレスは外部アカウントで登録されています",
+            );
+            setError(oauthError);
+            toast.error(
+              "このメールアドレスは外部アカウントで登録されています",
+              {
+                description: "Google または GitHub でログインしてください",
+                duration: 5000,
+              },
+            );
+            throw oauthError;
+          }
+
+          // 認証エラー（401）の場合は専用メッセージ
+          if (err.code === 401) {
+            const authError = new Error(
+              "メールアドレスまたはパスワードが間違っています",
+            );
+            setError(authError);
+            toast.error("メールアドレスまたはパスワードが間違っています", {
+              description: "入力内容をご確認ください",
+              duration: 4000,
+            });
+            throw authError;
+          }
+        }
+
+        // その他のエラー
         const error =
           err instanceof Error ? err : new Error("ログインに失敗しました");
         setError(error);
@@ -168,6 +249,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toast.success("アカウントを作成しました", { duration: 2000 });
         router.push("/");
       } catch (err) {
+        // デバッグ: エラー内容を確認（本番環境では出力しない）
+        if (process.env.NODE_ENV !== "production") {
+          console.error("[Signup Error]", {
+            isApiClientError: err instanceof ApiClientError,
+            code: err instanceof ApiClientError ? err.code : "N/A",
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+
+        // メールアドレス重複エラーの検出
+        if (err instanceof ApiClientError) {
+          const lowerMessage = err.message.toLowerCase();
+          // HTTP 409 Conflict, PostgreSQL constraint error, または特定のエラーメッセージで判定
+          if (
+            err.code === 409 ||
+            lowerMessage.includes("already exists") ||
+            lowerMessage.includes("duplicate key") ||
+            lowerMessage.includes("unique constraint") ||
+            lowerMessage.includes("users_email_key") ||
+            lowerMessage.includes("既に登録されています")
+          ) {
+            const duplicateError = new Error(
+              "このメールアドレスは既に登録されています",
+            );
+            setError(duplicateError);
+            toast.error("このメールアドレスは既に登録されています", {
+              description:
+                "別のメールアドレスを使用するか、ログインしてください",
+              duration: 4000,
+            });
+            throw duplicateError;
+          }
+        }
+
+        // その他のエラー
         const error =
           err instanceof Error ? err : new Error("サインアップに失敗しました");
         setError(error);

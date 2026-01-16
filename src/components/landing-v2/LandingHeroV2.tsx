@@ -85,7 +85,7 @@ export const LandingHeroV2 = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-tight selection:bg-primary/30"
+            className="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight selection:bg-primary/30"
           >
             すべての人の「最適」解
           </motion.h1>

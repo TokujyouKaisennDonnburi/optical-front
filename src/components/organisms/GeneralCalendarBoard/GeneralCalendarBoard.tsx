@@ -137,11 +137,8 @@ export function GeneralCalendarBoard({
                       );
 
                       // 移動距離が10px以下なら長押し判定
-                      if (
-                        movedDistance <= 10 &&
-                        onCreateItem &&
-                        cell.isCurrentMonth
-                      ) {
+                      // 当月以外の日付もクリック可能にする（UX改善）
+                      if (movedDistance <= 10 && onCreateItem) {
                         onCreateItem(cell.date);
                       }
                     }, 200);
@@ -223,8 +220,8 @@ export function GeneralCalendarBoard({
                         isWeekend &&
                           cell.isCurrentMonth &&
                           "bg-stone-100/80 dark:bg-slate-950/55",
-                        cell.isCurrentMonth &&
-                          "hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
+                        // 当月以外も含めてホバースタイルを適用（UX改善）
+                        "hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
                       )}
                     >
                       {cell.isToday ? (
@@ -519,8 +516,8 @@ function OverlayMessage({ message }: { message: string }) {
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <Text
         as="span"
-        size="sm"
-        className="rounded-full bg-stone-200 dark:bg-white/10 px-3 py-1.5 text-xs text-stone-600 dark:text-white"
+        size="md"
+        className="rounded-full bg-stone-200 dark:bg-white/10 px-5 py-2.5 text-base font-medium text-stone-600 dark:text-white"
       >
         {message}
       </Text>
