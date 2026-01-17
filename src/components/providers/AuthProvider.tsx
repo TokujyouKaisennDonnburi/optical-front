@@ -42,6 +42,8 @@ interface AuthContextType {
   isLoading: boolean;
   /** エラー */
   error: Error | null;
+  /** ログアウト中かどうか */
+  isLoggingOut: boolean;
   /** ログイン */
   login: (credentials: LoginRequest) => Promise<void>;
   /** サインアップ */
@@ -76,6 +78,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const router = useRouter();
 
@@ -326,6 +329,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const logout = useCallback(async () => {
     setIsLoading(true);
+    setIsLoggingOut(true);
     setError(null);
 
     try {
@@ -343,6 +347,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       removeRefreshToken();
       setUser(null);
       setIsLoading(false);
+      setIsLoggingOut(false);
 
       toast.success("ログアウトしました", { duration: 2000 });
       router.push("/landing");
@@ -370,6 +375,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value: AuthContextType = {
     user,
     isLoading,
+    isLoggingOut,
     error,
     login,
     signup,

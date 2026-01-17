@@ -144,7 +144,7 @@ export function SingleScheduleEventPopover({
     >
       <div
         ref={dialogRef}
-        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/98 text-white shadow-2xl backdrop-blur-sm ${slideDirection}`}
+        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl backdrop-blur-sm ${slideDirection}`}
         style={{
           top: dialogPosition.top,
           left: dialogPosition.left,
@@ -155,23 +155,23 @@ export function SingleScheduleEventPopover({
         aria-modal="true"
       >
         <div
-          className="relative flex flex-col gap-2.5 px-5 py-4 text-white"
+          className="relative flex flex-col gap-2.5 px-5 py-4 text-foreground"
           style={{ backgroundColor: headerColor }}
         >
           <Text
             as="h2"
             weight="semibold"
-            className="pr-12 text-lg leading-tight"
+            className="pr-12 text-lg leading-tight text-white mix-blend-plus-lighter"
           >
             {item.title}
           </Text>
-          <div className="flex items-center gap-2 text-sm text-white/85">
-            <Icon icon={CalendarDays} size="sm" className="text-white/70" />
+          <div className="flex items-center gap-2 text-sm text-white/90 mix-blend-plus-lighter">
+            <Icon icon={CalendarDays} size="sm" className="text-white/80" />
             <span>{dateLabel}</span>
           </div>
           {timeLabel ? (
-            <div className="flex items-center gap-2 text-sm text-white/80">
-              <Icon icon={Clock3} size="sm" className="text-white/65" />
+            <div className="flex items-center gap-2 text-sm text-white/85 mix-blend-plus-lighter">
+              <Icon icon={Clock3} size="sm" className="text-white/75" />
               <span>{timeLabel}</span>
             </div>
           ) : null}
@@ -181,24 +181,24 @@ export function SingleScheduleEventPopover({
             size="icon"
             onClick={onClose}
             aria-label="閉じる"
-            className="absolute right-3 top-3 h-8 w-8 rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:bg-black/40"
+            className="absolute right-3 top-3 h-8 w-8 rounded-full text-white/80 hover:bg-white/20 hover:text-white"
           >
             <Icon icon={X} size="sm" />
           </Button>
         </div>
 
-        <div className="max-h-[300px] space-y-4 overflow-y-auto px-5 py-4 text-sm text-white/90">
+        <div className="max-h-[300px] space-y-4 overflow-y-auto px-5 py-4 text-sm text-foreground">
           {item.memo ? (
-            <div className="flex items-start gap-2 text-white/85">
+            <div className="flex items-start gap-2 text-muted-foreground">
               <Icon
                 icon={NotebookPen}
                 size="sm"
-                className="mt-0.5 text-white/60"
+                className="mt-0.5 text-muted-foreground/70"
               />
               <Text
                 as="p"
                 size="sm"
-                className="whitespace-pre-wrap leading-relaxed text-white/85"
+                className="whitespace-pre-wrap leading-relaxed text-foreground"
               >
                 {item.memo}
               </Text>
@@ -206,13 +206,17 @@ export function SingleScheduleEventPopover({
           ) : null}
 
           {item.location ? (
-            <div className="flex items-start gap-2 text-white/85">
-              <Icon icon={MapPin} size="sm" className="mt-0.5 text-white/60" />
+            <div className="flex items-start gap-2 text-muted-foreground">
+              <Icon
+                icon={MapPin}
+                size="sm"
+                className="mt-0.5 text-muted-foreground/70"
+              />
               <div className="flex flex-col gap-1">
                 <Text
                   as="span"
                   size="sm"
-                  className="leading-relaxed text-white/85"
+                  className="leading-relaxed text-foreground"
                 >
                   {item.location}
                 </Text>
@@ -221,7 +225,7 @@ export function SingleScheduleEventPopover({
                     href={item.locationUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs text-sky-300 underline hover:text-sky-200"
+                    className="text-xs text-primary underline hover:text-primary/80"
                   >
                     {item.locationUrl}
                   </a>
@@ -231,25 +235,25 @@ export function SingleScheduleEventPopover({
           ) : null}
 
           {members.length ? (
-            <div className="flex items-start gap-2 text-white/85">
+            <div className="flex items-start gap-2 text-muted-foreground">
               <Icon
                 icon={UserCircle2}
                 size="sm"
-                className="mt-0.5 text-white/60"
+                className="mt-0.5 text-muted-foreground/70"
               />
-              <div className="flex flex-wrap gap-1 text-xs text-white/85">
+              <div className="flex flex-wrap gap-1 text-xs text-foreground">
                 {renderMembers(members)}
               </div>
             </div>
           ) : null}
 
-          <div className="flex items-start gap-2 text-white/85">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Icon
               icon={CalendarDays}
               size="sm"
-              className="mt-0.5 text-white/60"
+              className="text-muted-foreground/70"
             />
-            <span className="text-xs uppercase tracking-wide text-white/70">
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">
               {calendarName}
             </span>
           </div>
@@ -333,14 +337,14 @@ function renderMembers(members: string[]) {
     ...visible.map((member) => (
       <span
         key={member}
-        className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/90"
+        className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
       >
         {member}
       </span>
     )),
     <span
       key="more"
-      className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80"
+      className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
     >
       +{remaining}
     </span>,

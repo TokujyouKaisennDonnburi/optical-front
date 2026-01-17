@@ -1,43 +1,17 @@
 "use client";
 
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
-import { type MouseEvent, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { DemoVideoModal } from "./DemoVideoModal";
 
 export const LandingHeroV2 = () => {
   const [isDemoOpen, setIsDemoOpen] = useState(false);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const handleMouseMove = ({ clientX, clientY, currentTarget }: MouseEvent) => {
-    const { width, height, left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set((clientX - left) / width - 0.5);
-    mouseY.set((clientY - top) / height - 0.5);
-  };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Mouse tracking for parallax visual effect only
-    <div
-      className="relative overflow-hidden min-h-[110vh] flex items-center justify-center bg-background text-foreground font-sans section-hero"
-      onMouseMove={handleMouseMove}
-    >
-      {/* Grain/Noise Overlay */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]"
-        style={{ backgroundImage: "url('/noise.svg')" }}
-      >
-        {/* Fallback noise if svg missing, or use CSS radial gradient trick */}
-        <div
-          className="absolute inset-0 bg-repeat opacity-20"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          }}
-        ></div>
-      </div>
-
+    <div className="relative overflow-hidden min-h-[110vh] flex items-center justify-center bg-background text-foreground font-sans section-hero">
       {/* Dynamic Background Elements - Organic Gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -74,22 +48,14 @@ export const LandingHeroV2 = () => {
       </div>
 
       <div className="container relative z-10 px-6 mx-auto text-center perspective-1000">
-        <motion.div
-          style={{
-            perspective: 1000,
-            rotateX: useTransform(mouseY, [-0.5, 0.5], [5, -5]),
-            rotateY: useTransform(mouseX, [-0.5, 0.5], [-5, 5]),
-          }}
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight selection:bg-primary/30"
         >
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight selection:bg-primary/30"
-          >
-            すべての人の「最適」解
-          </motion.h1>
-        </motion.div>
+          すべての人の「最適」解
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}

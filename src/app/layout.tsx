@@ -31,24 +31,20 @@ export const metadata: Metadata = {
     template: "%s | OptiCal",
   },
   description:
-    "OptiCalは、オプション機能の自由設計  により、シンプルな個人利用からエンジニアチーム向けの高度な運用まで幅広いユースケースに対応できるカレンダーアプリです。",
+    "OptiCalは、あらゆる機能を自由にカスタマイズできるカレンダーアプリです。シンプルな個人利用からエンジニアチーム向けの高度な運用まで幅広いユースケースに対応できます。",
   keywords: [
     "カレンダー",
     "スケジュール管理",
+    "AIカレンダー",
+    "カスタマイズ",
     "予定管理",
     "オプション制",
-    "AIカレンダー",
-    "スマートカレンダー",
+    "オプティカル",
     "OptiCal",
   ],
   authors: [{ name: "OptiCal Team" }],
   creator: "OptiCal Team",
   publisher: "OptiCal",
-
-  icons: {
-    icon: "/favicon.png",
-    apple: "/apple-touch-icon.png",
-  },
 
   // 検索エンジン設定
   robots: {

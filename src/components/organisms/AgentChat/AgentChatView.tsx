@@ -3,6 +3,7 @@ import {
   Calendar,
   CalendarPlus,
   ChevronDown,
+  Hammer,
   Send,
   Sparkles,
 } from "lucide-react";
@@ -64,6 +65,12 @@ const MESSAGES = {
     placeholder: "カレンダーを選択",
     allCalendars: "すべてのカレンダー",
   },
+  maintenance: {
+    title: "メンテナンス中",
+    description:
+      "現在エージェント機能はメンテナンス中のためご利用いただけません。",
+    note: "ご不便をおかけしますが、再開までしばらくお待ちください。",
+  },
 } as const;
 
 /**
@@ -105,6 +112,7 @@ export function AgentChatView({
   className,
   calendars = [],
 }: AgentChatViewProps) {
+  const isAgentEnabled = process.env.NEXT_PUBLIC_ENABLE_AGENT !== "false";
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<AgentMessage[]>([]);
@@ -227,6 +235,32 @@ export function AgentChatView({
     // フォーカスをテキストエリアに移動
     textareaRef.current?.focus();
   };
+
+  // メンテナンス中の表示
+  if (!isAgentEnabled) {
+    return (
+      <div className={cn("flex flex-col h-full bg-muted/10", className)}>
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-6">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="p-4 rounded-full bg-muted/20">
+              <Hammer size={48} className="text-muted-foreground" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold text-lg text-foreground">
+                {MESSAGES.maintenance.title}
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-[280px]">
+                {MESSAGES.maintenance.description}
+              </p>
+              <p className="text-xs text-muted-foreground/80 mt-2">
+                {MESSAGES.maintenance.note}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex flex-col h-full relative", className)}>
