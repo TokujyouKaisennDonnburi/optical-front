@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { GitHubLoginButton } from "@/components/atoms/GitHubLoginButton";
 import { GoogleLoginButton } from "@/components/atoms/GoogleLoginButton";
-import { Loading } from "@/components/atoms/Loading";
+import { InitialLoading } from "@/components/molecules/InitialLoading/InitialLoading";
 import { SignupForm } from "@/components/molecules/SignupForm";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -32,7 +32,7 @@ export default function SignupPage() {
   if (isLoading) {
     return (
       <div className="light" data-theme="light">
-        <Loading variant="fullscreen" size="lg" message="読み込み中..." />
+        <InitialLoading message="アカウント作成中..." />
       </div>
     );
   }

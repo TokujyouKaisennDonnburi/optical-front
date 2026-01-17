@@ -15,6 +15,7 @@ import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Loading } from "@/components/atoms/Loading";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
+import { InitialLoading } from "@/components/molecules/InitialLoading/InitialLoading";
 import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { AgentChatView } from "@/components/organisms/AgentChat";
@@ -26,7 +27,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 
 function HomeContent() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, isLoggingOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -175,13 +176,13 @@ function HomeContent() {
 
   // 認証中またはリダイレクト中はローディング表示
   if (authLoading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">読み込み中...</p>
-        </div>
-      </div>
-    );
+    // ログアウト中の場合
+    if (isLoggingOut) {
+      return <InitialLoading message="ログアウト中..." />;
+    }
+
+    // その他のローディング/リダイレクト待機中
+    return <InitialLoading />;
   }
 
   return (

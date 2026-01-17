@@ -180,9 +180,9 @@ export function GeneralCreateCalendarDialog({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 text-white shadow-2xl">
-        <div className="relative flex flex-col gap-2.5 px-5 py-4 text-white bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-4 py-6 backdrop-blur-sm">
+      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl">
+        <div className="relative flex flex-col gap-2.5 px-5 py-4 text-foreground bg-gradient-to-r from-blue-500/10 to-purple-500/10">
           <Text
             as="h2"
             weight="semibold"
@@ -190,16 +190,16 @@ export function GeneralCreateCalendarDialog({
           >
             新規予定を作成
           </Text>
-          <div className="flex items-center gap-2 text-sm text-white/85">
-            <Icon icon={Calendar} size="sm" className="text-white/70" />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Icon icon={Calendar} size="sm" className="text-muted-foreground" />
             <span>{dateLabel}</span>
           </div>
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={onClose}
-            className="absolute right-3 top-3 h-8 w-8 rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:bg-white hover:text-black"
+            className="absolute right-3 top-3 h-8 w-8 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
           >
             <Icon icon={X} size="sm" />
           </Button>
@@ -207,8 +207,8 @@ export function GeneralCreateCalendarDialog({
 
         <div className="space-y-4 px-5 py-4">
           {Object.keys(errors).length > 0 && (
-            <div className="rounded-md bg-red-500/10 border border-red-500/30 p-3">
-              <ul className="space-y-1 text-sm text-red-300">
+            <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
+              <ul className="space-y-1 text-sm text-destructive font-medium">
                 {Object.entries(errors).map(([key, error]) => (
                   <li key={key}>• {error}</li>
                 ))}
@@ -216,7 +216,7 @@ export function GeneralCreateCalendarDialog({
             </div>
           )}
           <div className="space-y-1.5">
-            <Text as="label" size="sm" className="block text-white/90">
+            <Text as="label" size="sm" className="block text-muted-foreground">
               タイトル
             </Text>
             <Input
@@ -224,13 +224,13 @@ export function GeneralCreateCalendarDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="予定のタイトル"
-              className="h-10 border-white/15 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+              className="h-10 border-input bg-background/50 text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring"
               autoFocus
             />
           </div>
 
           <div className="space-y-1.5">
-            <Text as="label" size="sm" className="block text-white/90">
+            <Text as="label" size="sm" className="block text-muted-foreground">
               カレンダー
             </Text>
             <Select
@@ -238,10 +238,10 @@ export function GeneralCreateCalendarDialog({
               onValueChange={(value) => setCalendarId(value || null)}
               disabled={calendars.length === 0}
             >
-              <SelectTrigger className="w-full h-10 border-white/15 bg-white/5 text-white focus:ring-blue-400/40">
+              <SelectTrigger className="w-full h-10 border-input bg-background/50 text-foreground focus:ring-ring">
                 <SelectValue placeholder="カレンダーを選択" />
               </SelectTrigger>
-              <SelectContent className="border-white/15 bg-slate-900 text-white">
+              <SelectContent className="border-border bg-popover text-popover-foreground">
                 {calendars
                   .filter((cal) => cal.id)
                   .map((cal) => (
@@ -261,11 +261,11 @@ export function GeneralCreateCalendarDialog({
             </Select>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-white/85">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Switch
               checked={isAllDay}
               onCheckedChange={setIsAllDay}
-              className="bg-white/20 data-[state=checked]:bg-blue-500"
+              className="data-[state=unchecked]:bg-input data-[state=checked]:bg-primary"
             />
             <span>終日</span>
           </div>
@@ -273,34 +273,44 @@ export function GeneralCreateCalendarDialog({
           {!isAllDay ? (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Text as="label" size="sm" className="block text-white/90">
+                <Text
+                  as="label"
+                  size="sm"
+                  className="block text-muted-foreground"
+                >
                   開始時刻
                 </Text>
                 <Input
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
-                  style={{ colorScheme: "dark" }}
+                  className="h-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring"
                 />
               </div>
               <div className="space-y-1.5">
-                <Text as="label" size="sm" className="block text-white/90">
+                <Text
+                  as="label"
+                  size="sm"
+                  className="block text-muted-foreground"
+                >
                   終了時刻
                 </Text>
                 <Input
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
-                  style={{ colorScheme: "dark" }}
+                  className="h-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring"
                 />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Text as="label" size="sm" className="block text-white/90">
+                <Text
+                  as="label"
+                  size="sm"
+                  className="block text-muted-foreground"
+                >
                   開始日
                 </Text>
                 <Input
@@ -315,12 +325,15 @@ export function GeneralCreateCalendarDialog({
                       }
                     }
                   }}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
-                  style={{ colorScheme: "dark" }}
+                  className="h-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring"
                 />
               </div>
               <div className="space-y-1.5">
-                <Text as="label" size="sm" className="block text-white/90">
+                <Text
+                  as="label"
+                  size="sm"
+                  className="block text-muted-foreground"
+                >
                   終了日
                 </Text>
                 <Input
@@ -336,15 +349,14 @@ export function GeneralCreateCalendarDialog({
                       }
                     }
                   }}
-                  className="h-10 border-white/15 bg-white/5 text-white focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
-                  style={{ colorScheme: "dark" }}
+                  className="h-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring"
                 />
               </div>
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Text as="label" size="sm" className="block text-white/90">
+            <Text as="label" size="sm" className="block text-muted-foreground">
               メモ (任意)
             </Text>
             <textarea
@@ -352,12 +364,12 @@ export function GeneralCreateCalendarDialog({
               onChange={(e) => setMemo(e.target.value)}
               placeholder="メモを入力"
               rows={3}
-              className="w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/40"
+              className="w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Text as="label" size="sm" className="block text-white/90">
+            <Text as="label" size="sm" className="block text-muted-foreground">
               場所 (任意)
             </Text>
             <Input
@@ -365,12 +377,12 @@ export function GeneralCreateCalendarDialog({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="会議室やURLなど"
-              className="h-10 border-white/15 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-blue-400 focus-visible:ring-blue-400/40"
+              className="h-10 border-input bg-background/50 text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring"
             />
           </div>
         </div>
 
-        <div className="flex gap-2 border-t border-white/10 bg-slate-950/50 px-5 py-3">
+        <div className="flex gap-2 border-t border-border bg-muted/20 px-5 py-3">
           <Button
             type="button"
             variant="ghost"
@@ -382,7 +394,7 @@ export function GeneralCreateCalendarDialog({
           <Button
             type="button"
             onClick={handleConfirm}
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             作成する
           </Button>
