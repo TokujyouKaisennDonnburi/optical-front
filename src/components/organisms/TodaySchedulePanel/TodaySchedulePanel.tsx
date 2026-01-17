@@ -136,11 +136,7 @@ export function TodaySchedulePanel({
                   }))}
                   isOpen={isAllDayOpen}
                   onToggle={() => setIsAllDayOpen((v) => !v)}
-                  maxHeight={
-                    timelineWrapRef.current?.offsetHeight
-                      ? timelineWrapRef.current.offsetHeight
-                      : 240
-                  }
+                  maxHeight={100}
                 />
 
                 {/* ===== タイムライン ===== */}
