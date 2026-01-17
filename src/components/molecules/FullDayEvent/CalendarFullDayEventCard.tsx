@@ -3,7 +3,7 @@ import { Text } from "@/components/atoms/Text";
 import { cn, getContrastTextColor } from "@/utils_constants_styles/utils";
 
 /**
- * カレンダー（月・週）グリッド用の終日判定
+ * タイムライン（時間軸）用の終日判定
  *
  * - ISO文字列で「00:00:00 〜 23:59」を満たす場合に
  *   「単日終日イベント」とみなす
