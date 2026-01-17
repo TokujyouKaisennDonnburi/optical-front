@@ -1,7 +1,24 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
 import { TodayScheduleTimeline } from "@/components/molecules/TodayScheduleTimeline";
 
+/* ===== 型拡張（Storybook用） ===== */
+type EventItem = {
+  id: string;
+  title: string;
+  memo?: string;
+  location?: string;
+  statusVariant?: "info" | "success" | "warning" | "error";
+  calendarColor?: string;
+  timeRange: { start: string; end: string };
+};
+
+type TodayScheduleTimelineSlotWithEvents = {
+  time: string;
+  isCurrent?: boolean;
+  events?: EventItem[];
+};
+
+/* ===== メタデータ ===== */
 const meta: Meta<typeof TodayScheduleTimeline> = {
   title: "Molecules/TodayScheduleTimeline",
   component: TodayScheduleTimeline,
@@ -20,8 +37,8 @@ const meta: Meta<typeof TodayScheduleTimeline> = {
             timeRange: { start: "08:00", end: "08:30" },
           },
         ],
-      },
-      { time: "09:00" },
+      } as TodayScheduleTimelineSlotWithEvents,
+      { time: "09:00" } as TodayScheduleTimelineSlotWithEvents,
       {
         time: "10:00",
         events: [
@@ -34,8 +51,8 @@ const meta: Meta<typeof TodayScheduleTimeline> = {
             timeRange: { start: "10:00", end: "11:00" },
           },
         ],
-      },
-      { time: "11:00" },
+      } as TodayScheduleTimelineSlotWithEvents,
+      { time: "11:00" } as TodayScheduleTimelineSlotWithEvents,
     ],
   },
   parameters: {
@@ -52,11 +69,13 @@ export default meta;
 
 type Story = StoryObj<typeof TodayScheduleTimeline>;
 
+/* ===== ストーリー ===== */
 export const Default: Story = {};
+
 export const WithCurrentTime: Story = {
   args: {
     slots: [
-      { time: "07:00" },
+      { time: "07:00" } as TodayScheduleTimelineSlotWithEvents,
       {
         time: "08:00",
         isCurrent: true,
@@ -69,8 +88,8 @@ export const WithCurrentTime: Story = {
             timeRange: { start: "08:00", end: "08:45" },
           },
         ],
-      },
-      { time: "09:00" },
+      } as TodayScheduleTimelineSlotWithEvents,
+      { time: "09:00" } as TodayScheduleTimelineSlotWithEvents,
     ],
   },
 };
