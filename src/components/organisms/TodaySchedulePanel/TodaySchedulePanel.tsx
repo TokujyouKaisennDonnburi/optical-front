@@ -134,6 +134,7 @@ export function TodaySchedulePanel({
                     location: item.location,
                     memo: item.memo,
                   }))}
+                  title="終日予定"
                   isOpen={isAllDayOpen}
                   onToggle={() => setIsAllDayOpen((v) => !v)}
                   maxHeight={100}

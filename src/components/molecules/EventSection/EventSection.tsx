@@ -22,6 +22,7 @@ export type EventSectionProps = {
   items: EventItem[];
   isOpen: boolean;
   onToggle: () => void;
+  title?: string;
   maxHeight?: number;
   className?: string;
 };
@@ -30,6 +31,7 @@ export function EventSection({
   items,
   isOpen,
   onToggle,
+  title = "イベント",
   maxHeight = 240,
   className,
 }: EventSectionProps) {
@@ -48,24 +50,25 @@ export function EventSection({
       <button
         type="button"
         onClick={onToggle}
-        className="relative flex w-full items-center justify-between px-3 py-2"
+        className="flex w-full items-center justify-between px-3 py-2"
       >
-        <Text size="sm" weight="semibold">
-          終日イベント
-        </Text>
-
-        <div className="relative flex items-center">
+        <div className="flex items-center gap-1">
           {/* 件数バッジ */}
-          <Badge className="absolute -top-2 -right-3 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-semibold">
+          <Badge className="h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-semibold">
             {items.length}
           </Badge>
 
-          {isOpen ? (
-            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          )}
+          {/* タイトル */}
+          <Text size="sm" weight="semibold">
+            {title}
+          </Text>
         </div>
+
+        {isOpen ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
       </button>
 
       {/* ===== 中身 ===== */}
