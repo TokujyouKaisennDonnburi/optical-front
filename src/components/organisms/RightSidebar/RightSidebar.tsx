@@ -1,4 +1,11 @@
-import { GitPullRequest, Milestone, Plus, Sparkles, Users } from "lucide-react";
+import {
+  GitPullRequest,
+  ListTodo,
+  Milestone,
+  Plus,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/atoms/Button";
 import { cn } from "@/utils_constants_styles/utils";
@@ -14,6 +21,11 @@ const OPTION_CONFIG: Record<
   string,
   { sidebarId: string; icon: React.ReactNode; label: string }
 > = {
+  todo: {
+    sidebarId: "todo",
+    icon: <ListTodo size={20} />,
+    label: "To-do",
+  },
   pull_request_review_wait_count: {
     sidebarId: "pr-review",
     icon: <GitPullRequest size={20} />,
@@ -86,7 +98,7 @@ export function RightSidebar({
       {/* Separator */}
       <div className="h-[1px] w-8 bg-border" />
 
-      {/* Installed Options */}
+      {/* Installed Options (including Todo if enabled) */}
       <div className="flex flex-col items-center gap-3 w-full flex-1 overflow-y-auto overflow-x-hidden no-scrollbar py-2">
         {optionItems.map((item) => (
           <Button
