@@ -181,17 +181,8 @@ function HomeContent() {
       return <InitialLoading message="ログアウト中..." />;
     }
 
-    // 本当の初期ロード（認証確認中）
-    if (authLoading && !user) {
-      return <InitialLoading />;
-    }
-
-    // それ以外（リダイレクト待ちなど）
-    return (
-      <InitialLoading
-        message={authLoading ? "ログアウト中..." : "OptiCalを起動中..."}
-      />
-    );
+    // その他のローディング/リダイレクト待機中
+    return <InitialLoading />;
   }
 
   return (

@@ -112,7 +112,12 @@ export function AgentChatView({
   className,
   calendars = [],
 }: AgentChatViewProps) {
-  const isAgentEnabled = process.env.NEXT_PUBLIC_ENABLE_AGENT !== "false";
+  const enableAgentEnv = process.env.NEXT_PUBLIC_ENABLE_AGENT;
+  // デフォルト: 環境変数が未設定または空文字列の場合はエージェントを有効にする
+  const isAgentEnabled =
+    enableAgentEnv === undefined || enableAgentEnv === ""
+      ? true
+      : enableAgentEnv !== "false";
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<AgentMessage[]>([]);
