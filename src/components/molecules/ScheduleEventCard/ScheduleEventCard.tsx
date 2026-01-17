@@ -109,7 +109,7 @@ export const ScheduleEventCard = forwardRef<
             <Text
               as="span"
               className={cn(
-                "block truncate text-[9px] leading-tight",
+                "block truncate text-[12px] leading-tight",
                 isCompact || isSpan
                   ? "font-medium text-stone-600 dark:text-white/90"
                   : "text-muted-foreground",

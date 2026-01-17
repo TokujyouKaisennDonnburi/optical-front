@@ -259,7 +259,7 @@ export function TodayScheduleTimeline({
                         <HoverCard openDelay={120} closeDelay={120}>
                           <HoverCardTrigger asChild>
                             <div
-                              className="h-full w-full overflow-hidden rounded-md border dark:border-white/10 bg-stone-200/80 dark:bg-white/[0.08] shadow-sm px-2 py-1.5"
+                              className="h-full w-full overflow-hidden rounded-md border shadow-sm px-2 py-1.5 bg-card text-card-foreground"
                               style={{
                                 borderColor: ev.calendarColor ?? "#38bdf8",
                               }}
@@ -343,6 +343,7 @@ export function TodayScheduleTimeline({
               time={slot.time}
               suffix={slot.suffix}
               isCurrent={slot.isCurrent}
+              size="md"
             />
           </div>
         ))}

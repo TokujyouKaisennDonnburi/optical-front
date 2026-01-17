@@ -6,6 +6,7 @@ type TimeLabelProps = {
   suffix?: string;
   description?: string;
   isCurrent?: boolean;
+  size?: "sm" | "md" | "lg";
   className?: string;
 };
 
@@ -14,6 +15,7 @@ export function TimeLabel({
   suffix,
   description,
   isCurrent = false,
+  size = "sm",
   className,
 }: TimeLabelProps) {
   return (
@@ -27,21 +29,21 @@ export function TimeLabel({
     >
       <Text
         as="span"
-        size="sm"
+        size={size}
         weight={isCurrent ? "semibold" : "normal"}
         className="tabular-nums shrink-0"
       >
         {time}
       </Text>
       {suffix ? (
-        <Text as="span" size="sm" className="uppercase shrink-0">
+        <Text as="span" size={size} className="uppercase shrink-0">
           {suffix}
         </Text>
       ) : null}
       {description ? (
         <Text
           as="span"
-          size="sm"
+          size={size}
           className={cn(
             "text-xs truncate",
             "min-w-0 flex-1",
