@@ -28,7 +28,7 @@ function CallbackPageContent() {
       const state = searchParams.get("state");
       const installationId = searchParams.get("installation_id");
 
-      if (!code) {
+      if (!state) {
         const errorMessage = "認証コードが見つかりません";
         setError(errorMessage);
         toast.error(errorMessage, { duration: 2000 });
@@ -38,17 +38,8 @@ function CallbackPageContent() {
         return;
       }
 
-      if (!state) {
-        const errorMessage = "stateが見つかりません";
-        setError(errorMessage);
-        toast.error(errorMessage, { duration: 2000 });
-        setTimeout(() => {
-          router.push("/auth/login");
-        }, 3000);
-        return;
-      }
-
       // GitHub App インストール（既存ユーザーがGitHub組織を連携する場合）
+      // codeはオプショナル（code作成者と別の人がインストールした場合は発行されない）
       if (installationId) {
         try {
           await postGithubAppInstall({
@@ -65,7 +56,16 @@ function CallbackPageContent() {
           router.push("/auth/login");
         }
       } else {
-        // GitHub OAuth ログイン/登録
+        // GitHub OAuth ログイン/登録（codeは必須）
+        if (!code) {
+          const errorMessage = "認証コードが見つかりません";
+          setError(errorMessage);
+          toast.error(errorMessage);
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 3000);
+          return;
+        }
         try {
           const response = await postGitHubCallback({
             code: code,

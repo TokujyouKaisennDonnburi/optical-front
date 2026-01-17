@@ -145,13 +145,13 @@ export type TeamReviewLoadOptionProps = {
 
 /** GitHub OAuth コールバックリクエスト */
 export type GithubOauthRequest = {
-  code: string;
+  code: string | null;
   state: string;
 };
 
 /** GitHub App インストールリクエスト */
 export type GithubAppInstallRequest = {
-  code: string;
+  code: string | null;
   state: string;
   installationId: string;
 };
