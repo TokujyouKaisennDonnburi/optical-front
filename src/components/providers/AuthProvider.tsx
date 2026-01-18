@@ -23,6 +23,7 @@ import {
   signup as requestSignup,
 } from "@/lib/api-auth";
 import { ApiClientError } from "@/lib/api-client";
+import { postGoogleOauth } from "@/lib/api-google";
 import {
   isAuthenticated,
   removeRefreshToken,
@@ -302,9 +303,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   /**
    * Google ログイン（リダイレクト）
    */
-  const loginWithGoogle = useCallback(() => {
-    // Google OAuth エンドポイントにリダイレクト
-    window.location.href = AUTH_GOOGLE_LOGIN_URL;
+  const loginWithGoogle = useCallback(async () => {
+    try {
+      // バックエンドからGoogle認証URLを取得
+      const response = await postGoogleOauth();
+      // GitHub OAuth ページにリダイレクト
+      window.location.href = response.url;
+    } catch (err) {
+      console.error("Google認証URLの取得に失敗しました:", err);
+      toast.error("Google認証の開始に失敗しました", { duration: 2000 });
+      // エラーを再スローして呼び出し側でキャッチできるようにする
+      throw err;
+    }
   }, []);
 
   /**

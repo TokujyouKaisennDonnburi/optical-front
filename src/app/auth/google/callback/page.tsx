@@ -9,7 +9,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { saveToken } from "@/lib/auth";
+import { postGoogleCreateUser } from "@/lib/api-google";
+import { saveRefreshToken, saveToken } from "@/lib/auth";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -23,7 +24,8 @@ function CallbackPageContent() {
   useEffect(() => {
     const handleCallback = async () => {
       // トークンを取得
-      const token = searchParams.get("token");
+      const code = searchParams.get("code");
+      const state = searchParams.get("state");
       const errorParam = searchParams.get("error");
 
       // エラーがある場合
@@ -40,8 +42,8 @@ function CallbackPageContent() {
       }
 
       // トークンが存在しない場合
-      if (!token) {
-        const errorMessage = "認証トークンが見つかりません";
+      if (!code) {
+        const errorMessage = "認証コードが見つかりません";
         setError(errorMessage);
         toast.error(errorMessage, { duration: 2000 });
 
@@ -52,8 +54,34 @@ function CallbackPageContent() {
         return;
       }
 
-      // トークンを保存
-      saveToken(token);
+      // ステートが存在しない場合
+      if (!state) {
+        const errorMessage = "ステートが見つかりません";
+        setError(errorMessage);
+        toast.error(errorMessage, { duration: 2000 });
+
+        // 数秒後にログインページにリダイレクト
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 3000);
+        return;
+      }
+
+      try {
+        const response = await postGoogleCreateUser({
+          code: code,
+          state: state,
+        });
+        // OAuthでログイン
+        saveToken(response.accessToken);
+        saveRefreshToken(response.refreshToken);
+        await refreshAuth();
+        toast.success("Googleアカウントでログインしました", { duration: 2000 });
+        router.push("/");
+      } catch (_) {
+        toast.error("認証に失敗しました", { duration: 2000 });
+        router.push("/auth/login");
+      }
 
       // 認証状態を更新
       await refreshAuth();
