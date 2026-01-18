@@ -47,8 +47,8 @@ type NormalizedEvent = {
   location?: string;
   calendarColor?: string;
   statusVariant?: StatusDotVariant;
-  start: number;
-  end: number;
+  start: number; // 分単位の開始時刻
+  end: number; // 分単位の終了時刻
   timeRange: {
     start: string;
     end?: string;
@@ -63,9 +63,16 @@ function timeToMinutes(label: string) {
 function extractTimeLabel(iso?: string) {
   if (!iso) return undefined;
   const d = new Date(iso);
-  const h = d.getHours();
-  const m = d.getMinutes();
-  return `${h}:${m.toString().padStart(2, "0")}`;
+  return `${d.getHours()}:${d.getMinutes().toString().padStart(2, "0")}`;
+}
+
+// HEXカラーにアルファ値を付与してRGBA文字列を作成
+function withAlpha(color: string, alpha: number) {
+  if (!color.startsWith("#") || color.length !== 7) return color;
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export function TodayScheduleTimeline({
@@ -77,46 +84,36 @@ export function TodayScheduleTimeline({
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const currentSlotRef = useRef<HTMLDivElement | null>(null);
   const hasAutoScrolledRef = useRef(false);
+  const [hoveredEventId, setHoveredEventId] = useState<string | null>(null); // Hover中のイベントID
 
-  /* ===== ホバー中のイベントID（z-index制御用） ===== */
-  const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
-
-  const STACK_SHIFT = 24; // 横方向のずらし量（重なり回避）
   const MINUTES_IN_DAY = 24 * 60;
   const PX_PER_MIN = 1.6; // 1分あたりの高さ(px)
-
-  const MIN_DISPLAY_MINUTES = 30; // 最低表示時間（分）
-  const MIN_HEIGHT_PX = MIN_DISPLAY_MINUTES * PX_PER_MIN;
-  const SLOT_HEIGHT_PX = 60 * PX_PER_MIN;
+  const SLOT_HEIGHT_PX = 60 * PX_PER_MIN; // 1時間あたりの高さ
+  const MIN_HEIGHT_PX = 30 * PX_PER_MIN; // 最小カード高さ(30分)
 
   const setCurrentSlotRef = useCallback((node: HTMLDivElement | null) => {
     currentSlotRef.current = node;
   }, []);
 
+  /* ===== 現在時刻へ自動スクロール ===== */
   useEffect(() => {
     if (hasAutoScrolledRef.current) return;
-    const viewport = viewportRef.current;
-    const currentSlot = currentSlotRef.current;
-    if (!viewport || !currentSlot) return;
+    if (!viewportRef.current || !currentSlotRef.current) return;
 
-    const frame = requestAnimationFrame(() => {
-      const target =
-        currentSlot.offsetTop -
-        viewport.clientHeight / 2 +
-        currentSlot.offsetHeight / 2;
+    const target =
+      currentSlotRef.current.offsetTop -
+      viewportRef.current.clientHeight / 2 +
+      currentSlotRef.current.offsetHeight / 2;
 
-      viewport.scrollTo({ top: Math.max(target, 0), behavior: "auto" });
-      hasAutoScrolledRef.current = true;
-    });
-
-    return () => cancelAnimationFrame(frame);
+    viewportRef.current.scrollTo({ top: Math.max(target, 0) });
+    hasAutoScrolledRef.current = true;
   }, []);
 
+  /* ===== イベント正規化 ===== */
   const events = useMemo<NormalizedEvent[]>(() => {
     return items.flatMap((e) => {
       const startLabel = e.timeRange?.start ?? extractTimeLabel(e.startsAt);
       const endLabel = e.timeRange?.end ?? extractTimeLabel(e.endsAt);
-
       if (!startLabel) return [];
 
       const start = timeToMinutes(startLabel);
@@ -132,77 +129,88 @@ export function TodayScheduleTimeline({
           statusVariant: e.statusVariant,
           start,
           end,
-          timeRange: {
-            start: startLabel,
-            end: endLabel,
-          },
+          timeRange: { start: startLabel, end: endLabel },
         },
       ];
     });
   }, [items]);
 
+  // 表示用に高さを計算して追加
   const enrichedEvents = useMemo(() => {
-    return events.map((ev) => {
-      const realHeight = (ev.end - ev.start) * PX_PER_MIN;
-      const displayHeight = Math.max(realHeight, MIN_HEIGHT_PX);
+    return events.map((ev) => ({
+      ...ev,
+      displayHeight: Math.max((ev.end - ev.start) * PX_PER_MIN, MIN_HEIGHT_PX),
+    }));
+  }, [events, MIN_HEIGHT_PX]); // MIN_HEIGHT_PX を依存配列に追加
 
-      return {
-        ...ev,
-        realHeight,
-        displayHeight,
-        groupKey: `${ev.start}-${displayHeight}`, // 同じ開始位置・同じ高さのものを横並びグループ化するキー
-      };
-    });
-  }, [events, MIN_HEIGHT_PX]);
+  /* =====================================================
+   * Google Calendar方式レイアウト
+   * ・重なりをクラスタ化
+   * ・クラスタ内の最大 active.length を colCount にする
+   * ===================================================== */
+  const layoutedEvents = useMemo(() => {
+    type LayoutEvent = (typeof enrichedEvents)[number] & {
+      col: number; // 列番号
+      colCount: number; // クラスタ内の列数
+    };
 
-  /* =========================
-     開始位置＆高さが同じイベントをグループ化
-  ========================= */
-  const groups = useMemo(() => {
-    const map = new Map<string, typeof enrichedEvents>();
+    const sorted = [...enrichedEvents].sort((a, b) => a.start - b.start);
 
-    for (const ev of enrichedEvents) {
-      const arr = map.get(ev.groupKey) ?? [];
-      arr.push(ev);
-      map.set(ev.groupKey, arr);
+    /* --- クラスタ分割 --- */
+    const clusters: (typeof enrichedEvents)[] = [];
+    let current: typeof enrichedEvents = [];
+    let currentEnd = -1;
+
+    for (const ev of sorted) {
+      if (current.length === 0 || ev.start < currentEnd) {
+        current.push(ev);
+        currentEnd = Math.max(currentEnd, ev.end);
+      } else {
+        clusters.push(current);
+        current = [ev];
+        currentEnd = ev.end;
+      }
     }
+    if (current.length) clusters.push(current);
 
-    return map;
-  }, [enrichedEvents]);
+    const result: LayoutEvent[] = [];
 
-  /* =========================
-     縦積みレイアウト（重なる時間帯は横にずらして表示する）
-  ========================= */
-  const layoutedGroups = useMemo(() => {
-    const groupEntries = Array.from(groups.values()).sort(
-      (a, b) => a[0].start - b[0].start,
-    );
+    /* --- クラスタごとに列割当 --- */
+    for (const cluster of clusters) {
+      const active: { end: number; col: number }[] = [];
+      const placed: LayoutEvent[] = [];
+      let maxCols = 0;
 
-    const active: number[] = [];
-    const result: Array<{
-      group: typeof enrichedEvents;
-      stackIndex: number;
-    }> = [];
+      for (const ev of cluster) {
+        // 現在アクティブな列を左からソート
+        active.sort((a, b) => a.col - b.col);
 
-    for (const group of groupEntries) {
-      const start = group[0].start;
-      const end = group[0].end;
-
-      for (let i = active.length - 1; i >= 0; i--) {
-        if (active[i] <= start) {
-          active.splice(i, 1);
+        let col = 0;
+        for (; col < active.length; col++) {
+          if (active[col].end <= ev.start) break;
         }
+
+        // 新しい列が必要な場合
+        if (col === active.length) {
+          active.push({ end: ev.end, col });
+        } else {
+          active[col].end = ev.end;
+        }
+
+        maxCols = Math.max(maxCols, active.length);
+
+        placed.push({ ...ev, col, colCount: 0 });
       }
 
-      // 現在のレーン数 = ずらし量
-      const stackIndex = active.length;
-      active.push(end);
-
-      result.push({ group, stackIndex });
+      // クラスタ内の全イベントに列数を設定
+      for (const p of placed) {
+        p.colCount = maxCols;
+        result.push(p);
+      }
     }
 
     return result;
-  }, [groups]);
+  }, [enrichedEvents]);
 
   return (
     <ScrollArea
@@ -216,127 +224,106 @@ export function TodayScheduleTimeline({
         className={cn("relative w-full", contentClassName)}
         style={{ height: MINUTES_IN_DAY * PX_PER_MIN }}
       >
-        {/* ===== イベント ===== */}
+        {/* ===== イベント描画 ===== */}
         <div className="absolute inset-0 pointer-events-none">
-          {layoutedGroups.map(({ group, stackIndex }) => {
-            const base = group[0];
-            const top = base.start * PX_PER_MIN;
-            const height = base.displayHeight;
-            const leftBase = 56 + stackIndex * STACK_SHIFT;
-
-            // グループ内のどれかが hover されていたら最前面へ
-            const isGroupHovered = group.some((ev) => ev.id === hoveredEventId);
+          {layoutedEvents.map((ev) => {
+            const leftBase = 56;
+            const gap = 8;
+            const baseColor = ev.calendarColor ?? "#38bdf8";
 
             return (
               <div
-                key={base.id}
-                className="absolute pointer-events-auto overflow-x-auto"
+                key={ev.id}
+                className="absolute pointer-events-auto"
                 style={{
-                  top,
-                  height,
-                  left: leftBase,
-                  right: 8,
-                  zIndex: isGroupHovered ? 1000 : 10 + stackIndex, // hover中のグループは最前面へ
-                  scrollbarWidth: "none", // スクロールバー非表示（Firefox）
-                  msOverflowStyle: "none", // スクロールバー非表示（IE, Edge
+                  top: ev.start * PX_PER_MIN,
+                  height: ev.displayHeight,
+                  left: `calc(${leftBase}px + ((100% - ${leftBase}px) / ${ev.colCount}) * ${ev.col})`,
+                  width: `calc((100% - ${leftBase}px) / ${ev.colCount} - ${gap}px)`,
+                  zIndex: hoveredEventId === ev.id ? 1000 : 10,
                 }}
               >
-                <div className="flex h-full gap-2 w-max pr-2 hide-scrollbar">
-                  {group.map((ev) => {
-                    const isHovered = hoveredEventId === ev.id;
-
-                    return (
-                      <button
-                        type="button"
-                        key={ev.id}
-                        className="h-full flex-shrink-0 w-[220px] text-left"
+                {/* ===== Hoverで詳細カード表示 ===== */}
+                <button
+                  type="button"
+                  className="h-full w-full text-left"
+                  onMouseEnter={() => setHoveredEventId(ev.id)}
+                  onMouseLeave={() => setHoveredEventId(null)}
+                >
+                  <HoverCard openDelay={120} closeDelay={120}>
+                    <HoverCardTrigger asChild>
+                      {/* タイムライン上のイベントカード */}
+                      <div
+                        className="relative h-full w-full overflow-hidden rounded-md border"
                         style={{
-                          zIndex: isHovered ? 10000 : undefined,
+                          borderColor: baseColor,
+                          backgroundColor: withAlpha(baseColor, 0.15),
                         }}
-                        onMouseEnter={() => setHoveredEventId(ev.id)}
-                        onMouseLeave={() => setHoveredEventId(null)}
                       >
-                        <HoverCard openDelay={120} closeDelay={120}>
-                          <HoverCardTrigger asChild>
-                            <div
-                              className="h-full w-full overflow-hidden rounded-md border shadow-sm px-2 py-1.5 bg-card text-card-foreground"
-                              style={{
-                                borderColor: ev.calendarColor ?? "#38bdf8",
-                              }}
-                            >
-                              <ScheduleEventCard
-                                title={ev.title}
-                                subtitle={`${ev.timeRange.start} - ${
-                                  ev.timeRange.end ?? ""
-                                }`}
-                                calendarColor={ev.calendarColor}
-                                statusVariant={ev.statusVariant}
-                                variant="timeline"
-                                className="w-full min-w-0 overflow-hidden [&_*]:truncate"
-                              />
-                            </div>
-                          </HoverCardTrigger>
+                        <div
+                          className="absolute left-0 top-0 h-full w-1.5"
+                          style={{ backgroundColor: baseColor }}
+                        />
+                        <div className="h-full w-full pl-3 pr-2 py-1.5">
+                          <ScheduleEventCard
+                            title={ev.title}
+                            subtitle={`${ev.timeRange.start} - ${ev.timeRange.end ?? ""}`}
+                            calendarColor={baseColor}
+                            statusVariant={ev.statusVariant}
+                            variant="timeline"
+                            className="w-full min-w-0"
+                          />
+                        </div>
+                      </div>
+                    </HoverCardTrigger>
 
-                          <HoverCardContent
-                            side="left"
-                            align="center"
-                            className="w-72 space-y-1.5"
-                          >
-                            <Text
-                              as="p"
-                              weight="semibold"
-                              className="leading-tight"
-                            >
-                              {ev.title}
-                            </Text>
-
-                            <Text
-                              as="p"
-                              size="sm"
-                              className="text-muted-foreground"
-                            >
-                              時間:{" "}
-                              {ev.timeRange.end
-                                ? `${ev.timeRange.start} 〜 ${ev.timeRange.end}`
-                                : `${ev.timeRange.start} 開始`}
-                            </Text>
-
-                            {ev.location && (
-                              <Text
-                                as="p"
-                                size="sm"
-                                className="text-muted-foreground"
-                              >
-                                場所: {ev.location}
-                              </Text>
-                            )}
-
-                            {ev.memo && (
-                              <Text
-                                as="p"
-                                size="sm"
-                                className="whitespace-pre-wrap text-muted-foreground"
-                              >
-                                メモ: {ev.memo}
-                              </Text>
-                            )}
-                          </HoverCardContent>
-                        </HoverCard>
-                      </button>
-                    );
-                  })}
-                </div>
+                    {/* Hover時に表示する詳細カード */}
+                    <HoverCardContent
+                      side="left"
+                      align="center"
+                      className="w-72 space-y-1.5"
+                    >
+                      <Text as="p" weight="semibold" className="leading-tight">
+                        {ev.title}
+                      </Text>
+                      <Text as="p" size="sm" className="text-muted-foreground">
+                        時間:{" "}
+                        {ev.timeRange.end
+                          ? `${ev.timeRange.start} 〜 ${ev.timeRange.end}`
+                          : `${ev.timeRange.start} 開始`}
+                      </Text>
+                      {ev.location && (
+                        <Text
+                          as="p"
+                          size="sm"
+                          className="text-muted-foreground"
+                        >
+                          場所: {ev.location}
+                        </Text>
+                      )}
+                      {ev.memo && (
+                        <Text
+                          as="p"
+                          size="sm"
+                          className="whitespace-pre-wrap text-muted-foreground"
+                        >
+                          メモ: {ev.memo}
+                        </Text>
+                      )}
+                    </HoverCardContent>
+                  </HoverCard>
+                </button>
               </div>
             );
           })}
         </div>
 
-        {/* ===== 時刻目盛り ===== */}
+        {/* ===== 時刻目盛り描画 ===== */}
         {slots.map((slot) => (
           <div
             key={slot.time}
             ref={slot.isCurrent ? setCurrentSlotRef : undefined}
-            className="relative border-b border-border px-2.5 py-2 bg-background"
+            className="border-b border-border px-2.5 py-2 bg-background"
             style={{ height: SLOT_HEIGHT_PX }}
           >
             <TimeLabel
