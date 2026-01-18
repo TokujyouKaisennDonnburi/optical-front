@@ -149,9 +149,9 @@ export function CalendarDetailClient({
   // 組織連携ハンドラー（GitHub App インストールフロー）
   const handleLinkOrganization = useCallback(async () => {
     try {
-      const { installUrl } = await startGitHubAppInstall(calendarId);
+      const { url } = await startGitHubAppInstall(calendarId);
       // GitHub App インストールページへリダイレクト
-      window.location.href = installUrl;
+      window.location.href = url;
     } catch (err) {
       console.error("Error starting GitHub App install:", err);
       toast.error("連携の開始に失敗しました");

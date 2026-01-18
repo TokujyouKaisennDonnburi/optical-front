@@ -75,17 +75,10 @@ export async function connectGitHubAccount(): Promise<{ url: string }> {
 /**
  * GitHub組織を連携（GitHub App インストールフロー）
  *
- * TODO: バックエンド実装後に実APIに切り替え
+ * POST /github/apps/state
  */
 export async function startGitHubAppInstall(
   calendarId: string,
-): Promise<{ installUrl: string }> {
-  // TODO: 本番では apiPost<{ installUrl: string }>("/github/apps/install/start", { calendarId }) を使用
-  console.log("[Mock] startGitHubAppInstall called for:", calendarId);
-
-  // モック: GitHub App インストールURLを返す
-  // 実際のURLはバックエンドから取得する（state にcalendarIdを含む）
-  return Promise.resolve({
-    installUrl: `https://github.com/apps/optical-app/installations/new?state=${calendarId}`,
-  });
+): Promise<{ url: string }> {
+  return apiPost<{ url: string }>("/github/apps/state", { calendarId });
 }
