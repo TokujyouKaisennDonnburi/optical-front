@@ -45,6 +45,7 @@ export const ScheduleEventCard = forwardRef<
   ) => {
     const isCompact = variant === "compact";
     const isSpan = variant === "span";
+    const isTimeline = variant === "timeline";
 
     // スパン表示の場合の角丸調整
     const roundedClass = isSpan
@@ -60,36 +61,38 @@ export const ScheduleEventCard = forwardRef<
       <div
         ref={ref}
         className={cn(
-          "flex w-full min-w-0 items-center gap-0.5",
+          "flex w-full min-w-0 items-start gap-1",
           isCompact &&
             "border border-stone-300 dark:border-white/10 bg-stone-200/80 dark:bg-white/[0.08] px-1 py-px text-[0.5625rem] leading-tight text-stone-800 dark:text-white shadow-sm",
           isSpan &&
             "border-y border-stone-300 dark:border-white/10 bg-stone-200/80 dark:bg-white/[0.08] px-1 py-px text-[0.5625rem] leading-tight text-stone-800 dark:text-white shadow-sm",
-          !isCompact && !isSpan && "text-sm text-foreground",
+          isTimeline && "text-sm text-foreground",
           roundedClass,
           className,
         )}
         {...props}
       >
-        {isCompact || isSpan ? (
-          (isStart || !isSpan) && (
-            <span
-              className={cn(
-                "inline-flex h-2 w-2 shrink-0 rounded-full",
-                indicatorClassName,
-              )}
-              style={{ backgroundColor: calendarColor ?? "#38bdf8" }}
+        {/* timeline では左バーがあるのでドットは出さない */}
+        {!isTimeline &&
+          (isCompact || isSpan ? (
+            (isStart || !isSpan) && (
+              <span
+                className={cn(
+                  "inline-flex h-2 w-2 shrink-0 rounded-full",
+                  indicatorClassName,
+                )}
+                style={{ backgroundColor: calendarColor ?? "#38bdf8" }}
+              />
+            )
+          ) : (
+            <StatusDot
+              variant={calendarColor ? "default" : statusVariant}
+              style={
+                calendarColor ? { backgroundColor: calendarColor } : undefined
+              }
+              className={cn("h-2.5 w-2.5 shrink-0", indicatorClassName)}
             />
-          )
-        ) : (
-          <StatusDot
-            variant={calendarColor ? "default" : statusVariant}
-            style={
-              calendarColor ? { backgroundColor: calendarColor } : undefined
-            }
-            className={cn("h-2.5 w-2.5 shrink-0", indicatorClassName)}
-          />
-        )}
+          ))}
 
         <div className="flex min-w-0 flex-col">
           <Text
