@@ -177,23 +177,36 @@ export type MilestoneProgressResponse = Milestone[];
 
 /**
  * GitHubアカウント連携状態レスポンス
- * GET /api/github/account/linked
+ * GET /github/oauth/status
  */
-export type GitHubAccountLinkedResponse = {
-  /** アカウント連携済みか */
-  linked: boolean;
+export type GitHubAccountLinkedStatus = {
+  /** 連携しているかどうか */
+  isLinked: boolean;
+  /** GitHubユーザーID */
+  githubId?: string;
+  /** GitHubユーザー名 */
+  githubName?: string;
+  /** GitHubメールアドレス */
+  githubEmail?: string;
+  /** SSOログインかどうか */
+  isSsoLogin?: boolean;
+  /** 連携日時（ISO 8601） */
+  linkedAt?: string;
 };
 
 /**
- * GitHub組織連携状態レスポンス
- * GET /api/github/organization/linked?calendarId={id}
+ * GitHub組織連携状態（インストール状態）レスポンス
+ * GET /github/calendars/{calendarId}/installation-status
  */
-export type GitHubOrganizationLinkedResponse = {
-  /** 組織連携済みか */
-  linked: boolean;
-  /** 連携済み組織情報（連携済みの場合） */
-  organization?: {
-    name: string;
-    avatarUrl?: string;
-  };
+export type GitHubAppInstallationStatus = {
+  /** インストールされているかどうか */
+  isInstalled: boolean;
+  /** GitHub組織/ユーザーID */
+  githubId?: string;
+  /** GitHub組織/ユーザー名 */
+  githubName?: string;
+  /** GitHub App インストールID */
+  installationId?: string;
+  /** インストール日時（ISO 8601） */
+  installedAt?: string;
 };

@@ -32,8 +32,8 @@ import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
 import {
   connectGitHubAccount,
-  getGitHubAccountLinked,
-  getGitHubOrganizationLinked,
+  getGitHubAccountStatus,
+  getGitHubInstallationStatus,
   getGitHubReviewOptions,
   startGitHubAppInstall,
 } from "@/lib/api-github";
@@ -112,18 +112,18 @@ export function CalendarDetailClient({
     setIsConnectionCheckLoading(true);
     try {
       // Step 1: アカウント連携確認
-      const accountStatus = await getGitHubAccountLinked();
-      setIsAccountConnected(accountStatus.linked);
+      const accountStatus = await getGitHubAccountStatus();
+      setIsAccountConnected(accountStatus.isLinked);
 
-      if (!accountStatus.linked) {
+      if (!accountStatus.isLinked) {
         // アカウント未連携なら終了
         setIsOrganizationLinked(null);
         return;
       }
 
       // Step 2: 組織連携確認
-      const orgStatus = await getGitHubOrganizationLinked(calendarId);
-      setIsOrganizationLinked(orgStatus.linked);
+      const installationStatus = await getGitHubInstallationStatus(calendarId);
+      setIsOrganizationLinked(installationStatus.isInstalled);
     } catch (err) {
       console.error("Error checking GitHub connection status:", err);
       toast.error("GitHubの接続状態を確認できませんでした", { duration: 3000 });
@@ -145,8 +145,8 @@ export function CalendarDetailClient({
       // モック: 連携成功をシミュレート
       setIsAccountConnected(true);
       // 次に組織連携チェック
-      const orgStatus = await getGitHubOrganizationLinked(calendarId);
-      setIsOrganizationLinked(orgStatus.linked);
+      const installationStatus = await getGitHubInstallationStatus(calendarId);
+      setIsOrganizationLinked(installationStatus.isInstalled);
     } catch (err) {
       console.error("Error connecting GitHub account:", err);
       toast.error("連携に失敗しました");

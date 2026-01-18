@@ -1,7 +1,7 @@
 import { apiGet, apiPost } from "@/lib/api-client";
 import type {
-  GitHubAccountLinkedResponse,
-  GitHubOrganizationLinkedResponse,
+  GitHubAccountLinkedStatus,
+  GitHubAppInstallationStatus,
   GitHubReviewOptionsResponse,
   GithubAppInstallRequest,
   GithubOauthRequest,
@@ -45,33 +45,22 @@ export async function getMilestoneProgress(
 
 /**
  * GitHubアカウント連携状態を取得
- * GET /api/github/account/linked
- *
- * TODO: バックエンド実装後に実APIに切り替え
+ * GET /github/oauth/status
  */
-export async function getGitHubAccountLinked(): Promise<GitHubAccountLinkedResponse> {
-  // モック: 未連携状態を返す（開発用）
-  // 本番では apiGet<GitHubAccountLinkedResponse>("/github/account/linked") を使用
-  return Promise.resolve({
-    linked: false,
-  });
+export async function getGitHubAccountStatus(): Promise<GitHubAccountLinkedStatus> {
+  return apiGet<GitHubAccountLinkedStatus>("/github/oauth/status");
 }
 
 /**
- * GitHub組織連携状態を取得
- * GET /api/github/organization/linked?calendarId={id}
- *
- * TODO: バックエンド実装後に実APIに切り替え
+ * GitHub組織連携状態（インストール状態）を取得
+ * GET /github/calendars/{calendarId}/installation-status
  */
-export async function getGitHubOrganizationLinked(
+export async function getGitHubInstallationStatus(
   calendarId: string,
-): Promise<GitHubOrganizationLinkedResponse> {
-  // モック: 未連携状態を返す（開発用）
-  // 本番では apiGet<GitHubOrganizationLinkedResponse>(`/github/organization/linked?calendarId=${calendarId}`) を使用
-  console.log("[Mock] getGitHubOrganizationLinked called for:", calendarId);
-  return Promise.resolve({
-    linked: false,
-  });
+): Promise<GitHubAppInstallationStatus> {
+  return apiGet<GitHubAppInstallationStatus>(
+    `/github/calendars/${calendarId}/installation-status`,
+  );
 }
 
 /**
