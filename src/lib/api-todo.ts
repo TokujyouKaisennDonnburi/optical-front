@@ -26,7 +26,7 @@ let mockTodoLists: TodoList[] = [
     id: "todo-1",
     userId: "user-1",
     calendarId: "cal-1",
-    avatarUrl: "",
+    avatarUrl: null,
     name: "Infrastructure Project (Active)",
     items: [
       {
@@ -56,7 +56,7 @@ let mockTodoLists: TodoList[] = [
     id: "todo-2",
     userId: "user-1",
     calendarId: "cal-1",
-    avatarUrl: "",
+    avatarUrl: null,
     name: "Documentation & Other Tasks",
     items: [
       {
@@ -79,7 +79,7 @@ let mockTodoLists: TodoList[] = [
 
 // ユニークID生成（モック用）
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 // ============================================
@@ -90,7 +90,7 @@ function generateId(): string {
  * Todoリスト一覧を取得
  * @param calendarId カレンダーID
  */
-export async function getTodoLists(calendarId: string): Promise<TodoList[]> {
+export async function getTodoLists(_calendarId: string): Promise<TodoList[]> {
   // モック: 遅延をシミュレート
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -98,7 +98,8 @@ export async function getTodoLists(calendarId: string): Promise<TodoList[]> {
   // const response = await fetch(`/api/calendars/${calendarId}/todos`);
   // return response.json();
 
-  return mockTodoLists.filter((list) => list.calendarId === calendarId || true); // モックは全て返す
+  // モック実装ではカレンダーIDに関係なく全てのリストを返す
+  return mockTodoLists;
 }
 
 /**
@@ -124,7 +125,7 @@ export async function createTodoList(
     id: generateId(),
     userId: "current-user",
     calendarId,
-    avatarUrl: "",
+    avatarUrl: null,
     name,
     items: [],
   };

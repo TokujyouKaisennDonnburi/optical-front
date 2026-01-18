@@ -119,7 +119,7 @@ export function TodoSection({
                 onClick={() => onAddTask?.(id)}
               >
                 <Plus className="h-4 w-4" />
-                <span>Add task</span>
+                <span>タスクを追加</span>
               </Button>
             </div>
           </motion.div>

@@ -12,7 +12,7 @@ export type TodoList = {
   id: string;
   userId: string;
   calendarId: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
   name: string;
   items: TodoItem[];
 };

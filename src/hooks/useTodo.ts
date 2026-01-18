@@ -119,7 +119,8 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
 
       try {
         await updateTodoItemStatus(itemId, isDone);
-      } catch (_err) {
+      } catch (err) {
+        console.error("Todo item status update failed:", err);
         // 失敗したら元に戻す
         setTodoLists((prev) =>
           prev.map((list) =>
@@ -156,7 +157,8 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
         ),
       );
       toast.success("タスクを追加しました");
-    } catch (_err) {
+    } catch (err) {
+      console.error("Failed to add task:", err);
       toast.error("タスクの追加に失敗しました");
     }
   }, []);
@@ -174,7 +176,8 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
         setTodoLists((prev) => [...prev, newList]);
         setExpandedSections((prev) => new Set([...prev, newList.id]));
         toast.success("セクションを追加しました");
-      } catch (_err) {
+      } catch (err) {
+        console.error("Failed to add section:", err);
         toast.error("セクションの追加に失敗しました");
       }
     },
@@ -196,7 +199,8 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
         ),
       );
       toast.success("タスクを削除しました");
-    } catch (_err) {
+    } catch (err) {
+      console.error("Failed to delete task:", err);
       toast.error("削除に失敗しました");
     }
   }, []);
@@ -207,7 +211,8 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
       await deleteTodoList(listId);
       setTodoLists((prev) => prev.filter((list) => list.id !== listId));
       toast.success("セクションを削除しました");
-    } catch (_err) {
+    } catch (err) {
+      console.error("Failed to delete section:", err);
       toast.error("削除に失敗しました");
     }
   }, []);
