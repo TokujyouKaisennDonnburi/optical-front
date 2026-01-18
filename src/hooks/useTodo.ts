@@ -9,7 +9,7 @@ import {
   deleteTodoItem,
   deleteTodoList,
   getTodoLists,
-  updateTodoItemStatus,
+  updateTodoItem,
 } from "@/lib/api-todo";
 import type { TodoList } from "@/types/todo";
 
@@ -34,6 +34,7 @@ interface UseTodoReturn {
   toggleItem: (
     listId: string,
     itemId: string,
+    itemName: string,
     isDone: boolean,
   ) => Promise<void>;
   /** 新しいタスクを追加 */
@@ -102,7 +103,12 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
 
   // Todoアイテムの完了状態をトグル（楽観的更新）
   const toggleItem = useCallback(
-    async (listId: string, itemId: string, isDone: boolean) => {
+    async (
+      listId: string,
+      itemId: string,
+      itemName: string,
+      isDone: boolean,
+    ) => {
       // 楽観的更新：即座にUIに反映
       setTodoLists((prev) =>
         prev.map((list) =>
@@ -118,7 +124,10 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
       );
 
       try {
-        await updateTodoItemStatus(itemId, isDone);
+        await updateTodoItem(listId, itemId, {
+          name: itemName,
+          isDone: isDone,
+        });
       } catch (err) {
         console.error("Todo item status update failed:", err);
         // 失敗したら元に戻す
@@ -148,7 +157,9 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
     }
 
     try {
-      const newItem = await createTodoItem(listId, name.trim());
+      const newItem = await createTodoItem(listId, {
+        name: name.trim(),
+      });
       setTodoLists((prev) =>
         prev.map((list) =>
           list.id === listId
@@ -172,7 +183,9 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
       }
 
       try {
-        const newList = await createTodoList(calendarId, name.trim());
+        const newList = await createTodoList(calendarId, {
+          name: name.trim(),
+        });
         setTodoLists((prev) => [...prev, newList]);
         setExpandedSections((prev) => new Set([...prev, newList.id]));
         toast.success("セクションを追加しました");

@@ -75,8 +75,8 @@ export function TodoOption({ calendarId }: Props) {
 
   // アイテムトグルハンドラを生成
   const createToggleHandler = React.useCallback(
-    (listId: string) => (itemId: string, isDone: boolean) => {
-      toggleItem(listId, itemId, isDone);
+    (listId: string) => (itemId: string, itemName: string, isDone: boolean) => {
+      toggleItem(listId, itemId, itemName, isDone);
     },
     [toggleItem],
   );

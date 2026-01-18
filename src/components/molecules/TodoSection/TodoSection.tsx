@@ -15,7 +15,7 @@ export interface TodoSectionProps {
   items: TodoItemType[];
   isExpanded?: boolean;
   onToggleExpand?: (id: string) => void;
-  onToggleItem?: (itemId: string, isDone: boolean) => void;
+  onToggleItem?: (itemId: string, itemName: string, isDone: boolean) => void;
   onAddTask?: (sectionId: string) => void;
   className?: string;
 }
