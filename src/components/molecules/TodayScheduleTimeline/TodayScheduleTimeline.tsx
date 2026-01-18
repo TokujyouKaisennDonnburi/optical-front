@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   HoverCard,
   HoverCardContent,
@@ -212,6 +219,30 @@ export function TodayScheduleTimeline({
     return result;
   }, [enrichedEvents]);
 
+  const [mountedMap, setMountedMap] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    setMountedMap((prev) => {
+      const next: Record<string, boolean> = { ...prev };
+      items.forEach((e) => {
+        if (!(e.id in next)) {
+          next[e.id] = false;
+        }
+      });
+      return next;
+    });
+  }, [items]);
+
+  useLayoutEffect(() => {
+    Object.keys(mountedMap).forEach((id) => {
+      if (!mountedMap[id]) {
+        requestAnimationFrame(() => {
+          setMountedMap((prev) => ({ ...prev, [id]: true }));
+        });
+      }
+    });
+  }, [mountedMap]);
+
   return (
     <ScrollArea
       className={cn(
@@ -230,17 +261,27 @@ export function TodayScheduleTimeline({
             const leftBase = 56;
             const gap = 8;
             const baseColor = ev.calendarColor ?? "#38bdf8";
+            const mounted = mountedMap[ev.id] ?? true;
+            const isNew = !mountedMap[ev.id];
+
+            // 新規イベントは右から左にスライド
+            const initialX = isNew ? 20 : 0; // px
 
             return (
               <div
                 key={ev.id}
-                className="absolute pointer-events-auto"
+                className="absolute pointer-events-auto transition-all ease-out"
                 style={{
                   top: ev.start * PX_PER_MIN,
                   height: ev.displayHeight,
                   left: `calc(${leftBase}px + ((100% - ${leftBase}px) / ${ev.colCount}) * ${ev.col})`,
                   width: `calc((100% - ${leftBase}px) / ${ev.colCount} - ${gap}px)`,
                   zIndex: hoveredEventId === ev.id ? 1000 : 10,
+                  opacity: mounted ? 1 : 0,
+                  transform: mounted
+                    ? "translateX(0)"
+                    : `translateX(${initialX}px)`,
+                  transitionDuration: "700ms",
                 }}
               >
                 {/* ===== Hoverで詳細カード表示 ===== */}
