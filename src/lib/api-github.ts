@@ -66,13 +66,10 @@ export async function getGitHubInstallationStatus(
 /**
  * GitHubアカウント連携を開始（OAuth URL取得）
  *
- * TODO: バックエンド実装後に実APIに切り替え
+ * POST /github/oauth/state
  */
-export async function connectGitHubAccount(): Promise<{ oauthUrl: string }> {
-  // モック: ダミーURLを返す
-  return Promise.resolve({
-    oauthUrl: "https://github.com/login/oauth/authorize?client_id=MOCK",
-  });
+export async function connectGitHubAccount(): Promise<{ url: string }> {
+  return apiPost<{ url: string }>("/github/oauth/state");
 }
 
 /**

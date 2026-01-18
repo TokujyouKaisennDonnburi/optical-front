@@ -137,21 +137,14 @@ export function CalendarDetailClient({
   // アカウント連携ハンドラー
   const handleConnectAccount = useCallback(async () => {
     try {
-      const { oauthUrl } = await connectGitHubAccount();
-      // 本来はoauthUrlへリダイレクト、今回はモックなのでトースト表示
-      toast.success("GitHubアカウント連携を開始します（モック）", {
-        description: oauthUrl,
-      });
-      // モック: 連携成功をシミュレート
-      setIsAccountConnected(true);
-      // 次に組織連携チェック
-      const installationStatus = await getGitHubInstallationStatus(calendarId);
-      setIsOrganizationLinked(installationStatus.isInstalled);
+      const { url } = await connectGitHubAccount();
+      // GitHub OAuth ページへリダイレクト
+      window.location.href = url;
     } catch (err) {
       console.error("Error connecting GitHub account:", err);
-      toast.error("連携に失敗しました");
+      toast.error("連携の開始に失敗しました");
     }
-  }, [calendarId]);
+  }, []);
 
   // 組織連携ハンドラー（GitHub App インストールフロー）
   const handleLinkOrganization = useCallback(async () => {
