@@ -14,7 +14,7 @@ export interface TodoItemProps {
   avatarUrl?: string | null;
   name: string;
   isDone: boolean;
-  onToggle?: (id: string, isDone: boolean) => void;
+  onToggle?: (id: string, name: string, isDone: boolean) => void;
   className?: string;
 }
 
@@ -29,8 +29,8 @@ export function TodoItem({
   className,
 }: TodoItemProps) {
   const handleToggle = React.useCallback(() => {
-    onToggle?.(id, !isDone);
-  }, [id, isDone, onToggle]);
+    onToggle?.(id, name, !isDone);
+  }, [id, name, isDone, onToggle]);
 
   return (
     <motion.div
