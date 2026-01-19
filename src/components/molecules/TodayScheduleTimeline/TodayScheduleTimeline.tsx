@@ -258,7 +258,7 @@ export function TodayScheduleTimeline({
         {/* ===== イベント描画 ===== */}
         <div className="absolute inset-0 pointer-events-none">
           {layoutedEvents.map((ev) => {
-            const leftBase = 56;
+            const leftBase = 60;
             const gap = 8;
             const baseColor = ev.calendarColor ?? "#38bdf8";
             const mounted = mountedMap[ev.id] ?? true;
