@@ -566,6 +566,7 @@ export const calendars = [
       "pull_request_review_wait_count",
       "team_review_load",
       "milestone_progress",
+      "scheduler",
     ],
   },
   {
