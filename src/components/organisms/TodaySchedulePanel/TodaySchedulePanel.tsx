@@ -101,7 +101,7 @@ export function TodaySchedulePanel({
   return (
     <Card
       className={cn(
-        "flex h-full w-full min-h-0 flex-col overflow-hidden",
+        "bg-stone-50 flex h-full w-full min-h-0 flex-col overflow-hidden",
         className,
       )}
     >
