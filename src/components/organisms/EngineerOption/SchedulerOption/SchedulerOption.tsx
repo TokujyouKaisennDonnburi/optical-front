@@ -3,10 +3,10 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  createSchedulerPoll,
-  getSchedulerPoll,
-  getSchedulerPolls,
-} from "@/lib/api-scheduler-polls";
+  createScheduler,
+  getScheduler,
+  getSchedulerList,
+} from "@/types/scheduler";
 import type { SchedulerPollResponse } from "@/types/scheduler-poll";
 import { SchedulerAvailability } from "./views/SchedulerAvailability";
 import {
@@ -40,6 +40,7 @@ export type Summary = {
 export type SummaryMap = Record<string, Summary>;
 
 type Props = {
+  calendarId: string;
   selectedDates: string[];
   onDatesChange: (dates: string[]) => void;
   viewMode: ViewMode;
@@ -53,6 +54,7 @@ type Props = {
 };
 
 export function SchedulerOption({
+  calendarId,
   selectedDates,
   onDatesChange,
   viewMode,
@@ -72,15 +74,28 @@ export function SchedulerOption({
     if (viewMode === "list") {
       const fetchSchedulers = async () => {
         try {
-          const data = await getSchedulerPolls();
-          setSchedulers(data);
+          const data = await getSchedulerList(calendarId);
+          setSchedulers(
+            data.map((scheduler) => {
+              return {
+                id: scheduler.id,
+                author: scheduler.userId,
+                title: scheduler.title,
+                memo: scheduler.memo,
+                limitTime: scheduler.limitTime,
+                createdAt: scheduler.limitTime || "",
+                respondersCount: 0,
+                hasResponded: scheduler.isDone,
+              };
+            }),
+          );
         } catch (_error) {
           toast.error("スケジューラーの読み込みに失敗しました");
         }
       };
       fetchSchedulers();
     }
-  }, [viewMode]);
+  }, [calendarId, viewMode]);
 
   // Reset to list view if state is inconsistent
   useEffect(() => {
@@ -104,10 +119,12 @@ export function SchedulerOption({
     if (!newSchedulerData) return;
 
     try {
-      const createdScheduler = await createSchedulerPoll({
-        ...newSchedulerData,
-        availabilities: availability,
-        comment,
+      const createdScheduler = await createScheduler(calendarId, {
+        title: newSchedulerData.title,
+        memo: newSchedulerData.memo,
+        limitTime: newSchedulerData.limitTime,
+        isAllDay: newSchedulerData.isAllDay,
+        dates: newSchedulerData.dates,
       });
       toast.success("スケジューラーを作成しました");
       setNewSchedulerData(null);
@@ -127,28 +144,54 @@ export function SchedulerOption({
     } else {
       // Fetch poll data to pre-fill the availability form
       try {
-        const pollDetails = await getSchedulerPoll(id);
-        const dates = pollDetails.dates.map((d) => d.date.slice(0, 10));
-        onDatesChange(dates);
-        const isAllDay = !pollDetails.dates[0]?.startTime;
+        const pollDetails = await getScheduler(calendarId, id);
+        const dates = pollDetails.PossibleDate.map((d) => {
+          const startDatetime = new Date(d.StartTime);
+          const endDatetime = new Date(d.EndTime);
+          return {
+            date: new Date(d.Date)
+              .toISOString()
+              .slice(0, 10)
+              .replace(/-/g, "/"),
+            startTime:
+              startDatetime.getHours().toString() +
+              ":" +
+              startDatetime.getMinutes().toString(),
+            endTime:
+              endDatetime.getHours().toString() +
+              ":" +
+              endDatetime.getMinutes().toString(),
+          };
+        });
+        onDatesChange(dates.map((d) => d.date));
+        const isAllDay = !pollDetails.PossibleDate[0]?.StartTime;
+        const defaultStartTime = isAllDay
+          ? null
+          : new Date(pollDetails.PossibleDate[0]?.StartTime);
+        const defaultEndTime = isAllDay
+          ? null
+          : new Date(pollDetails.PossibleDate[0]?.EndTime);
         setNewSchedulerData({
-          title: pollDetails.title,
-          memo: pollDetails.memo,
-          defaultStartTime: isAllDay
-            ? ""
-            : pollDetails.dates[0]?.startTime || "",
-          defaultEndTime: isAllDay ? "" : pollDetails.dates[0]?.endTime || "",
+          title: pollDetails.Title,
+          memo: pollDetails.Memo,
+          defaultStartTime: defaultStartTime
+            ? defaultStartTime.getHours().toString() +
+              ":" +
+              defaultStartTime.getMinutes().toString()
+            : "",
+          defaultEndTime: defaultEndTime
+            ? defaultEndTime.getHours().toString() +
+              ":" +
+              defaultEndTime.getMinutes().toString()
+            : "",
           limitTime: null,
           isAllDay: isAllDay,
-          dates: pollDetails.dates.map((d) => ({
-            date: d.date,
-            startTime: d.startTime,
-            endTime: d.endTime,
-          })),
+          dates: dates,
         });
         setViewMode("respond"); // A new view for responding
-      } catch (_error) {
+      } catch (err) {
         toast.error("スケジューラーの読み込みに失敗しました");
+        console.error(err);
       }
     }
   };
