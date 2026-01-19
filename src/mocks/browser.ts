@@ -11,16 +11,20 @@ let worker: WorkerInstance | null = null;
 
 async function initializeWorker() {
   const { setupWorker } = await import("msw/browser");
-  const { scheduleHandlers } = await import("@/mocks/handlers");
-  const { authHandlers } = await import("@/mocks/handlers/authHandlers");
-  const { githubHandlers } = await import("@/mocks/handlers/githubHandlers");
-  const { agentHandlers } = await import("@/mocks/handlers/agentHandlers");
+  const {
+    scheduleHandlers,
+    authHandlers,
+    githubHandlers,
+    agentHandlers,
+    schedulerPollHandlers,
+  } = await import("@/mocks/handlers");
 
   console.log("[MSW] Setting up handlers:", {
     scheduleHandlers: scheduleHandlers.length,
     authHandlers: authHandlers.length,
     githubHandlers: githubHandlers.length,
     agentHandlers: agentHandlers.length,
+    schedulerPollHandlers: schedulerPollHandlers.length,
   });
 
   return setupWorker(
@@ -28,6 +32,7 @@ async function initializeWorker() {
     ...authHandlers,
     ...githubHandlers,
     ...agentHandlers,
+    ...schedulerPollHandlers,
   );
 }
 
