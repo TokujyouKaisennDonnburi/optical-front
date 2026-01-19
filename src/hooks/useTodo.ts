@@ -15,6 +15,8 @@ import type { TodoList } from "@/types/todo";
 
 interface UseTodoOptions {
   calendarId: string;
+  /** 現在のユーザーのアバターURL（新規作成時に使用） */
+  currentUserAvatarUrl?: string | null;
 }
 
 interface UseTodoReturn {
@@ -57,7 +59,10 @@ interface UseTodoReturn {
  * });
  * ```
  */
-export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
+export function useTodo({
+  calendarId,
+  currentUserAvatarUrl,
+}: UseTodoOptions): UseTodoReturn {
   const [todoLists, setTodoLists] = useState<TodoList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -150,29 +155,37 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
   );
 
   // 新しいタスクを追加
-  const addTask = useCallback(async (listId: string, name: string) => {
-    if (!name.trim()) {
-      toast.error("タスク名を入力してください");
-      return;
-    }
+  const addTask = useCallback(
+    async (listId: string, name: string) => {
+      if (!name.trim()) {
+        toast.error("タスク名を入力してください");
+        return;
+      }
 
-    try {
-      const newItem = await createTodoItem(listId, {
-        name: name.trim(),
-      });
-      setTodoLists((prev) =>
-        prev.map((list) =>
-          list.id === listId
-            ? { ...list, items: [...list.items, newItem] }
-            : list,
-        ),
-      );
-      toast.success("タスクを追加しました");
-    } catch (err) {
-      console.error("Failed to add task:", err);
-      toast.error("タスクの追加に失敗しました");
-    }
-  }, []);
+      try {
+        const newItem = await createTodoItem(listId, {
+          name: name.trim(),
+        });
+        // APIがavatarUrlを返さない場合、現在のユーザーのアバターを使用
+        const itemWithAvatar = {
+          ...newItem,
+          avatarUrl: newItem.avatarUrl ?? currentUserAvatarUrl ?? null,
+        };
+        setTodoLists((prev) =>
+          prev.map((list) =>
+            list.id === listId
+              ? { ...list, items: [...list.items, itemWithAvatar] }
+              : list,
+          ),
+        );
+        toast.success("タスクを追加しました");
+      } catch (err) {
+        console.error("Failed to add task:", err);
+        toast.error("タスクの追加に失敗しました");
+      }
+    },
+    [currentUserAvatarUrl],
+  );
 
   // 新しいセクションを追加
   const addSection = useCallback(
@@ -186,15 +199,20 @@ export function useTodo({ calendarId }: UseTodoOptions): UseTodoReturn {
         const newList = await createTodoList(calendarId, {
           name: name.trim(),
         });
-        setTodoLists((prev) => [...prev, newList]);
-        setExpandedSections((prev) => new Set([...prev, newList.id]));
+        // APIがavatarUrlを返さない場合、現在のユーザーのアバターを使用
+        const listWithAvatar = {
+          ...newList,
+          avatarUrl: newList.avatarUrl ?? currentUserAvatarUrl ?? null,
+        };
+        setTodoLists((prev) => [...prev, listWithAvatar]);
+        setExpandedSections((prev) => new Set([...prev, listWithAvatar.id]));
         toast.success("セクションを追加しました");
       } catch (err) {
         console.error("Failed to add section:", err);
         toast.error("セクションの追加に失敗しました");
       }
     },
-    [calendarId],
+    [calendarId, currentUserAvatarUrl],
   );
 
   // タスクを削除

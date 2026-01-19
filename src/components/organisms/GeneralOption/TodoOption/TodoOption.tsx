@@ -16,6 +16,7 @@ import { Text } from "@/components/atoms/Text";
 import { AddSectionDialog } from "@/components/molecules/AddSectionDialog";
 import { AddTaskDialog } from "@/components/molecules/AddTaskDialog";
 import { TodoSection } from "@/components/molecules/TodoSection";
+import { useAuth } from "@/hooks/useAuth";
 import { useTodo } from "@/hooks/useTodo";
 
 type Props = {
@@ -30,6 +31,7 @@ type Props = {
  * カレンダー詳細画面のオプションとして使用される。
  */
 export function TodoOption({ calendarId }: Props) {
+  const { user } = useAuth();
   const {
     todoLists,
     isLoading,
@@ -39,7 +41,7 @@ export function TodoOption({ calendarId }: Props) {
     toggleItem,
     addTask,
     addSection,
-  } = useTodo({ calendarId });
+  } = useTodo({ calendarId, currentUserAvatarUrl: user?.avatarUrl });
 
   // ダイアログ状態
   const [addTaskDialog, setAddTaskDialog] = React.useState<{
