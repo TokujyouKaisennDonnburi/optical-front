@@ -27,9 +27,11 @@ import {
   SingleCreateScheduleDialog,
   SingleScheduleEventPopover,
 } from "@/components/organisms/SingleCalendarBoard";
+import { TodoPanel } from "@/components/organisms/TodoPanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
+import { useTodo } from "@/hooks/useTodo";
 import {
   connectGitHubAccount,
   getGitHubAccountLinked,
@@ -73,6 +75,17 @@ export function CalendarDetailClient({
   // 全カレンダー一覧を取得（カレンダー切り替え用）
   const { calendars: allCalendars, isLoading: calendarsLoading } =
     useGeneralCalendar();
+
+  // Todo機能
+  const {
+    todoLists,
+    isLoading: isTodoLoading,
+    expandedSections,
+    toggleSection,
+    toggleItem,
+    addTask,
+    addSection,
+  } = useTodo({ calendarId });
 
   // サイドバーの選択状態
   const [selectedSidebarItem, setSelectedSidebarItem] = useState<string | null>(
@@ -485,6 +498,19 @@ export function CalendarDetailClient({
                   )}
                 </CardContent>
               </>
+            )}
+
+            {selectedSidebarItem === "todo" && (
+              <TodoPanel
+                todoLists={todoLists}
+                isLoading={isTodoLoading}
+                expandedSections={expandedSections}
+                onClose={() => setSelectedSidebarItem(null)}
+                onToggleSection={toggleSection}
+                onToggleItem={toggleItem}
+                onAddTask={addTask}
+                onAddSection={addSection}
+              />
             )}
 
             {selectedSidebarItem === "add-option" && (

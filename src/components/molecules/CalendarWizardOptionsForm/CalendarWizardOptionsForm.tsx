@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Code2,
   GitPullRequest,
+  ListTodo,
   Minus,
   Zap,
 } from "@/components/ui/icons";
@@ -49,6 +50,8 @@ const getOptionIcon = (id: string, _category: string) => {
       return Activity;
     case "milestone_progress":
       return Calendar;
+    case "todo":
+      return ListTodo;
     default:
       return Zap;
   }

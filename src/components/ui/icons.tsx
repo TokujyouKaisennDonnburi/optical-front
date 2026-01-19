@@ -44,6 +44,7 @@ export {
   Inbox,
   Info,
   Link,
+  ListTodo,
   Loader2,
   Mail,
   MapPin,

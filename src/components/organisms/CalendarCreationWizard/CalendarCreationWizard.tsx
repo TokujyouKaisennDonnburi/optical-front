@@ -124,6 +124,15 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
       "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
     category: "engineer",
   },
+  // General - 一般・便利機能
+  {
+    id: 10,
+    name: "todo",
+    label: "To-doリスト",
+    description:
+      "カレンダーにTo-doリスト機能を追加します。タスク管理が可能になります。",
+    category: "general",
+  },
 ];
 
 const CUSTOM_OPTION_ITEMS: CalendarWizardCustomOption[] =
@@ -132,7 +141,7 @@ const CUSTOM_OPTION_ITEMS: CalendarWizardCustomOption[] =
 // テンプレートIDとカスタムオプションIDのマッピング
 const TEMPLATE_OPTION_MAPPING: Record<string, number[]> = {
   engineer: [1, 2, 5],
-  general: [], // 一般テンプレートは特定のオプションを持たない
+  general: [10], // 一般テンプレートはTo-doリストを含む
   simple: [], // シンプルテンプレートはオプションなし
 };
 
