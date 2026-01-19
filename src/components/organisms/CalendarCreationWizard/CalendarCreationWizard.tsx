@@ -112,14 +112,14 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   {
     id: 2,
     name: "team_review_load",
-    label: "チームレビュー負荷",
+    label: "レビュー負荷",
     description: "チーム全体のレビュー状況を可視化します。",
     category: "engineer",
   },
   {
     id: 5,
     name: "milestone_progress",
-    label: "マイルストーン進捗",
+    label: "マイルストーン達成率",
     description:
       "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
     category: "engineer",
@@ -128,9 +128,9 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   {
     id: 7,
     name: "todo",
-    label: "To-doリスト",
+    label: "ToDoリスト",
     description:
-      "カレンダーにTo-doリスト機能を追加します。タスク管理が可能になります。",
+      "カレンダーにToDoリスト機能を追加します。タスク管理が可能になります。",
     category: "general",
   },
 ];

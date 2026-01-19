@@ -89,7 +89,7 @@ export function TodoOption({ calendarId }: Props) {
         <CardHeader className="space-y-1 pb-3">
           <div className="flex items-center gap-2">
             <ListTodo className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-base">To-do リスト</CardTitle>
+            <CardTitle className="text-base">ToDoリスト</CardTitle>
           </div>
           <CardDescription>タスクを管理しましょう</CardDescription>
         </CardHeader>
