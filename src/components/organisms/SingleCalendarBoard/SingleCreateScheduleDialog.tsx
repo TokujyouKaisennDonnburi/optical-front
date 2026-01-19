@@ -130,7 +130,15 @@ export function SingleCreateScheduleDialog({
       setAllDayEndDate(date);
       setErrors({});
     }
-  }, [isOpen, date, initialTitle, initialStartTime, initialEndTime, getRoundedNowTime, addOneHour]);
+  }, [
+    isOpen,
+    date,
+    initialTitle,
+    initialStartTime,
+    initialEndTime,
+    getRoundedNowTime,
+    addOneHour,
+  ]);
 
   useEffect(() => {
     setMounted(true);
