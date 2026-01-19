@@ -211,7 +211,7 @@ export function SchedulerCreate({
                   hover:bg-red-500 hover:text-white
                   "
                 >
-                  −
+                  -
                 </Button>
               </div>
             ))}

@@ -239,14 +239,19 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
                       <TableCell className="text-center font-bold text-red-500">
                         {counts?.ng}
                       </TableCell>
-                      {poll.submissions.map(({ user, availabilities }) => (
-                        <TableCell
-                          key={user.id}
-                          className={`text-center font-bold ${statusToColor[availabilities[dateInfo.date]]}`}
-                        >
-                          {statusToIcon[availabilities[dateInfo.date]]}
-                        </TableCell>
-                      ))}
+                        {poll.submissions.map(({ user, availabilities }) => {
+                          const availabilityStatus = availabilities[dateInfo.date];
+                          const colorClass = statusToColor[availabilityStatus] ?? "";
+                          const icon = statusToIcon[availabilityStatus] ?? "";
+                          return (
+                            <TableCell
+                              key={user.id}
+                              className={`text-center font-bold ${colorClass}`}
+                            >
+                              {icon}
+                            </TableCell>
+                          );
+                        })}
                     </TableRow>
                   );
                 })}
@@ -257,7 +262,24 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
 
         <div className="mt-6 space-y-4">
           <h3 className="text-lg font-medium">コメント</h3>
-          {/* ... comments section ... */}
+          {poll.submissions.map(({ user, comment }) => (
+            <div key={user.id} className="space-y-1">
+              <Text size="sm" className="font-medium">
+                {user.name}
+              </Text>
+              <div className="rounded-md border bg-muted p-3">
+                {comment ? (
+                  <Text size="sm" className="whitespace-pre-wrap">
+                    {comment}
+                  </Text>
+                ) : (
+                  <Text size="sm" className="text-gray-500">
+                    コメントはありません。
+                  </Text>
+                )}
+              </div>
+            </div>
+          ))}  
         </div>
 
         <div className="mt-6 flex flex-col gap-2">

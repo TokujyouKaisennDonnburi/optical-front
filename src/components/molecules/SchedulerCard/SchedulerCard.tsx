@@ -32,4 +32,3 @@ export const SchedulerCard: React.FC<SchedulerCardProps> = ({
     </Card>
   );
 };
-export default SchedulerCard;

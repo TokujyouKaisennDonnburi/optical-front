@@ -25,7 +25,7 @@ export function AvailabilityRow({
       : defaultStartTime || defaultEndTime || "";
 
   return (
-    <div className="flex items-center justify-between rounded-xl bg-gray-800 px-4 py-3">
+    <div className="flex items-center justify-between rounded-xl dark:bg-white bg-gray-800 px-4 py-3">
       <div className="flex flex-col">
         <span className="text-sm font-medium text-white">{date}</span>
         {displayTime && (
