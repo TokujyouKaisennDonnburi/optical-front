@@ -1,50 +1,62 @@
-export interface SchedulerPollCreateRequest {
-  title: string;
-  memo: string;
-  limitTime: string | null;
-  isAllDay: boolean;
-  dates: {
+export interface SchedulerCreateRequest {
+    title: string;
+    memo: string;
+    limitTime: string | null;
+    isAllDay: boolean;
+    dates: SchedulerCreateDateRequest[];
+}
+
+export interface SchedulerCreateDateRequest {
     date: string;
     startTime: string;
     endTime: string;
-  }[];
-  availabilities: {
-    [date: string]: "ok" | "maybe" | "ng";
-  };
-  comment?: string;
 }
 
-export interface SchedulerPollResponse {
-  id: string;
-  title: string;
-  memo: string;
-  limitTime: string | null;
-  author: string;
-  createdAt: string;
-  respondersCount: number;
-  hasResponded: boolean;
+export interface SchedulerCreateResponse {
+    id: string;
+}
+
+export interface SchedulerAddAttendanceRequest {
+    comment: string;
+    status: SchedulerStatusRequest;
+}
+
+export interface SchedulerStatusRequest {
+    date: string;
+    status: number;
+}
+
+export interface SchedulerResponse {
+    id: string;
+    calendar_id: string;
+    user_id: string;
+    title: string;
+    memo: string;
+    limitTime: string;
+    is_allday: boolean;
+    is_done: boolean;
 }
 
 export interface DateInfo {
-  date: string;
-  startTime: string;
-  endTime: string;
+    date: string;
+    startTime: string;
+    endTime: string;
 }
 
-export interface PollSubmission {
-  user: {
+export interface Submission {
+    user: {
+        id: string;
+        name: string;
+        avatarUrl?: string;
+    };
+    availabilities: { [date: string]: number };
+    comment: string;
+}
+
+export interface SchedulerDetailResponse {
     id: string;
-    name: string;
-    avatarUrl?: string;
-  };
-  availabilities: { [date: string]: "ok" | "maybe" | "ng" };
-  comment: string;
-}
-
-export interface SchedulerPollDetailResponse {
-  id: string;
-  title: string;
-  memo: string;
-  dates: DateInfo[];
-  submissions: PollSubmission[];
+    title: string;
+    memo: string;
+    dates: DateInfo[];
+    submissions: Submission[];
 }

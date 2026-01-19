@@ -1,18 +1,27 @@
 import type {
-  SchedulerPollCreateRequest,
-  SchedulerPollDetailResponse,
-  SchedulerPollResponse,
+    SchedulerCreateRequest,
+    SchedulerDetailResponse,
+    SchedulerAddAttendanceRequest,
+    SchedulerResponse,
 } from "@/types/scheduler-poll";
 import { apiGet, apiPost } from "./api-client";
 
-export function createSchedulerPoll(body: SchedulerPollCreateRequest) {
-  return apiPost<SchedulerPollResponse>("/scheduler-polls", body);
+export async function createSchedulerPoll(body: SchedulerCreateRequest) {
+    return apiPost<SchedulerCreateRequest>("/calendars/${calendarId}/schedulers", body);
+}
+export async function addAttendancePoll(body: SchedulerAddAttendanceRequest) {
+    return apiPost<SchedulerResponse>("/calendars/${calendarId}/schedulers/{schedulerId}/attendance", body);
 }
 
-export function getSchedulerPolls() {
-  return apiGet<SchedulerPollResponse[]>("/scheduler-polls");
+export function getAllScheduler() {
+    return apiGet<SchedulerResponse[]>("/calendars/{calendarId}/schedulers");
 }
-
-export function getSchedulerPoll(id: string) {
-  return apiGet<SchedulerPollDetailResponse>(`/scheduler-polls/${id}`);
+export function getScheduler() {
+    return apiGet<SchedulerResponse[]>("/calendars/{calendarId}/schedulers/{schedulerId}");
+}
+export function getSchedulerAttendance() {
+    return apiGet<SchedulerResponse[]>("/calendars/{calendarId}/schedulers/{schedulerId}");
+}
+export function getSchedulerResult() {
+    return apiGet<SchedulerDetailResponse>("/calendars/{calendarId}/schedulers/{schedulerId}");
 }
