@@ -195,7 +195,7 @@ export function SchedulerOption({
       setAvailability({});
       setComment("");
       setViewMode("summary");
-    } catch (error) {
+    } catch (_error) {
       toast.error(
         "ネットワークエラーが発生しました。接続状況を確認してください。",
       );
