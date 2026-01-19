@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import { ArrowLeft, CalendarDays, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -378,9 +379,9 @@ export function CalendarDetailClient({
           </Button>
 
           {/* OptiCal ロゴ */}
-          <div className="flex items-center shrink-0">
+          <Link href="/" className="flex shrink-0 items-center">
             <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
-          </div>
+          </Link>
 
           {/* カレンダー切り替え */}
           <CalendarSwitcher
