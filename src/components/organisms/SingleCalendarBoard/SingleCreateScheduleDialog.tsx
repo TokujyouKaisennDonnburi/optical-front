@@ -29,6 +29,9 @@ export type SingleCreateScheduleDialogProps = {
     allDayStartDate: Date;
     allDayEndDate: Date;
   }) => void;
+  initialTitle?: string;
+  initialStartTime?: string;
+  initialEndTime?: string;
 };
 
 /**
@@ -45,6 +48,9 @@ export function SingleCreateScheduleDialog({
   calendarName = "カレンダー",
   calendarColor,
   onConfirm,
+  initialTitle,
+  initialStartTime,
+  initialEndTime,
 }: SingleCreateScheduleDialogProps) {
   const formatDateInput = (target: Date) => {
     const y = target.getFullYear();
@@ -59,9 +65,9 @@ export function SingleCreateScheduleDialog({
   };
 
   const [mounted, setMounted] = useState(false);
-  const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
+  const [title, setTitle] = useState(initialTitle || "");
+  const [startTime, setStartTime] = useState(initialStartTime || "09:00");
+  const [endTime, setEndTime] = useState(initialEndTime || "10:00");
   const [memo, setMemo] = useState("");
   const [location, setLocation] = useState("");
   const [isAllDay, setIsAllDay] = useState(false);
@@ -71,9 +77,9 @@ export function SingleCreateScheduleDialog({
 
   useEffect(() => {
     if (isOpen) {
-      setTitle("");
-      setStartTime("09:00");
-      setEndTime("10:00");
+      setTitle(initialTitle || "");
+      setStartTime(initialStartTime || "09:00");
+      setEndTime(initialEndTime || "10:00");
       setMemo("");
       setLocation("");
       setIsAllDay(false);
@@ -81,7 +87,7 @@ export function SingleCreateScheduleDialog({
       setAllDayEndDate(date);
       setErrors({});
     }
-  }, [isOpen, date]);
+  }, [isOpen, date, initialTitle, initialStartTime, initialEndTime]);
 
   useEffect(() => {
     setMounted(true);

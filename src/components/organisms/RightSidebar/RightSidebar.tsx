@@ -3,6 +3,7 @@ import {
   ListTodo,
   Milestone,
   Plus,
+  Sheet,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -40,6 +41,11 @@ const OPTION_CONFIG: Record<
     sidebarId: "milestone",
     icon: <Milestone size={20} />,
     label: "Milestones",
+  },
+  scheduler: {
+    sidebarId: "scheduler",
+    icon: <Sheet size={20} />,
+    label: "Scheduler",
   },
 };
 
