@@ -239,19 +239,21 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
                       <TableCell className="text-center font-bold text-red-500">
                         {counts?.ng}
                       </TableCell>
-                        {poll.submissions.map(({ user, availabilities }) => {
-                          const availabilityStatus = availabilities[dateInfo.date];
-                          const colorClass = statusToColor[availabilityStatus] ?? "";
-                          const icon = statusToIcon[availabilityStatus] ?? "";
-                          return (
-                            <TableCell
-                              key={user.id}
-                              className={`text-center font-bold ${colorClass}`}
-                            >
-                              {icon}
-                            </TableCell>
-                          );
-                        })}
+                      {poll.submissions.map(({ user, availabilities }) => {
+                        const availabilityStatus =
+                          availabilities[dateInfo.date];
+                        const colorClass =
+                          statusToColor[availabilityStatus] ?? "";
+                        const icon = statusToIcon[availabilityStatus] ?? "";
+                        return (
+                          <TableCell
+                            key={user.id}
+                            className={`text-center font-bold ${colorClass}`}
+                          >
+                            {icon}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   );
                 })}
@@ -279,7 +281,7 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
                 )}
               </div>
             </div>
-          ))}  
+          ))}
         </div>
 
         <div className="mt-6 flex flex-col gap-2">
