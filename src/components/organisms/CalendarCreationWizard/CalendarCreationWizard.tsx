@@ -101,15 +101,6 @@ const TEMPLATE_OPTIONS: CalendarWizardTemplate[] = [
 const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   CalendarWizardCustomOption & { defaultChecked?: boolean }
 > = [
-  // General - 一般・便利機能
-  {
-    id: 7,
-    name: "todo",
-    label: "ToDoリスト",
-    description:
-      "カレンダーにToDoリスト機能を追加します。タスク管理が可能になります。",
-    category: "general",
-  },
   // Engineer - 実装済みオプションのみ
   {
     id: 1,
@@ -190,7 +181,7 @@ const createInitialState = (): CalendarCreationState => ({
     },
     {},
   ),
-  useSolo: false,
+  useSolo: true,
 });
 
 export function CalendarCreationWizard() {
