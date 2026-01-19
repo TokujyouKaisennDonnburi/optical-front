@@ -55,11 +55,7 @@ const OPTION_CONFIG: Record<
     sidebarId: "scheduler",
     icon: <Sheet size={20} />,
     label: "Scheduler",
-  },
-  scheduler: {
-    sidebarId: "scheduler",
-    icon: <Sheet size={20} />,
-    label: "Scheduler",
+    shortLabel: "調整",
   },
 };
 
