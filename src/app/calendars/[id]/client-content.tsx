@@ -191,9 +191,9 @@ export function CalendarDetailClient({
   useEffect(() => {
     if (
       hasGitHubOptions &&
-      (selectedSidebarItem === "pr-review" ||
-        selectedSidebarItem === "team-load" ||
-        selectedSidebarItem === "milestone")
+      (selectedSidebarItem === "PRレビュー待ち件数" ||
+        selectedSidebarItem === "レビュー負荷" ||
+        selectedSidebarItem === "マイルストーン達成率")
     ) {
       // まず接続状態を確認
       if (isAccountConnected === null) {

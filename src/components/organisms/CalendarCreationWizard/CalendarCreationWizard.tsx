@@ -101,6 +101,15 @@ const TEMPLATE_OPTIONS: CalendarWizardTemplate[] = [
 const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   CalendarWizardCustomOption & { defaultChecked?: boolean }
 > = [
+  // General - 一般・便利機能
+  {
+    id: 7,
+    name: "todo",
+    label: "ToDoリスト",
+    description:
+      "カレンダーにToDoリスト機能を追加します。タスク管理が可能になります。",
+    category: "general",
+  },
   // Engineer - 実装済みオプションのみ
   {
     id: 1,
@@ -112,26 +121,17 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   {
     id: 2,
     name: "team_review_load",
-    label: "チームレビュー負荷",
+    label: "レビュー負荷",
     description: "チーム全体のレビュー状況を可視化します。",
     category: "engineer",
   },
   {
     id: 5,
     name: "milestone_progress",
-    label: "マイルストーン進捗",
+    label: "マイルストーン達成率",
     description:
       "GitHub連携により、マイルストーンの進捗状況をプレビューに表示します。",
     category: "engineer",
-  },
-  // General - 一般・便利機能
-  {
-    id: 7,
-    name: "todo",
-    label: "To-doリスト",
-    description:
-      "カレンダーにTo-doリスト機能を追加します。タスク管理が可能になります。",
-    category: "general",
   },
 ];
 

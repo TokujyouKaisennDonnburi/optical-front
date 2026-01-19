@@ -114,7 +114,7 @@ export function TodoPanel({
         {/* ヘッダー */}
         <CardHeader className="flex flex-row items-center justify-between gap-2 border-b border-border px-4 py-3 bg-muted/20">
           <Text as="h2" weight="semibold" size="lg">
-            To-do
+            ToDo
           </Text>
 
           <div className="flex items-center gap-1">
