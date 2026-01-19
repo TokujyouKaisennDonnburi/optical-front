@@ -1,7 +1,7 @@
 import { apiGet, apiPost } from "@/lib/api-client";
 import type {
-  GitHubAccountLinkedResponse,
-  GitHubOrganizationLinkedResponse,
+  GitHubAccountLinkedStatus,
+  GitHubAppInstallationStatus,
   GitHubReviewOptionsResponse,
   GithubAppInstallRequest,
   GithubOauthRequest,
@@ -45,61 +45,40 @@ export async function getMilestoneProgress(
 
 /**
  * GitHubアカウント連携状態を取得
- * GET /api/github/account/linked
- *
- * TODO: バックエンド実装後に実APIに切り替え
+ * GET /github/oauth/status
  */
-export async function getGitHubAccountLinked(): Promise<GitHubAccountLinkedResponse> {
-  // モック: 未連携状態を返す（開発用）
-  // 本番では apiGet<GitHubAccountLinkedResponse>("/github/account/linked") を使用
-  return Promise.resolve({
-    linked: false,
-  });
+export async function getGitHubAccountStatus(): Promise<GitHubAccountLinkedStatus> {
+  return apiGet<GitHubAccountLinkedStatus>("/github/oauth/status");
 }
 
 /**
- * GitHub組織連携状態を取得
- * GET /api/github/organization/linked?calendarId={id}
- *
- * TODO: バックエンド実装後に実APIに切り替え
+ * GitHub組織連携状態（インストール状態）を取得
+ * GET /github/calendars/{calendarId}/installation-status
  */
-export async function getGitHubOrganizationLinked(
+export async function getGitHubInstallationStatus(
   calendarId: string,
-): Promise<GitHubOrganizationLinkedResponse> {
-  // モック: 未連携状態を返す（開発用）
-  // 本番では apiGet<GitHubOrganizationLinkedResponse>(`/github/organization/linked?calendarId=${calendarId}`) を使用
-  console.log("[Mock] getGitHubOrganizationLinked called for:", calendarId);
-  return Promise.resolve({
-    linked: false,
-  });
+): Promise<GitHubAppInstallationStatus> {
+  return apiGet<GitHubAppInstallationStatus>(
+    `/github/calendars/${calendarId}/installation-status`,
+  );
 }
 
 /**
  * GitHubアカウント連携を開始（OAuth URL取得）
  *
- * TODO: バックエンド実装後に実APIに切り替え
+ * POST /github/oauth/state
  */
-export async function connectGitHubAccount(): Promise<{ oauthUrl: string }> {
-  // モック: ダミーURLを返す
-  return Promise.resolve({
-    oauthUrl: "https://github.com/login/oauth/authorize?client_id=MOCK",
-  });
+export async function connectGitHubAccount(): Promise<{ url: string }> {
+  return apiPost<{ url: string }>("/github/oauth/state");
 }
 
 /**
  * GitHub組織を連携（GitHub App インストールフロー）
  *
- * TODO: バックエンド実装後に実APIに切り替え
+ * POST /github/apps/state
  */
 export async function startGitHubAppInstall(
   calendarId: string,
-): Promise<{ installUrl: string }> {
-  // TODO: 本番では apiPost<{ installUrl: string }>("/github/apps/install/start", { calendarId }) を使用
-  console.log("[Mock] startGitHubAppInstall called for:", calendarId);
-
-  // モック: GitHub App インストールURLを返す
-  // 実際のURLはバックエンドから取得する（state にcalendarIdを含む）
-  return Promise.resolve({
-    installUrl: `https://github.com/apps/optical-app/installations/new?state=${calendarId}`,
-  });
+): Promise<{ url: string }> {
+  return apiPost<{ url: string }>("/github/apps/state", { calendarId });
 }
