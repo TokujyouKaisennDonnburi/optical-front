@@ -125,7 +125,15 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
     category: "engineer",
   },
 
+
   // General - 一般・便利機能
+  {
+    id: 6,
+    name: "scheduler",
+    label: "スケジューラー",
+    description: "メンバーの予定を簡単に調整できます。",
+    category: "general",
+  },
   {
     id: 6,
     name: "scheduler",
