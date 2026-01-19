@@ -61,7 +61,7 @@ export const ScheduleEventCard = forwardRef<
       <div
         ref={ref}
         className={cn(
-          "flex w-full min-w-0 items-start gap-1",
+          "flex w-full min-w-0 items-center gap-1",
           isCompact &&
             "border border-stone-300 dark:border-white/10 bg-stone-200/80 dark:bg-white/[0.08] px-1 py-px text-[0.5625rem] leading-tight text-stone-800 dark:text-white shadow-sm",
           isSpan &&
