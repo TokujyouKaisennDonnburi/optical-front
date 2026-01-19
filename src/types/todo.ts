@@ -25,3 +25,16 @@ export type TodoSection = {
   isExpanded?: boolean;
   items: TodoItem[];
 };
+
+export type CreateTodoListRequest = {
+  name: string;
+};
+
+export type CreateTodoItemRequest = {
+  name: string;
+};
+
+export type UpdateTodoListRequest = {
+  name: string;
+  isDone: boolean;
+};

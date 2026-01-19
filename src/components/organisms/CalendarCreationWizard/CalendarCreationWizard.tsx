@@ -126,7 +126,7 @@ const CUSTOM_OPTIONS_WITH_DEFAULT: Array<
   },
   // General - 一般・便利機能
   {
-    id: 10,
+    id: 7,
     name: "todo",
     label: "To-doリスト",
     description:
@@ -141,7 +141,7 @@ const CUSTOM_OPTION_ITEMS: CalendarWizardCustomOption[] =
 // テンプレートIDとカスタムオプションIDのマッピング
 const TEMPLATE_OPTION_MAPPING: Record<string, number[]> = {
   engineer: [1, 2, 5],
-  general: [10], // 一般テンプレートはTo-doリストを含む
+  general: [7], // 一般テンプレートはTo-doリストを含む
   simple: [], // シンプルテンプレートはオプションなし
 };
 

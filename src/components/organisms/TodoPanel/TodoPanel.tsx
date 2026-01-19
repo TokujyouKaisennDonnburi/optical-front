@@ -25,7 +25,12 @@ export interface TodoPanelProps {
   /** セクションの展開/折りたたみをトグル */
   onToggleSection?: (sectionId: string) => void;
   /** Todoアイテムの完了状態を変更 */
-  onToggleItem?: (listId: string, itemId: string, isDone: boolean) => void;
+  onToggleItem?: (
+    listId: string,
+    itemId: string,
+    itemName: string,
+    isDone: boolean,
+  ) => void;
   /** タスクを追加 */
   onAddTask?: (listId: string, name: string) => Promise<void>;
   /** セクションを追加 */
@@ -91,8 +96,8 @@ export function TodoPanel({
 
   // アイテムトグルハンドラを生成
   const createToggleHandler = React.useCallback(
-    (listId: string) => (itemId: string, isDone: boolean) => {
-      onToggleItem?.(listId, itemId, isDone);
+    (listId: string) => (itemId: string, name: string, isDone: boolean) => {
+      onToggleItem?.(listId, itemId, name, isDone);
     },
     [onToggleItem],
   );
