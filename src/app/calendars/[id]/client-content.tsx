@@ -514,7 +514,7 @@ export function CalendarDetailClient({
                 <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
                   <div className="flex items-center justify-between">
                     <Text size="lg" weight="semibold">
-                      PR Review
+                      PRレビュー待ち件数
                     </Text>
                     <Button
                       variant="ghost"
@@ -558,7 +558,7 @@ export function CalendarDetailClient({
                 <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
                   <div className="flex items-center justify-between">
                     <Text size="lg" weight="semibold">
-                      Team Load
+                      PRレビュー負荷
                     </Text>
                     <Button
                       variant="ghost"
@@ -602,7 +602,7 @@ export function CalendarDetailClient({
                 <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
                   <div className="flex items-center justify-between">
                     <Text size="lg" weight="semibold">
-                      Milestone
+                      マイルストーン達成率
                     </Text>
                     <Button
                       variant="ghost"
