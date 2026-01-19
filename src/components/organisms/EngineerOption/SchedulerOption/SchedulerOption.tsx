@@ -169,12 +169,35 @@ export function SchedulerOption({
   // Handler for submitting a response to an existing poll
   const handleRespondNext = async () => {
     if (!selectedSchedulerId) return;
-    // This would call a new API endpoint, e.g., `submitResponse(id, availability)`
-    // For now, we'll just simulate success and go to summary.
-    toast.success("回答を送信しました");
-    setAvailability({});
-    setComment("");
-    setViewMode("summary");
+    try {
+  const response = await fetch(
+    `/api/scheduler-polls/${encodeURIComponent(selectedSchedulerId)}/responses`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        availability,
+        comment,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    toast.error("回答の送信に失敗しました。時間をおいて再度お試しください。");
+    return;
+  }
+
+  toast.success("回答を送信しました");
+  setAvailability({});
+  setComment("");
+  setViewMode("summary");
+} catch (error) {
+  toast.error(
+    "ネットワークエラーが発生しました。接続状況を確認してください。",
+  );
+}
   };
 
   return (
