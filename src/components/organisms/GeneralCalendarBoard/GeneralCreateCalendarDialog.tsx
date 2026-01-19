@@ -1,9 +1,8 @@
 "use client";
 
-import { Calendar, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Calendar, Clock, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
@@ -101,6 +100,10 @@ export function GeneralCreateCalendarDialog({
   const [allDayStartDate, setAllDayStartDate] = useState<Date>(date);
   const [allDayEndDate, setAllDayEndDate] = useState<Date>(date);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // 時刻入力欄をクリックしたときに、必ずブラウザ標準の時刻ピッカーを開くための ref
+  const startTimeRef = useRef<HTMLInputElement | null>(null);
+  const endTimeRef = useRef<HTMLInputElement | null>(null);
 
   // ダイアログを開いた瞬間の時刻を初期値にする
   useEffect(() => {
@@ -319,12 +322,30 @@ export function GeneralCreateCalendarDialog({
                 >
                   開始時刻
                 </Text>
-                <Input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="h-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring"
-                />
+                <div className="relative">
+                  <Input
+                    ref={startTimeRef}
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    onClick={() => {
+                      startTimeRef.current?.showPicker();
+                      startTimeRef.current?.focus();
+                    }}
+                    className="h-10 pr-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring no-time-icon"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      startTimeRef.current?.showPicker();
+                      startTimeRef.current?.focus();
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <Clock className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Text
@@ -334,12 +355,30 @@ export function GeneralCreateCalendarDialog({
                 >
                   終了時刻
                 </Text>
-                <Input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="h-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring"
-                />
+                <div className="relative">
+                  <Input
+                    ref={endTimeRef}
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    onClick={() => {
+                      endTimeRef.current?.showPicker();
+                      endTimeRef.current?.focus();
+                    }}
+                    className="h-10 pr-10 border-input bg-background/50 text-foreground focus-visible:border-ring focus-visible:ring-ring no-time-icon"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      endTimeRef.current?.showPicker();
+                      endTimeRef.current?.focus();
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <Clock className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
