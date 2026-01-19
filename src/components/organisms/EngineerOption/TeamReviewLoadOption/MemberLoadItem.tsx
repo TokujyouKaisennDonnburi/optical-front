@@ -1,18 +1,10 @@
 import { ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 import { Button } from "@/components/atoms/Button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/atoms/DropdownMenu";
 import type {
   ChangeReviewerRequest,
   GitHubReviewer,
-  GitHubUser,
   ReviewLoadLevel,
-  TeamMemberReviewLoad,
 } from "@/types/github";
 import { cn } from "@/utils_constants_styles/utils";
 

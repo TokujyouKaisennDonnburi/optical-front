@@ -3,7 +3,6 @@ import type {
   GitHubAccountLinkedStatus,
   GitHubAppInstallationStatus,
   GitHubReviewLoadResponse,
-  GitHubReviewOptionsResponse,
   GitHubReviewRequestResponse,
   GithubAppInstallRequest,
   GithubOauthRequest,

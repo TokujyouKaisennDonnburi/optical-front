@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ExternalLink, Flame } from "lucide-react";
+import { Bell, ExternalLink } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/atoms/Badge";
@@ -47,7 +47,7 @@ export function PullRequestReviewOption({
       setPullRequests(prList);
     };
     fetch();
-  }, []);
+  }, [calendarId]);
   const [overflowStates, setOverflowStates] = useState<Map<number, boolean>>(
     new Map(),
   );
