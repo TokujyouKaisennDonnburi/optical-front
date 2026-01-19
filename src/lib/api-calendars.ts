@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiRequest } from "@/lib/api-client";
+import { apiGet, apiPatch, apiPost, apiRequest } from "@/lib/api-client";
 import type {
   CalendarDetailApiResponse,
   CalendarDetailResponse,
@@ -49,4 +49,8 @@ export async function getCalendarDetail(
 
 export async function createCalendar(payload: CreateCalendarRequest) {
   return apiPost<CreateCalendarResponse>("/calendars", payload);
+}
+
+export async function joinCalendar(calendarId: string) {
+  return apiPatch<void>(`/calendars/${calendarId}/members`);
 }
