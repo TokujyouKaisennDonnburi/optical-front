@@ -41,7 +41,11 @@ export function TodoOption({ calendarId }: Props) {
     toggleItem,
     addTask,
     addSection,
-  } = useTodo({ calendarId, currentUserAvatarUrl: user?.avatarUrl });
+  } = useTodo({
+    calendarId,
+    currentUserAvatarUrl: user?.avatarUrl,
+    currentUserName: user?.name,
+  });
 
   // ダイアログ状態
   const [addTaskDialog, setAddTaskDialog] = React.useState<{
@@ -108,14 +112,14 @@ export function TodoOption({ calendarId }: Props) {
           ) : todoLists.length === 0 ? (
             <div className="text-center py-4">
               <Text as="p" size="sm" className="text-muted-foreground mb-3">
-                Todoリストがありません
+                セクションがありません
               </Text>
               <button
                 type="button"
                 className="text-sm text-primary hover:underline"
                 onClick={() => setIsAddSectionOpen(true)}
               >
-                + 新しいリストを作成
+                + セクションを作成
               </button>
             </div>
           ) : (
