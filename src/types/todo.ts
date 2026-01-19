@@ -2,6 +2,7 @@
 export type TodoItem = {
   id: string;
   userId: string;
+  userName?: string;
   avatarUrl: string | null;
   name: string;
   isDone: boolean;

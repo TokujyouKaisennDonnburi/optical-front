@@ -99,6 +99,7 @@ export function TodoSection({
                     key={item.id}
                     id={item.id}
                     userId={item.userId}
+                    userName={item.userName}
                     avatarUrl={item.avatarUrl}
                     name={item.name}
                     isDone={item.isDone}

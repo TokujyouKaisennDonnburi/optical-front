@@ -17,6 +17,8 @@ interface UseTodoOptions {
   calendarId: string;
   /** 現在のユーザーのアバターURL（新規作成時に使用） */
   currentUserAvatarUrl?: string | null;
+  /** 現在のユーザーの名前（新規作成時に使用） */
+  currentUserName?: string | null;
 }
 
 interface UseTodoReturn {
@@ -62,6 +64,7 @@ interface UseTodoReturn {
 export function useTodo({
   calendarId,
   currentUserAvatarUrl,
+  currentUserName,
 }: UseTodoOptions): UseTodoReturn {
   const [todoLists, setTodoLists] = useState<TodoList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,15 +169,16 @@ export function useTodo({
         const newItem = await createTodoItem(listId, {
           name: name.trim(),
         });
-        // APIがavatarUrlを返さない場合、現在のユーザーのアバターを使用
-        const itemWithAvatar = {
+        // APIがavatarUrlを返さない場合、現在のユーザーのアバターと名前を使用
+        const itemWithUserInfo = {
           ...newItem,
           avatarUrl: newItem.avatarUrl ?? currentUserAvatarUrl ?? null,
+          userName: newItem.userName ?? currentUserName ?? undefined,
         };
         setTodoLists((prev) =>
           prev.map((list) =>
             list.id === listId
-              ? { ...list, items: [...list.items, itemWithAvatar] }
+              ? { ...list, items: [...list.items, itemWithUserInfo] }
               : list,
           ),
         );
@@ -184,7 +188,7 @@ export function useTodo({
         toast.error("タスクの追加に失敗しました");
       }
     },
-    [currentUserAvatarUrl],
+    [currentUserAvatarUrl, currentUserName],
   );
 
   // 新しいセクションを追加

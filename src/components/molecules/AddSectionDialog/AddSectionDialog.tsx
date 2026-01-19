@@ -76,7 +76,7 @@ export function AddSectionDialog({
                 value={sectionName}
                 onChange={(e) => setSectionName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="例: Sprint 3 Tasks"
+                placeholder="例: 今週のタスク"
                 disabled={isSubmitting}
               />
             </div>

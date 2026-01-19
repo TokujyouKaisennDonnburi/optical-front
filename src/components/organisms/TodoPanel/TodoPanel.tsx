@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Settings, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/atoms/Button";
@@ -35,8 +35,7 @@ export interface TodoPanelProps {
   onAddTask?: (listId: string, name: string) => Promise<void>;
   /** セクションを追加 */
   onAddSection?: (name: string) => Promise<void>;
-  /** 設定を開く */
-  onSettings?: () => void;
+
   className?: string;
 }
 
@@ -49,7 +48,6 @@ export function TodoPanel({
   onToggleItem,
   onAddTask,
   onAddSection,
-  onSettings,
   className,
 }: TodoPanelProps) {
   // ダイアログ状態
@@ -112,22 +110,12 @@ export function TodoPanel({
         )}
       >
         {/* ヘッダー */}
-        <CardHeader className="flex flex-row items-center justify-between gap-2 border-b border-border px-4 py-3 bg-muted/20">
+        <CardHeader className="flex flex-row items-center justify-between gap-2 border-b border-border px-4 py-3 bg-muted/20 rounded-t-lg">
           <Text as="h2" weight="semibold" size="lg">
             ToDo
           </Text>
 
           <div className="flex items-center gap-1">
-            {/* 設定ボタン */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={onSettings}
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-
             {/* 閉じるボタン */}
             <Button
               variant="ghost"
@@ -155,7 +143,7 @@ export function TodoPanel({
                 size="sm"
                 className="text-muted-foreground text-center"
               >
-                Todoリストがありません
+                セクションがありません
               </Text>
               <Button
                 variant="outline"
@@ -163,7 +151,7 @@ export function TodoPanel({
                 onClick={() => setIsAddSectionOpen(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                リストを作成
+                セクションを作成
               </Button>
             </div>
           ) : (
