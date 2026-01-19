@@ -22,7 +22,7 @@ export function CalendarGrid({ children, className }: CalendarGridProps) {
       className={cn(
         "flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border shadow-inner",
         // ライトモード: 温かみのあるストーン系
-        "border-stone-200 bg-stone-50",
+        "border-stone-200 bg-stone-100",
         // ダークモード: 従来のスレート系
         "dark:border-white/10 dark:bg-slate-950/70",
         className,
@@ -32,7 +32,7 @@ export function CalendarGrid({ children, className }: CalendarGridProps) {
         className={cn(
           "grid grid-cols-7 border-b text-xs uppercase tracking-wide",
           // ライトモード
-          "border-stone-200 bg-stone-100/80 text-stone-600",
+          "border-stone-200 bg-stone-200 text-stone-800",
           // ダークモード
           "dark:border-white/10 dark:bg-white/5 dark:text-muted-foreground",
         )}

@@ -5,7 +5,7 @@ function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-xl border bg-card text-card-foreground shadow",
+        "bg-stone-50 dark:bg-slate-950/40 rounded-xl border bg-card text-card-foreground shadow",
         className,
       )}
       {...props}
