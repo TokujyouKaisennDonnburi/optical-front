@@ -97,7 +97,7 @@ export function CalendarWizardOptionsForm({
   );
 
   // Order of categories to display
-  const categoryOrder = ["engineer", "general"];
+  const categoryOrder = ["general", "engineer"];
 
   return (
     <div className="space-y-10">
