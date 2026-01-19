@@ -9,6 +9,7 @@ import {
 } from "@/components/atoms/DropdownMenu";
 import type {
   ChangeReviewerRequest,
+  GitHubReviewer,
   GitHubUser,
   ReviewLoadLevel,
   TeamMemberReviewLoad,
@@ -28,44 +29,27 @@ const fallbackLevelLabels: Record<ReviewLoadLevel, string> = {
 };
 
 interface MemberLoadItemProps {
-  member: TeamMemberReviewLoad;
+  member: GitHubReviewer;
   onReviewerChange?: (payload: ChangeReviewerRequest) => void;
 }
 
-export function MemberLoadItem({
-  member,
-  onReviewerChange,
-}: MemberLoadItemProps) {
+export function MemberLoadItem({ member }: MemberLoadItemProps) {
   const [isPrListOpen, setIsPrListOpen] = useState(false);
-  const safeRate = Math.max(0, Math.min(1, member.loadBarRate));
-  const levelText =
-    member.loadLevelLabel ?? fallbackLevelLabels[member.loadLevel];
-  const barColor = loadLevelColors[member.loadLevel];
-  const pullRequests = member.pendingPullRequests;
-  const pendingCount = pullRequests.length;
+  const safeRate = Math.max(0, Math.min(1, member.assigned));
+  const loadLevel: ReviewLoadLevel =
+    member.assigned > 3 ? "high" : member.assigned > 2 ? "medium" : "low";
+  const levelText = fallbackLevelLabels[loadLevel];
+  const barColor = loadLevelColors[loadLevel];
+  const pendingCount = member.assigned;
   const displayedReviewCount =
-    pendingCount > 0 ? pendingCount : member.reviewCount;
+    pendingCount > 0 ? pendingCount : member.assigned;
   const prListId = useId();
-
-  const handleReviewerSelect = (prIndex: number, newReviewer: GitHubUser) => {
-    if (!onReviewerChange) return;
-    const pr = pullRequests[prIndex];
-    // 現在のレビュアー（最初の一人）を削除対象として設定
-    const currentReviewer = pr.reviewers[0];
-    onReviewerChange({
-      pullRequestId: pr.id,
-      pullRequestNumber: pr.number,
-      repository: pr.repository,
-      newReviewerUsername: newReviewer.username,
-      removeReviewerUsername: currentReviewer?.username,
-    });
-  };
 
   return (
     <div className="space-y-3">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <span className="w-full text-sm font-semibold leading-none text-foreground sm:w-24">
-          @{member.member.username}
+          @{member.githubName}
         </span>
         <div className="flex-1 min-w-0">
           <div className="h-2 w-full overflow-hidden rounded-full bg-border">
@@ -117,57 +101,7 @@ export function MemberLoadItem({
               "space-y-2 rounded-lg border bg-muted/40 p-3",
               !isPrListOpen && "hidden",
             )}
-          >
-            {pullRequests.map((pr, index) => (
-              <div
-                key={pr.id}
-                className="flex flex-col gap-2 rounded-md bg-background/60 p-3 sm:flex-row sm:items-center"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {pr.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {pr.repository.owner}/{pr.repository.name} #{pr.number}
-                  </p>
-                  {pr.reviewers.length > 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      現在: @{pr.reviewers.map((r) => r.username).join(", @")}
-                    </p>
-                  ) : null}
-                </div>
-
-                {onReviewerChange && member.availableReviewers.length > 0 ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="outline">
-                        レビュアー変更
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      {member.availableReviewers.map((reviewer) => (
-                        <DropdownMenuItem
-                          key={reviewer.username}
-                          onSelect={(event) => {
-                            event.preventDefault();
-                            handleReviewerSelect(index, reviewer);
-                          }}
-                        >
-                          {reviewer.displayName ?? `@${reviewer.username}`}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Button asChild size="sm" variant="secondary">
-                    <a href={pr.url} target="_blank" rel="noreferrer">
-                      PRを開く
-                    </a>
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
+          ></div>
         </div>
       ) : null}
     </div>

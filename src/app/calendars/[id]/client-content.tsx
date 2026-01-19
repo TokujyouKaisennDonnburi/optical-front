@@ -41,13 +41,13 @@ import {
   connectGitHubAccount,
   getGitHubAccountStatus,
   getGitHubInstallationStatus,
-  getGitHubReviewOptions,
+  getReviewRequests,
   startGitHubAppInstall,
 } from "@/lib/api-github";
 import { createSchedule } from "@/lib/api-schedule";
 import type {
   GitHubPullRequest,
-  GitHubReviewOptionsResponse,
+  GitHubReviewRequestResponse,
   TeamMemberReviewLoad,
 } from "@/types/github";
 import { cn } from "@/utils_constants_styles/utils";
@@ -208,10 +208,10 @@ export function CalendarDetailClient({
   const fetchGitHubReviewOptions = useCallback(async () => {
     setIsGitHubLoading(true);
     try {
-      const data: GitHubReviewOptionsResponse = await getGitHubReviewOptions();
-      setPullRequests(data.myPendingReviews);
-      setTeamMembers(data.teamReviewLoads);
-      setAllPrsUrl(data.allPullRequestsUrl);
+      // const data: GitHubReviewRequestResponse[] = await getReviewRequests(calendarId);
+      // setPullRequests(prList);
+      // setTeamMembers(data.teamReviewLoads);
+      // setAllPrsUrl(data.allPullRequestsUrl);
     } catch (err) {
       console.error("Error fetching GitHub review options:", err);
       toast.error("GitHubデータの取得に失敗しました", { duration: 3000 });
@@ -549,7 +549,7 @@ export function CalendarDetailClient({
                     />
                   ) : (
                     <PullRequestReviewOption
-                      pullRequests={pullRequests}
+                      calendarId={calendarId}
                       allPrsUrl={allPrsUrl}
                     />
                   )}
@@ -593,7 +593,7 @@ export function CalendarDetailClient({
                     />
                   ) : (
                     <TeamReviewLoadOption
-                      members={teamMembers}
+                      calendarId={calendarId}
                       onReviewerChange={(payload) => console.log(payload)}
                     />
                   )}
