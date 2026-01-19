@@ -255,3 +255,22 @@
 @utility animate-slide-in-left {
   animation: slide-in-left 0.2s ease-out forwards;
 }
+
+/* Chrome, Edge, Safari */
+.no-time-icon::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Firefox */
+.no-time-icon::-moz-inner-spin-button,
+.no-time-icon::-moz-time-picker-indicator {
+  display: none;
+}
+
+/* IE, Edge Legacy */
+.no-time-icon::-ms-clear,
+.no-time-icon::-ms-expand {
+  display: none;
+}
