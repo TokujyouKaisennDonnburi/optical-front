@@ -226,7 +226,8 @@ export function CalendarDetailClient({
       hasGitHubOptions &&
       (selectedSidebarItem === "PRレビュー待ち件数" ||
         selectedSidebarItem === "レビュー負荷" ||
-        selectedSidebarItem === "マイルストーン達成率")
+        selectedSidebarItem === "マイルストーン達成率" ||
+        selectedSidebarItem === "milestone")
     ) {
       // まず接続状態を確認
       if (isAccountConnected === null) {
