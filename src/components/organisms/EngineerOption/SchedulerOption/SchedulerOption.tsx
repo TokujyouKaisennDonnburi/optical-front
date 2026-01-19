@@ -4,6 +4,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   createSchedulerPoll,
+  addAttendancePoll,
   getSchedulerPoll,
   getAllScheduler,
 } from "@/lib/api-scheduler-polls";
@@ -106,17 +107,27 @@ export function SchedulerOption({
     if (!newSchedulerData) return;
 
     try {
-      const createdScheduler = await createSchedulerPoll({
-        ...newSchedulerData,
-        availabilities: availability,
+      // 1. スケジューラーを作成
+      const createdScheduler = await createSchedulerPoll(calendarId, {
+        title: newSchedulerData.title,
+        memo: newSchedulerData.memo,
+        limitTime: newSchedulerData.limitTime,
+        isAllDay: newSchedulerData.isAllDay,
+        dates: newSchedulerData.dates,
+      });
+
+      // 2. 作成者の出欠を登録
+      await addAttendancePoll(calendarId, createdScheduler.schedulerId, {
+        availability,
         comment,
       });
+
       toast.success("スケジューラーを作成しました");
       setNewSchedulerData(null);
       setAvailability({});
       setComment("");
-      setSelectedSchedulerId(createdScheduler.id); // Set the ID of the newly created scheduler
-      setViewMode("summary"); // Navigate to summary of the newly created scheduler
+      setSelectedSchedulerId(createdScheduler.schedulerId);
+      setViewMode("summary");
     } catch (_error) {
       toast.error("スケジューラーの作成に失敗しました");
     }
@@ -172,26 +183,10 @@ export function SchedulerOption({
   const handleRespondNext = async () => {
     if (!selectedSchedulerId) return;
     try {
-      const response = await fetch(
-        `/api/scheduler-polls/${encodeURIComponent(selectedSchedulerId)}/responses`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            availability,
-            comment,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        toast.error(
-          "回答の送信に失敗しました。時間をおいて再度お試しください。",
-        );
-        return;
-      }
+      await addAttendancePoll(calendarId, selectedSchedulerId, {
+        availability,
+        comment,
+      });
 
       toast.success("回答を送信しました");
       setAvailability({});
@@ -199,7 +194,7 @@ export function SchedulerOption({
       setViewMode("summary");
     } catch (_error) {
       toast.error(
-        "ネットワークエラーが発生しました。接続状況を確認してください。",
+        "回答の送信に失敗しました。時間をおいて再度お試しください。",
       );
     }
   };

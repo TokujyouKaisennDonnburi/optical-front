@@ -1,16 +1,16 @@
 import type {
     SchedulerCreateRequest,
+    SchedulerCreateResponse,
     SchedulerDetailResponse,
     SchedulerAddAttendanceRequest,
     SchedulerResponse,
     SchedulerPollResponse,
     SchedulerPollDetailResponse,
-    SchedulerPollCreateRequest,
 } from "@/types/scheduler-poll";
 import { apiGet, apiPost } from "./api-client";
 
-export async function createSchedulerPoll(body: SchedulerPollCreateRequest) {
-    return apiPost<SchedulerPollResponse>("/scheduler-polls", body);
+export async function createSchedulerPoll(calendarId: string, body: SchedulerCreateRequest) {
+    return apiPost<SchedulerCreateResponse>(`/calendars/${calendarId}/schedulers`, body);
 }
 
 export async function addAttendancePoll(calendarId: string, schedulerId: string, body: SchedulerAddAttendanceRequest) {
