@@ -205,8 +205,12 @@ export function SchedulerCreate({
                   onClick={() =>
                     setSelectedDates(selectedDates.filter((x) => x !== d))
                   }
-                  className="text-lg font-bold text-red-500"
-                >
+                  variant="ghost"
+                  className="
+                  text-red-500
+                  hover:bg-red-500 hover:text-white
+                  "
+                  >
                   −
                 </Button>
               </div>
