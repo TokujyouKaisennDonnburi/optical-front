@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * API クライアントユーティリティ
  * JWT トークンの自動注入とエラーハンドリングを提供
@@ -156,6 +158,7 @@ export async function apiRequest<T>(
           return await apiRequest(endpoint, options, true);
         } catch (e) {
           console.log("refresh failed", e);
+          throw e;
         }
       }
       // リフレッシュ失敗または他のApiClientError はそのままスロー
