@@ -54,7 +54,7 @@ export function AvailabilityRadioGroup({
                 ? "bg-gray-700 border-gray-600 text-gray-500 cursor-not-allowed"
                 : isSelected
                   ? "bg-primary/20 border-primary text-primary"
-                  : "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:border-gray-600",
+                  : "bg-white dark:bg-gray-800 border-gray-700 text-gray-300 hover:bg-primary/20 hover:dark:bg-gray-700 hover:border-gray-600 ",
             )}
           >
             <input

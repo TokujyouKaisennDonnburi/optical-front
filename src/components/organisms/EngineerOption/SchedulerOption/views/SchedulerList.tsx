@@ -17,10 +17,12 @@ type Props = {
 
 export function SchedulerList({ onCreate, schedulers, onSelectPoll }: Props) {
   return (
-    <Card>
+    <Card className="border-stone-300 bg-stone-50 dark:border-slate-700 dark:bg-slate-900">
       <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base">スケジューラー一覧</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-base text-stone-900 dark:text-slate-50">
+          スケジューラー一覧
+        </CardTitle>
+        <CardDescription className="text-stone-600 dark:text-slate-400">
           メンバーの予定を確認して、日程を調整しましょう。
         </CardDescription>
       </CardHeader>
