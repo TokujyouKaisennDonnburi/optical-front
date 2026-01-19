@@ -107,7 +107,14 @@ function isExpired(token: string | null): boolean {
     }
 
     const payload = parts[1];
-    const decoded = atob(payload);
+    let base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+
+    const paddingNeeded = 4 - (base64.length % 4);
+    if (paddingNeeded < 4) {
+      base64 += "=".repeat(paddingNeeded);
+    }
+
+    const decoded = atob(base64);
     const data = JSON.parse(decoded) as Record<string, unknown>;
 
     if (typeof data.exp !== "number") {
