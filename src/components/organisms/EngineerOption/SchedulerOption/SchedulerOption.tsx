@@ -170,34 +170,36 @@ export function SchedulerOption({
   const handleRespondNext = async () => {
     if (!selectedSchedulerId) return;
     try {
-  const response = await fetch(
-    `/api/scheduler-polls/${encodeURIComponent(selectedSchedulerId)}/responses`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        availability,
-        comment,
-      }),
-    },
-  );
+      const response = await fetch(
+        `/api/scheduler-polls/${encodeURIComponent(selectedSchedulerId)}/responses`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            availability,
+            comment,
+          }),
+        },
+      );
 
-  if (!response.ok) {
-    toast.error("回答の送信に失敗しました。時間をおいて再度お試しください。");
-    return;
-  }
+      if (!response.ok) {
+        toast.error(
+          "回答の送信に失敗しました。時間をおいて再度お試しください。",
+        );
+        return;
+      }
 
-  toast.success("回答を送信しました");
-  setAvailability({});
-  setComment("");
-  setViewMode("summary");
-} catch (error) {
-  toast.error(
-    "ネットワークエラーが発生しました。接続状況を確認してください。",
-  );
-}
+      toast.success("回答を送信しました");
+      setAvailability({});
+      setComment("");
+      setViewMode("summary");
+    } catch (error) {
+      toast.error(
+        "ネットワークエラーが発生しました。接続状況を確認してください。",
+      );
+    }
   };
 
   return (
