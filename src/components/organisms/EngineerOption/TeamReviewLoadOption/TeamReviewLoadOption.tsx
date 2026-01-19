@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -6,13 +7,27 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Separator } from "@/components/atoms/Separator";
-import type { TeamReviewLoadOptionProps } from "@/types/github";
+import { getReviewLoads } from "@/lib/api-github";
+import type {
+  GitHubReviewLoadResponse,
+  TeamReviewLoadOptionProps,
+} from "@/types/github";
 import { MemberLoadItem } from "./MemberLoadItem";
 
 export function TeamReviewLoadOption({
-  members,
+  calendarId,
   onReviewerChange,
 }: TeamReviewLoadOptionProps) {
+  const [reviewLoads, setReviewLoads] = useState<GitHubReviewLoadResponse[]>(
+    [],
+  );
+  useEffect(() => {
+    const fetch = async () => {
+      const data: GitHubReviewLoadResponse[] = await getReviewLoads(calendarId);
+      setReviewLoads(data);
+    };
+    fetch();
+  }, [calendarId]);
   return (
     <Card>
       <CardHeader className="space-y-1 pb-3">
@@ -22,22 +37,24 @@ export function TeamReviewLoadOption({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {members.length === 0 ? (
+        {reviewLoads.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             レビュー待ちはありません。
           </p>
         ) : (
-          members.map((memberLoad, index) => (
-            <div key={memberLoad.member.username} className="space-y-2">
-              <MemberLoadItem
-                member={memberLoad}
-                onReviewerChange={onReviewerChange}
-              />
-              {index < members.length - 1 && (
-                <Separator className="bg-border" />
-              )}
-            </div>
-          ))
+          reviewLoads.map((reviewLoad) =>
+            reviewLoad.reviewers.map((reviewer, index) => (
+              <div key={reviewer.githubId} className="space-y-2">
+                <MemberLoadItem
+                  member={reviewer}
+                  onReviewerChange={onReviewerChange}
+                />
+                {index < reviewLoads.length - 1 && (
+                  <Separator className="bg-border" />
+                )}
+              </div>
+            )),
+          )
         )}
       </CardContent>
     </Card>

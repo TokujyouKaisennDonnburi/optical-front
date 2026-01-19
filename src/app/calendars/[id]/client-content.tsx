@@ -41,15 +41,9 @@ import {
   connectGitHubAccount,
   getGitHubAccountStatus,
   getGitHubInstallationStatus,
-  getGitHubReviewOptions,
   startGitHubAppInstall,
 } from "@/lib/api-github";
 import { createSchedule } from "@/lib/api-schedule";
-import type {
-  GitHubPullRequest,
-  GitHubReviewOptionsResponse,
-  TeamMemberReviewLoad,
-} from "@/types/github";
 import { cn } from "@/utils_constants_styles/utils";
 
 interface CalendarDetailClientProps {
@@ -138,9 +132,9 @@ export function CalendarDetailClient({
   const [isNavigating, setIsNavigating] = useState(false);
 
   // GitHub レビューオプションの状態
-  const [pullRequests, setPullRequests] = useState<GitHubPullRequest[]>([]);
-  const [teamMembers, setTeamMembers] = useState<TeamMemberReviewLoad[]>([]);
-  const [allPrsUrl, setAllPrsUrl] = useState<string>("");
+  // const [pullRequests, setPullRequests] = useState<GitHubPullRequest[]>([]);
+  // const [teamMembers, setTeamMembers] = useState<TeamMemberReviewLoad[]>([]);
+  const [allPrsUrl, _setAllPrsUrl] = useState<string>("");
   const [isGitHubLoading, setIsGitHubLoading] = useState(false);
 
   // GitHub 連携ステータス
@@ -208,10 +202,11 @@ export function CalendarDetailClient({
   const fetchGitHubReviewOptions = useCallback(async () => {
     setIsGitHubLoading(true);
     try {
-      const data: GitHubReviewOptionsResponse = await getGitHubReviewOptions();
-      setPullRequests(data.myPendingReviews);
-      setTeamMembers(data.teamReviewLoads);
-      setAllPrsUrl(data.allPullRequestsUrl);
+      // const data: GitHubReviewRequestResponse[] = await getReviewRequests(calendarId);
+      // setPullRequests(prList);
+      // setTeamMembers(data.teamReviewLoads);
+      // setAllPrsUrl(data.allPullRequestsUrl);
+      await Promise.resolve(); // Placeholder to make try block not empty
     } catch (err) {
       console.error("Error fetching GitHub review options:", err);
       toast.error("GitHubデータの取得に失敗しました", { duration: 3000 });
@@ -224,9 +219,9 @@ export function CalendarDetailClient({
   useEffect(() => {
     if (
       hasGitHubOptions &&
-      (selectedSidebarItem === "PRレビュー待ち件数" ||
-        selectedSidebarItem === "レビュー負荷" ||
-        selectedSidebarItem === "マイルストーン達成率")
+      (selectedSidebarItem === "pr-review" ||
+        selectedSidebarItem === "team-load" ||
+        selectedSidebarItem === "milestone")
     ) {
       // まず接続状態を確認
       if (isAccountConnected === null) {
@@ -549,7 +544,7 @@ export function CalendarDetailClient({
                     />
                   ) : (
                     <PullRequestReviewOption
-                      pullRequests={pullRequests}
+                      calendarId={calendarId}
                       allPrsUrl={allPrsUrl}
                     />
                   )}
@@ -593,7 +588,7 @@ export function CalendarDetailClient({
                     />
                   ) : (
                     <TeamReviewLoadOption
-                      members={teamMembers}
+                      calendarId={calendarId}
                       onReviewerChange={(payload) => console.log(payload)}
                     />
                   )}

@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         hostname: "localhost",
       },
       {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
         // モック用画像ホスト
         protocol: "https",
         hostname: "picsum.photos",

@@ -2,7 +2,8 @@ import { apiGet, apiPost } from "@/lib/api-client";
 import type {
   GitHubAccountLinkedStatus,
   GitHubAppInstallationStatus,
-  GitHubReviewOptionsResponse,
+  GitHubReviewLoadResponse,
+  GitHubReviewRequestResponse,
   GithubAppInstallRequest,
   GithubOauthRequest,
   MilestoneProgressResponse,
@@ -18,16 +19,26 @@ export async function postGithubAppInstall(payload: GithubAppInstallRequest) {
 
 /**
  * GitHub レビューオプション情報を取得
+ * 自分宛てのレビュー依頼を確認
  * TODO: バックエンドは POST /github/calendars/{calendarId}/review-requests を使用
- * 現在はフロント側でモックデータを返す
  */
-export async function getGitHubReviewOptions(): Promise<GitHubReviewOptionsResponse> {
-  // バックエンド未実装のため、モックデータを返す
-  return Promise.resolve({
-    myPendingReviews: [],
-    teamReviewLoads: [],
-    allPullRequestsUrl: "",
-  });
+export async function getReviewRequests(
+  calendarId: string,
+): Promise<GitHubReviewRequestResponse[]> {
+  return apiPost<GitHubReviewRequestResponse[]>(
+    `/github/calendars/${calendarId}/review-requests`,
+  );
+}
+
+/**
+ * チーム全体のレビュー負荷分布を確認（誰が何件のレビューを抱えているか）
+ */
+export async function getReviewLoads(
+  calendarId: string,
+): Promise<GitHubReviewLoadResponse[]> {
+  return apiGet<GitHubReviewLoadResponse[]>(
+    `/github/calendars/${calendarId}/review-load-status`,
+  );
 }
 
 /**

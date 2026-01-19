@@ -28,6 +28,13 @@ export type GitHubRepository = {
   name: string;
 };
 
+export type GitHubAssignedUser = {
+  id: number;
+  name: string;
+  url: string;
+  assigned: number;
+};
+
 /**
  * GitHub Pull Request 情報
  *
@@ -43,20 +50,21 @@ export type GitHubPullRequest = {
   title: string;
   /** PR への GitHub URL */
   url: string;
+  assignees: GitHubAssignedUser[];
   /** リポジトリ情報 */
-  repository: GitHubRepository;
+  // repository: GitHubRepository;
   /** PR 作成者 */
-  author: GitHubUser;
+  // author: GitHubUser;
   /** 現在のレビュアー一覧 */
-  reviewers: GitHubUser[];
+  // reviewers: GitHubUser[];
   /** 緊急対応が必要かどうか（ラベルや優先度から判定） */
-  isUrgent?: boolean;
+  // isUrgent?: boolean;
   /** PR の状態 */
-  state: "open" | "closed" | "merged";
+  // state: "open" | "closed" | "merged";
   /** 作成日時（ISO 8601 形式） */
-  createdAt: string;
+  // createdAt: string;
   /** 更新日時（ISO 8601 形式） */
-  updatedAt: string;
+  // updatedAt: string;
 };
 
 /**
@@ -121,12 +129,47 @@ export type GitHubReviewOptionsResponse = {
   allPullRequestsUrl: string;
 };
 
+export type GitHubReviewer = {
+  githubId: number;
+  githubName: string;
+  githubUrl: string;
+  assigned: number;
+};
+
+export type GitHubReviewRequestResponseUser = {
+  githubId: number;
+  githubName: string;
+  githubUrl: string;
+  assigned: number;
+};
+
+export type GitHubReviewRequestResponse = {
+  id: number;
+  url: string;
+  title: string;
+  number: number;
+  assignees: GitHubReviewRequestResponseUser[];
+};
+
+export type GitHubReviewLoadResponseReviewer = {
+  githubId: number;
+  githubName: string;
+  githubUrl: string;
+  assigned: number;
+};
+
+export type GitHubReviewLoadResponse = {
+  repositoryId: number;
+  repositoryName: string;
+  total: number;
+  reviewers: GitHubReviewLoadResponseReviewer[];
+};
+
 /**
  * PullRequestReviewOption コンポーネントの Props
  */
 export type PullRequestReviewOptionProps = {
-  /** レビュー待ちの PR 一覧 */
-  pullRequests: GitHubPullRequest[];
+  calendarId: string;
   /** GitHub リポジトリの PR 一覧へのリンク（フッター用） */
   allPrsUrl?: string;
   /** カスタム className */
@@ -138,7 +181,7 @@ export type PullRequestReviewOptionProps = {
  */
 export type TeamReviewLoadOptionProps = {
   /** チームメンバーのレビュー負荷一覧 */
-  members: TeamMemberReviewLoad[];
+  calendarId: string;
   /** レビュアー変更時のコールバック */
   onReviewerChange?: (payload: ChangeReviewerRequest) => void;
 };

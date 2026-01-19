@@ -1,10 +1,15 @@
 "use client";
 
-import { Bell, ExternalLink, Flame } from "lucide-react";
+import { Bell, ExternalLink } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/atoms/Badge";
-import type { PullRequestReviewOptionProps } from "@/types/github";
+import { getReviewRequests } from "@/lib/api-github";
+import type {
+  GitHubPullRequest,
+  GitHubReviewRequestResponse,
+  PullRequestReviewOptionProps,
+} from "@/types/github";
 import { cn } from "@/utils_constants_styles/utils";
 
 /**
@@ -14,11 +19,35 @@ import { cn } from "@/utils_constants_styles/utils";
  * PR の一覧を常時表示する。
  */
 export function PullRequestReviewOption({
-  pullRequests,
+  calendarId,
   allPrsUrl,
   className,
 }: PullRequestReviewOptionProps) {
-  const count = pullRequests.length;
+  const [pullRequests, setPullRequests] = useState<GitHubPullRequest[]>([]);
+  useEffect(() => {
+    const fetch = async () => {
+      const data: GitHubReviewRequestResponse[] =
+        await getReviewRequests(calendarId);
+      const prList: GitHubPullRequest[] = data.map((pr) => {
+        return {
+          id: pr.id,
+          number: pr.number,
+          title: pr.title,
+          url: pr.url,
+          assignees: pr.assignees.map((assign) => {
+            return {
+              id: assign.githubId,
+              name: assign.githubName,
+              url: assign.githubUrl,
+              assigned: assign.assigned,
+            };
+          }),
+        };
+      });
+      setPullRequests(prList);
+    };
+    fetch();
+  }, [calendarId]);
   const [overflowStates, setOverflowStates] = useState<Map<number, boolean>>(
     new Map(),
   );
@@ -122,12 +151,12 @@ export function PullRequestReviewOption({
       <div className="flex justify-center mb-4">
         <div className="relative">
           <Bell className="h-14 w-14 text-[#8b949e]" />
-          {count > 0 && (
+          {pullRequests.length > 0 && (
             <Badge
               variant="outline"
               className="absolute -top-2 -right-2 h-7 min-w-7 flex items-center justify-center rounded-full border-[#238636] bg-[#238636] p-0 text-sm font-bold text-white"
             >
-              {count}
+              {pullRequests.length}
             </Badge>
           )}
         </div>
@@ -136,17 +165,20 @@ export function PullRequestReviewOption({
       {/* PR 一覧 */}
       <div className="space-y-3">
         <div className="text-center font-semibold text-lg text-white">
-          レビュー待ち ({count})
+          レビュー待ち ({pullRequests.length})
         </div>
         <div className="border-t border-[#30363d]" />
 
-        {count === 0 ? (
+        {pullRequests.length === 0 ? (
           <div className="py-6 text-center text-sm text-[#8b949e]">
             レビュー待ちはありません
           </div>
         ) : (
           <ul
-            className={cn("space-y-2", count > 3 && "max-h-48 overflow-y-auto")}
+            className={cn(
+              "space-y-2",
+              pullRequests.length > 3 && "max-h-48 overflow-y-auto",
+            )}
           >
             {pullRequests.map((pr) => (
               <li key={pr.id}>
@@ -169,23 +201,19 @@ export function PullRequestReviewOption({
                           {pr.title}
                         </span>
                       </div>
-                      {pr.isUrgent && (
-                        <span className="inline-flex items-center gap-0.5 text-xs font-semibold text-[#ffa657] shrink-0">
-                          <Flame className="h-3 w-3" />
-                          Urgent
-                        </span>
-                      )}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-[#8b949e] mt-1">
                       <span className="text-[#2ea043] font-semibold">
                         #{pr.number}
                       </span>
-                      <span>
-                        by{" "}
-                        <span className="text-[#79c0ff]">
-                          @{pr.author.username}
+                      {pr.assignees.length > 0 && (
+                        <span>
+                          by{" "}
+                          <span className="text-[#79c0ff]">
+                            @{pr.assignees[0].name}
+                          </span>
                         </span>
-                      </span>
+                      )}
                     </div>
                   </div>
                   <ExternalLink className="h-4 w-4 shrink-0 text-[#8b949e] mt-0.5" />
