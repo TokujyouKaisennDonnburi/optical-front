@@ -85,7 +85,7 @@ export function CalendarDetailClient({
     toggleItem,
     addTask,
     addSection,
-  } = useTodo({ calendarId });
+  } = useTodo({ calendarId, currentUserAvatarUrl: user?.avatarUrl });
 
   // サイドバーの選択状態
   const [selectedSidebarItem, setSelectedSidebarItem] = useState<string | null>(
