@@ -15,7 +15,6 @@ import {
 } from "react";
 import { toast } from "sonner";
 import {
-  AUTH_GOOGLE_LOGIN_URL,
   fetchCurrentUser,
   getGitHubAuthState,
   login as requestLogin,

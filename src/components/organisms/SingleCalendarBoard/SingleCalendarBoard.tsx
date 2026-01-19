@@ -51,6 +51,10 @@ export type SingleCalendarBoardProps = {
   ) => void;
   /** 新規予定作成時のコールバック (日付セルクリック時) */
   onCreateItem?: (date: Date) => void;
+  /** 日付選択時のコールバック */
+  onDateSelect?: (date: Date) => void;
+  /** 選択中の日付 */
+  selectedDates?: string[];
 };
 
 /**
@@ -97,6 +101,8 @@ export function SingleCalendarBoard({
   baseDate,
   onSelectItem,
   onCreateItem,
+  onDateSelect,
+  selectedDates = [],
 }: SingleCalendarBoardProps) {
   // 長押し判定用の参照
   const longPressTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
@@ -152,6 +158,13 @@ export function SingleCalendarBoard({
       const cell = calendarCellMap.get(cellKey);
       if (!cell) return;
 
+      if (onDateSelect) {
+        if (cell.isCurrentMonth) {
+          onDateSelect(cell.date);
+        }
+        return;
+      }
+
       const pos = getPositionFromEvent(e);
       longPressStartPosRef.current.set(cellKey, pos);
 
@@ -168,7 +181,7 @@ export function SingleCalendarBoard({
 
       longPressTimeoutsRef.current.set(cellKey, timeoutId);
     },
-    [calendarCellMap, onCreateItem],
+    [calendarCellMap, onCreateItem, onDateSelect],
   );
 
   // イベント委譲: 長押し終了ハンドラー
@@ -225,13 +238,19 @@ export function SingleCalendarBoard({
         if (!cell) return;
 
         e.preventDefault();
-        // 当月以外の日付もクリック可能にする（UX改善）
-        if (onCreateItem) {
+        if (onDateSelect) {
+          if (cell.isCurrentMonth) {
+            onDateSelect(cell.date);
+          }
+          return;
+        }
+
+        if (onCreateItem && cell.isCurrentMonth) {
           onCreateItem(cell.date);
         }
       }
     },
-    [calendarCellMap, onCreateItem],
+    [calendarCellMap, onCreateItem, onDateSelect],
   );
 
   const showEmptyState = !isLoading && !errorMessage && !items.length;
@@ -263,13 +282,22 @@ export function SingleCalendarBoard({
                 {week.map((cell) => {
                   const events = eventsByDay.get(cell.key) ?? [];
                   const isWeekend = cell.weekday === 0 || cell.weekday === 6;
+                  const isSelected = selectedDates.includes(cell.key);
 
                   return (
                     <div
                       key={cell.key}
                       data-cell-key={cell.key}
-                      role={onCreateItem ? "button" : undefined}
-                      tabIndex={onCreateItem ? 0 : undefined}
+                      role={
+                        (onCreateItem || onDateSelect) && cell.isCurrentMonth
+                          ? "button"
+                          : undefined
+                      }
+                      tabIndex={
+                        (onCreateItem || onDateSelect) && cell.isCurrentMonth
+                          ? 0
+                          : undefined
+                      }
                       className={cn(
                         "relative flex flex-1 min-h-0 flex-col gap-0.5 overflow-hidden p-0.5 transition-colors",
                         // ライトモード: 温かみのあるストーン系
@@ -280,9 +308,11 @@ export function SingleCalendarBoard({
                         isWeekend &&
                           cell.isCurrentMonth &&
                           "bg-stone-100/80 dark:bg-slate-950/55",
-                        // クリック可能な場合はポインターカーソルを表示（当月以外も含む）
-                        onCreateItem &&
+                        // クリック可能な場合のみポインターカーソルを表示
+                        (onCreateItem || onDateSelect) &&
+                          cell.isCurrentMonth &&
                           "cursor-pointer hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
+                        isSelected && "bg-blue-200/50",
                       )}
                     >
                       {cell.isToday ? (

@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { ArrowLeft, CalendarDays, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -17,6 +18,10 @@ import { AgentChatView } from "@/components/organisms/AgentChat";
 import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrapper";
 import MilestoneProgressOption from "@/components/organisms/EngineerOption/MilestoneProgressOption";
 import { PullRequestReviewOption } from "@/components/organisms/EngineerOption/PullRequestReviewOption";
+import {
+  SchedulerOption,
+  type ViewMode as SchedulerViewMode,
+} from "@/components/organisms/EngineerOption/SchedulerOption";
 import { TeamReviewLoadOption } from "@/components/organisms/EngineerOption/TeamReviewLoadOption";
 import { GitHubConnectView } from "@/components/organisms/GitHubConnectView";
 import { RightSidebar } from "@/components/organisms/RightSidebar";
@@ -50,6 +55,13 @@ import { cn } from "@/utils_constants_styles/utils";
 interface CalendarDetailClientProps {
   calendarId: string;
 }
+
+type CreateDialogData = {
+  date: Date;
+  title?: string;
+  startTime?: string;
+  endTime?: string;
+};
 
 export function CalendarDetailClient({
   calendarId,
@@ -91,6 +103,18 @@ export function CalendarDetailClient({
   const [selectedSidebarItem, setSelectedSidebarItem] = useState<string | null>(
     null,
   );
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [schedulerViewMode, setSchedulerViewMode] =
+    useState<SchedulerViewMode>("list");
+  const [createDialogData, setCreateDialogData] =
+    useState<CreateDialogData | null>(null);
+
+  // スケジューラー作成画面から離れた場合に選択をリセット
+  useEffect(() => {
+    if (selectedSidebarItem !== "scheduler") {
+      setSelectedDates([]);
+    }
+  }, [selectedSidebarItem]);
 
   const handleSidebarSelect = (id: string) => {
     // 既に選択されているものをクリックしたら閉じる
@@ -99,6 +123,15 @@ export function CalendarDetailClient({
     } else {
       setSelectedSidebarItem(id);
     }
+  };
+
+  const handleDateSelect = (date: Date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    setSelectedDates((prev) =>
+      prev.includes(dateStr)
+        ? prev.filter((d) => d !== dateStr)
+        : [...prev, dateStr],
+    );
   };
 
   // ナビゲーション中のローディング状態
@@ -251,6 +284,85 @@ export function CalendarDetailClient({
     setViewDate(today);
   };
 
+  const handleScheduleConfirm = (data: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }) => {
+    const newDate = new Date(data.date);
+    // Adjust for timezone offset if needed
+    const timezoneOffset = newDate.getTimezoneOffset() * 60000;
+    const adjustedDate = new Date(newDate.getTime() + timezoneOffset);
+
+    setCreateDialogData({
+      date: adjustedDate,
+      title: data.title,
+      startTime: data.startTime,
+      endTime: data.endTime,
+    });
+    setSelectedSidebarItem(null); // Close the scheduler panel
+  };
+
+  const handleCreateConfirm = async (payload: {
+    date: Date;
+    title: string;
+    startTime: string;
+    endTime: string;
+    memo: string;
+    location: string;
+    calendarId: string;
+    isAllDay: boolean;
+    allDayStartDate: Date;
+    allDayEndDate: Date;
+  }) => {
+    const startDate = new Date(payload.date);
+    let endIso = "";
+    let startIso = "";
+
+    if (payload.isAllDay) {
+      // 終日イベント: 日付のみを使用
+      const allDayStart = new Date(payload.allDayStartDate);
+      allDayStart.setHours(0, 0, 0, 0);
+      startIso = allDayStart.toISOString();
+
+      const allDayEnd = new Date(payload.allDayEndDate);
+      allDayEnd.setHours(23, 59, 59, 999);
+      endIso = allDayEnd.toISOString();
+    } else {
+      // 時刻イベント
+      const [startHour, startMinute] = payload.startTime.split(":").map(Number);
+      startDate.setHours(startHour ?? 0, startMinute ?? 0, 0, 0);
+      startIso = startDate.toISOString();
+
+      if (payload.endTime) {
+        const endDate = new Date(payload.date);
+        const [endHour, endMinute] = payload.endTime.split(":").map(Number);
+        endDate.setHours(endHour ?? 0, endMinute ?? 0, 0, 0);
+        endIso = endDate.toISOString();
+      }
+    }
+
+    try {
+      await createSchedule(calendarId, {
+        title: payload.title,
+        startTime: startIso,
+        endTime: endIso,
+        memo: payload.memo,
+        location: payload.location,
+        isAllDay: payload.isAllDay,
+      });
+      toast.success("予定を追加しました", {
+        description: payload.title,
+        duration: 2000,
+      });
+      refresh();
+    } catch (err) {
+      console.error("Failed to create schedule:", err);
+      toast.error("予定の追加に失敗しました", { duration: 2000 });
+    }
+  };
+
   // 認証中またはリダイレクト中はローディング表示
   if (authLoading || !user) {
     return (
@@ -340,6 +452,14 @@ export function CalendarDetailClient({
               calendarName={calendar?.name}
               calendarColor={calendar?.color}
               onScheduleCreated={refresh}
+              onDateSelect={
+                selectedSidebarItem === "scheduler" &&
+                schedulerViewMode === "create"
+                  ? handleDateSelect
+                  : undefined
+              }
+              selectedDates={selectedDates}
+              setCreateDialogData={setCreateDialogData}
             />
           </div>
         </main>
@@ -367,6 +487,35 @@ export function CalendarDetailClient({
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col overflow-hidden px-0 py-0">
                   <AgentChatView />
+                </CardContent>
+              </>
+            )}
+
+            {selectedSidebarItem === "scheduler" && (
+              <>
+                <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <Text size="lg" weight="semibold">
+                      Scheduler
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedSidebarItem(null)}
+                      aria-label="Schedulerパネルを閉じる"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-auto p-4">
+                  <SchedulerOption
+                    selectedDates={selectedDates}
+                    onDatesChange={setSelectedDates}
+                    viewMode={schedulerViewMode}
+                    setViewMode={setSchedulerViewMode}
+                    onScheduleConfirm={handleScheduleConfirm}
+                  />
                 </CardContent>
               </>
             )}
@@ -556,13 +705,26 @@ export function CalendarDetailClient({
           message="総合スケジュールを読み込み中..."
         />
       )}
+      {createDialogData ? (
+        <SingleCreateScheduleDialog
+          date={createDialogData.date}
+          isOpen
+          onClose={() => setCreateDialogData(null)}
+          calendarId={calendarId}
+          calendarName={calendar?.name}
+          calendarColor={calendar?.color}
+          onConfirm={handleCreateConfirm}
+          initialTitle={createDialogData.title}
+          initialStartTime={createDialogData.startTime}
+          initialEndTime={createDialogData.endTime}
+        />
+      ) : null}
     </div>
   );
 }
 
 function BoardArea({
   className,
-  calendarId,
   items,
   isLoading,
   error,
@@ -570,7 +732,9 @@ function BoardArea({
   onChangeViewDate,
   calendarName,
   calendarColor,
-  onScheduleCreated,
+  onDateSelect,
+  selectedDates,
+  setCreateDialogData,
 }: {
   className?: string;
   calendarId: string;
@@ -582,12 +746,16 @@ function BoardArea({
   calendarName?: string;
   calendarColor?: string;
   onScheduleCreated?: () => void;
+  onDateSelect?: (date: Date) => void;
+  selectedDates: string[];
+  setCreateDialogData: React.Dispatch<
+    React.SetStateAction<CreateDialogData | null>
+  >;
 }) {
   const [selectedItem, setSelectedItem] = useState<{
     item: SingleCalendarBoardItem;
     position: { x: number; y: number };
   } | null>(null);
-  const [createDialogDate, setCreateDialogDate] = useState<Date | null>(null);
 
   const boardItems = useMemo(() => {
     const viewYear = viewDate.getFullYear();
@@ -691,70 +859,7 @@ function BoardArea({
   };
 
   const handleCreateItem = (date: Date) => {
-    setCreateDialogDate(date);
-  };
-
-  const handleCloseCreateDialog = () => {
-    setCreateDialogDate(null);
-  };
-
-  const handleCreateConfirm = async (payload: {
-    date: Date;
-    title: string;
-    startTime: string;
-    endTime: string;
-    memo: string;
-    location: string;
-    calendarId: string;
-    isAllDay: boolean;
-    allDayStartDate: Date;
-    allDayEndDate: Date;
-  }) => {
-    const startDate = new Date(payload.date);
-    let endIso = "";
-    let startIso = "";
-
-    if (payload.isAllDay) {
-      // 終日イベント: 日付のみを使用
-      const allDayStart = new Date(payload.allDayStartDate);
-      allDayStart.setHours(0, 0, 0, 0);
-      startIso = allDayStart.toISOString();
-
-      const allDayEnd = new Date(payload.allDayEndDate);
-      allDayEnd.setHours(23, 59, 59, 999);
-      endIso = allDayEnd.toISOString();
-    } else {
-      // 時刻イベント
-      const [startHour, startMinute] = payload.startTime.split(":").map(Number);
-      startDate.setHours(startHour ?? 0, startMinute ?? 0, 0, 0);
-      startIso = startDate.toISOString();
-
-      if (payload.endTime) {
-        const endDate = new Date(payload.date);
-        const [endHour, endMinute] = payload.endTime.split(":").map(Number);
-        endDate.setHours(endHour ?? 0, endMinute ?? 0, 0, 0);
-        endIso = endDate.toISOString();
-      }
-    }
-
-    try {
-      await createSchedule(calendarId, {
-        title: payload.title,
-        startTime: startIso,
-        endTime: endIso,
-        memo: payload.memo,
-        location: payload.location,
-        isAllDay: payload.isAllDay,
-      });
-      toast.success("予定を追加しました", {
-        description: payload.title,
-        duration: 2000,
-      });
-      onScheduleCreated?.();
-    } catch (err) {
-      console.error("Failed to create schedule:", err);
-      toast.error("予定の追加に失敗しました", { duration: 2000 });
-    }
+    setCreateDialogData({ date });
   };
 
   return (
@@ -787,6 +892,8 @@ function BoardArea({
           baseDate={viewDate}
           onSelectItem={handleSelectItem}
           onCreateItem={handleCreateItem}
+          onDateSelect={onDateSelect}
+          selectedDates={selectedDates}
         />
       </CardContent>
       {selectedItem ? (
@@ -795,17 +902,6 @@ function BoardArea({
           isOpen
           onClose={handleCloseDialog}
           anchorPosition={selectedItem.position}
-        />
-      ) : null}
-      {createDialogDate ? (
-        <SingleCreateScheduleDialog
-          date={createDialogDate}
-          isOpen
-          onClose={handleCloseCreateDialog}
-          calendarId={calendarId}
-          calendarName={calendarName}
-          calendarColor={calendarColor}
-          onConfirm={handleCreateConfirm}
         />
       ) : null}
     </Card>
