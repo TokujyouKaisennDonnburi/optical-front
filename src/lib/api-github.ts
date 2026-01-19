@@ -19,8 +19,8 @@ export async function postGithubAppInstall(payload: GithubAppInstallRequest) {
 
 /**
  * GitHub レビューオプション情報を取得
+ * 自分宛てのレビュー依頼を確認
  * TODO: バックエンドは POST /github/calendars/{calendarId}/review-requests を使用
- * 現在はフロント側でモックデータを返す
  */
 export async function getReviewRequests(
   calendarId: string,
@@ -30,6 +30,9 @@ export async function getReviewRequests(
   );
 }
 
+/**
+ * チーム全体のレビュー負荷分布を確認（誰が何件のレビューを抱えているか）
+ */
 export async function getReviewLoads(
   calendarId: string,
 ): Promise<GitHubReviewLoadResponse[]> {
