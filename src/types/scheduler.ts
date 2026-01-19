@@ -1,3 +1,5 @@
+import { apiGet, apiPost } from "@/lib/api-client";
+
 export type TeamMember = {
   id: number;
   name: string;
@@ -35,4 +37,84 @@ export type CandidateDate = {
   date: string; // "2026-01-07"
   start?: string; // "10:00"
   end?: string; // "11:00"
+};
+
+export type CreateSchedulerRequest = {
+  title: string;
+  memo: string;
+  limitTime: string | null;
+  isAllDay: boolean;
+  dates: {
+    date: string;
+    startTime: string;
+    endTime: string;
+  }[];
+};
+
+export type CreateSchedulerResponse = {
+  id: string;
+};
+
+export const createScheduler = async (
+  calendarId: string,
+  request: CreateSchedulerRequest,
+) => {
+  return apiPost<CreateSchedulerResponse>(
+    `/calendars/${calendarId}/schedulers`,
+    request,
+  );
+};
+
+export type SchedulerAttendaceResponse = {
+  user_id: string;
+  comment: string;
+  status: {
+    date: string;
+    status: number;
+  }[];
+};
+
+export const getSchedulerAttendance = async (
+  calendarId: string,
+  schedulerId: string,
+) => {
+  return apiPost<SchedulerAttendaceResponse>(
+    `/calendars/${calendarId}/schedulers/${schedulerId}/attendaces`,
+  );
+};
+
+export type SchedulerResponse = {
+  SchedulerId: string;
+  CalendarId: string;
+  UserId: string;
+  Title: string;
+  Memo: string;
+  LimitTime: string;
+  IsAllDay: boolean;
+  PossibleDate: {
+    Date: string;
+    StartTime: string;
+    EndTime: string;
+  }[];
+};
+
+export const getScheduler = async (calendarId: string, schedulerId: string) => {
+  return apiGet<SchedulerResponse>(
+    `/calendars/${calendarId}/schedulers/${schedulerId}`,
+  );
+};
+
+export type AllSchedulerResponse = {
+  id: string;
+  userId: string;
+  calendarId: string;
+  title: string;
+  memo: string;
+  limitTime: string | null;
+  isAllDay: boolean;
+  isDone: boolean;
+};
+
+export const getSchedulerList = async (calendarId: string) => {
+  return apiGet<AllSchedulerResponse[]>(`/calendars/${calendarId}/schedulers`);
 };
