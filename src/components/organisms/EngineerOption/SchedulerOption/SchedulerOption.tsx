@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import {
   createSchedulerPoll,
   getSchedulerPoll,
-  getSchedulerPolls,
+  getAllScheduler,
 } from "@/lib/api-scheduler-polls";
-import type { SchedulerPollResponse } from "@/types/scheduler-poll";
+import type { SchedulerPollResponse, SchedulerPollDetailResponse } from "@/types/scheduler-poll";
 import { SchedulerAvailability } from "./views/SchedulerAvailability";
 import {
   SchedulerCreate,
@@ -40,6 +40,7 @@ export type Summary = {
 export type SummaryMap = Record<string, Summary>;
 
 type Props = {
+  calendarId: string;
   selectedDates: string[];
   onDatesChange: (dates: string[]) => void;
   viewMode: ViewMode;
@@ -53,6 +54,7 @@ type Props = {
 };
 
 export function SchedulerOption({
+  calendarId,
   selectedDates,
   onDatesChange,
   viewMode,
@@ -72,7 +74,7 @@ export function SchedulerOption({
     if (viewMode === "list") {
       const fetchSchedulers = async () => {
         try {
-          const data = await getSchedulerPolls();
+          const data = await getAllScheduler(calendarId);
           setSchedulers(data);
         } catch (_error) {
           toast.error("スケジューラーの読み込みに失敗しました");
@@ -80,7 +82,7 @@ export function SchedulerOption({
       };
       fetchSchedulers();
     }
-  }, [viewMode]);
+  }, [viewMode, calendarId]);
 
   // Reset to list view if state is inconsistent
   useEffect(() => {

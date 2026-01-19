@@ -13,15 +13,15 @@ export interface SchedulerCreateDateRequest {
 }
 
 export interface SchedulerCreateResponse {
-    id: string;
+    schedulerId: string;
 }
 
-export interface SchedulerAddAttendanceRequest {
+export interface AddAttendanceRequest {
     comment: string;
-    status: SchedulerStatusRequest;
+    status: AttendanceStatus[];
 }
 
-export interface SchedulerStatusRequest {
+export interface AttendanceStatus {
     date: string;
     status: number;
 }
@@ -59,4 +59,49 @@ export interface SchedulerDetailResponse {
     memo: string;
     dates: DateInfo[];
     submissions: Submission[];
+}
+
+// Scheduler Poll types for list and detail views
+export interface SchedulerPollResponse {
+    id: string;
+    title: string;
+    memo: string;
+    limitTime: string | null;
+    author: string;
+    createdAt: string;
+    respondersCount: number;
+    hasResponded: boolean;
+}
+
+export interface SchedulerPollDetailResponse {
+    id: string;
+    title: string;
+    memo: string;
+    dates: DateInfo[];
+    submissions: SchedulerPollSubmission[];
+}
+
+export interface SchedulerPollSubmission {
+    user: {
+        id: string;
+        name: string;
+        avatarUrl?: string;
+    };
+    availabilities: { [date: string]: "ok" | "maybe" | "ng" };
+    comment: string;
+}
+
+export interface SchedulerPollCreateRequest {
+    title: string;
+    memo: string;
+    limitTime: string | null;
+    isAllDay: boolean;
+    dates: SchedulerCreateDateRequest[];
+    availabilities: { [date: string]: "ok" | "maybe" | "ng" };
+    comment: string;
+}
+
+export interface SchedulerAddAttendanceRequest {
+    availability: { [date: string]: "ok" | "maybe" | "ng" };
+    comment: string;
 }

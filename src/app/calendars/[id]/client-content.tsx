@@ -503,6 +503,7 @@ export function CalendarDetailClient({
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto p-4">
                   <SchedulerOption
+                    calendarId={calendarId}
                     selectedDates={selectedDates}
                     onDatesChange={setSelectedDates}
                     viewMode={schedulerViewMode}
