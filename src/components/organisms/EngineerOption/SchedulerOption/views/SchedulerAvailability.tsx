@@ -44,10 +44,14 @@ export function SchedulerAvailability({
   };
 
   return (
-    <Card>
+    <Card className="border-stone-300 bg-stone-50 dark:border-slate-700 dark:bg-slate-900">
       <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base">{title}</CardTitle>
-        <CardDescription>{memo}</CardDescription>
+        <CardTitle className="text-base text-stone-900 dark:text-slate-50">
+          {title}
+        </CardTitle>
+        <CardDescription className="text-stone-600 dark:text-slate-400">
+          {memo}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

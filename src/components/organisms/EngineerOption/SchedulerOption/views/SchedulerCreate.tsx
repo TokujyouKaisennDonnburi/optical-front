@@ -133,10 +133,14 @@ export function SchedulerCreate({
   };
 
   return (
-    <Card>
+    <Card className="border-stone-300 bg-stone-50 dark:border-slate-700 dark:bg-slate-900">
       <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base">スケジューラーを新規作成</CardTitle>
-        <CardDescription>候補日と共有内容を設定します。</CardDescription>
+        <CardTitle className="text-base text-stone-900 dark:text-slate-50">
+          スケジューラーを新規作成
+        </CardTitle>
+        <CardDescription className="text-stone-600 dark:text-slate-400">
+          候補日と共有内容を設定します。
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">

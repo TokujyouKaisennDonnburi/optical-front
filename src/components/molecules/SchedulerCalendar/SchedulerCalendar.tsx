@@ -30,7 +30,8 @@ export function SchedulerCalendar({ selectedDates, onChange }: Props) {
       selected={selectedDates.map((d) => new Date(d))}
       onDayClick={toggleDate}
       classNames={{
-        day_selected: "bg-green-500 text-white hover:bg-green-600",
+        day_selected:
+          "bg-green-500 dark:bg-green-400 text-white dark:text-slate-900 font-bold hover:bg-green-600 dark:hover:bg-green-300",
       }}
     />
   );

@@ -169,10 +169,14 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
   }
 
   return (
-    <Card>
+    <Card className="border-stone-300 bg-stone-50 dark:border-slate-700 dark:bg-slate-900">
       <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base">{poll.title}</CardTitle>
-        <CardDescription>{poll.memo}</CardDescription>
+        <CardTitle className="text-base text-stone-900 dark:text-slate-50">
+          {poll.title}
+        </CardTitle>
+        <CardDescription className="text-stone-600 dark:text-slate-400">
+          {poll.memo}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <RadioGroup
