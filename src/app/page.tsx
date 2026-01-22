@@ -44,7 +44,6 @@ function HomeContent() {
   // カレンダーグリッド用のスケジュール（viewDateに基づく）
   const { items, calendars, isLoading, error, refresh, deleteCalendar } =
     useGeneralCalendar(viewDate);
-
   // 今日の予定パネル用のスケジュール（常に今日の月）
   const {
     items: todayMonthItems,
@@ -162,11 +161,8 @@ function HomeContent() {
     setIsEmailConfirmOpen(true);
   };
 
-  // モーダルの「保存」ボタン押下時のハンドラ
   const handleConfirmEmailSave = () => {
-    // ここで実際の保存処理を実装
     console.log("保存:", pendingEmail);
-
     setConfirmSaveTrigger((prev) => prev + 1);
     setIsEmailConfirmOpen(false);
     setPendingEmail(null);
