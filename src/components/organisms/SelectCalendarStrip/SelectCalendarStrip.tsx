@@ -15,6 +15,7 @@ export type SelectCalendarStripProps = {
   className?: string;
   onSelectCalendar?: (calendar: SelectCalendarStripItem) => void;
   onAddCalendar?: () => void;
+  onDeleteCalendar?: (calendarId: string) => void;
 };
 
 export function SelectCalendarStrip({
@@ -22,6 +23,7 @@ export function SelectCalendarStrip({
   className,
   onSelectCalendar,
   onAddCalendar,
+  onDeleteCalendar,
 }: SelectCalendarStripProps) {
   const handleSelect = (calendar: SelectCalendarStripItem) => {
     onSelectCalendar?.(calendar);
@@ -29,6 +31,10 @@ export function SelectCalendarStrip({
 
   const handleAdd = () => {
     onAddCalendar?.();
+  };
+
+  const handleDelete = (calendarId: string) => {
+    onDeleteCalendar?.(calendarId);
   };
 
   return (
@@ -44,6 +50,7 @@ export function SelectCalendarStrip({
             key={cal.id}
             calendar={cal}
             onClick={() => handleSelect(cal)}
+            onDelete={() => handleDelete(cal.id)}
           />
         ))}
         <SelectCalendarAddCard onClick={handleAdd} />
