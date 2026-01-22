@@ -56,7 +56,10 @@ export function useGeneralCalendar(viewDate?: Date) {
 
   // viewDateから月のパラメータを生成
   const getMonthParam = useCallback((date: Date) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0",
+    )}`;
   }, []);
 
   const currentMonthParam = viewDate ? getMonthParam(viewDate) : undefined;
