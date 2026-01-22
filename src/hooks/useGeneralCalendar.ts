@@ -1,8 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
-import { getCalendarList } from "@/lib/api-calendars";
+import {
+  deleteCalendar as apiDeleteCalendar,
+  getCalendarList,
+} from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
@@ -19,9 +23,26 @@ export function useGeneralCalendar(viewDate?: Date) {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
+  const deleteCalendar = useCallback(
+    async (calendarId: string) => {
+      try {
+        await apiDeleteCalendar(calendarId);
+        toast.success("カレンダーを削除しました");
+        refresh();
+      } catch (err) {
+        console.error("Failed to delete calendar:", err);
+        toast.error("カレンダーの削除に失敗しました");
+      }
+    },
+    [refresh],
+  );
+
   // viewDateから月のパラメータを生成
   const getMonthParam = useCallback((date: Date) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0",
+    )}`;
   }, []);
 
   const currentMonthParam = viewDate ? getMonthParam(viewDate) : undefined;
@@ -148,6 +169,7 @@ export function useGeneralCalendar(viewDate?: Date) {
     isLoading,
     error,
     refresh,
+    deleteCalendar,
   };
 }
 

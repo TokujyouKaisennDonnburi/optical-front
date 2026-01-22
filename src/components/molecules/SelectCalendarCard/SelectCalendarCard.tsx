@@ -1,9 +1,16 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { MoreVertical, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/atoms/Button";
 import { Card } from "@/components/atoms/Card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/atoms/DropdownMenu";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type SelectCalendarCardData = {
@@ -18,12 +25,14 @@ export type SelectCalendarCardProps = {
   calendar: SelectCalendarCardData;
   className?: string;
   onClick?: () => void;
+  onDelete?: () => void;
 };
 
 export function SelectCalendarCard({
   calendar,
   className,
   onClick,
+  onDelete,
 }: SelectCalendarCardProps) {
   const toRgba = (hex: string | undefined, alpha: number) => {
     if (!hex || typeof hex !== "string") {
@@ -91,16 +100,28 @@ export function SelectCalendarCard({
     }
   })();
 
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={onClick == null}
+    <div
       className={cn(
-        "group relative min-w-[10rem] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-background/90 p-0 text-left shadow-sm transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-default",
+        "group relative min-w-[10rem] flex-shrink-0 overflow-hidden rounded-lg border bg-background/90 text-left shadow-sm transition-all duration-200",
+        "hover:border-primary/40 hover:shadow-md",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        onClick ? "cursor-pointer" : "cursor-default",
         className,
       )}
       style={{ borderColor: accentBorder }}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          onClick?.();
+        }
+      }}
+      role="button"
+      tabIndex={onClick ? 0 : -1}
       aria-label={`${calendar.name} を開く`}
     >
       <div className="relative grid aspect-[16/8] w-full place-items-stretch">
@@ -148,7 +169,48 @@ export function SelectCalendarCard({
           </div>
         </div>
       </div>
-    </button>
+
+      <div
+        className="absolute bottom-1.5 right-1.5"
+        onClick={handleMenuClick}
+        onKeyDown={handleMenuClick}
+        role="button"
+        tabIndex={0}
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 rounded-full text-white/80 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/20 hover:text-white focus:opacity-100"
+              aria-label="カレンダーオプション"
+            >
+              <MoreVertical size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                // onEdit?.();
+              }}
+              disabled
+            >
+              編集
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
+              className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+            >
+              削除
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
   );
 }
 

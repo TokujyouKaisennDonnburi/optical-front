@@ -16,15 +16,21 @@ export type SelectCalendarStripProps = {
   /** @deprecated Use next/link's automatic navigation instead */
   onSelectCalendar?: (calendar: SelectCalendarStripItem) => void;
   onAddCalendar?: () => void;
+  onDeleteCalendar?: (calendarId: string) => void;
 };
 
 export function SelectCalendarStrip({
   calendars,
   className,
   onAddCalendar,
+  onDeleteCalendar,
 }: SelectCalendarStripProps) {
   const handleAdd = () => {
     onAddCalendar?.();
+  };
+
+  const handleDelete = (calendarId: string) => {
+    onDeleteCalendar?.(calendarId);
   };
 
   return (
