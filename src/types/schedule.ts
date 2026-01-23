@@ -25,6 +25,7 @@ export type ScheduleBoardItem = {
   members?: string[];
   calendarName?: string;
   calendarColor?: string;
+  calendarId?: string; // 削除用
 };
 
 /** カレンダー一覧取得APIのレスポンス型 */

@@ -445,4 +445,39 @@ export const scheduleHandlers = [
       })),
     });
   }),
+
+  // DELETE /calendars/:calendarId/events/:eventId - スケジュール削除
+  http.delete(
+    "http://localhost:8000/calendars/:calendarId/events/:eventId",
+    ({ params, request }) => {
+      const { calendarId, eventId } = params;
+
+      console.log(
+        "[MSW] DELETE /calendars/:calendarId/events/:eventId",
+        calendarId,
+        eventId,
+      );
+
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return HttpResponse.json(
+          { error: { code: 401, message: "認証が必要です" } },
+          { status: 401 },
+        );
+      }
+
+      // 実際に mock の配列から削除する
+      const before = scheduleStore.items.length;
+
+      scheduleStore.items = scheduleStore.items.filter(
+        (item) => item.id !== eventId,
+      );
+
+      const after = scheduleStore.items.length;
+
+      console.log("[MSW] 削除前:", before, "削除後:", after);
+
+      return HttpResponse.json({ success: true }, { status: 200 });
+    },
+  ),
 ];

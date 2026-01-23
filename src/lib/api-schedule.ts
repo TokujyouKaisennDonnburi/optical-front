@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "@/lib/api-client";
+import { apiDelete, apiGet, apiPost } from "@/lib/api-client";
 import type {
   CreateScheduleRequest,
   CreateScheduleResponse,
@@ -21,4 +21,8 @@ export async function createSchedule(
     `/calendars/${calendarId}/events`,
     body,
   );
+}
+
+export async function deleteSchedule(calendarId: string, eventId: string) {
+  return apiDelete(`/calendars/${calendarId}/events/${eventId}`);
 }

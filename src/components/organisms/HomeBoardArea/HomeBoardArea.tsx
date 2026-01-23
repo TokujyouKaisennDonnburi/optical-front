@@ -11,7 +11,7 @@ import {
   GeneralCreateCalendarDialog,
 } from "@/components/organisms/GeneralCalendarBoard";
 import type { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
-import { createSchedule } from "@/lib/api-schedule";
+import { createSchedule, deleteSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 type HomeBoardAreaProps = {
@@ -98,6 +98,7 @@ export function HomeBoardArea({
           members: item.members ?? [],
           calendarName: item.calendarName,
           calendarColor: item.calendarColor,
+          calendarId: item.calendarId, // 追加
         };
       })
       .filter((value): value is NonNullable<typeof value> => Boolean(value))
@@ -136,6 +137,35 @@ export function HomeBoardArea({
     position: { x: number; y: number },
   ) => {
     setSelectedItem({ item, position });
+  };
+
+  const handleDelete = async () => {
+    if (!selectedItem) return;
+
+    const { calendarId, id } = selectedItem.item;
+
+    if (!calendarId) {
+      console.error(
+        "calendarId が無い予定を削除しようとしました",
+        selectedItem.item,
+      );
+      toast.error("削除できない予定です（カレンダー情報がありません）");
+      return;
+    }
+
+    try {
+      console.log("🗑 削除開始:", { calendarId, id });
+
+      await deleteSchedule(calendarId, id);
+
+      console.log("削除成功");
+
+      toast.warning("予定を削除しました");
+      onRefresh();
+    } catch (error) {
+      console.error("削除に失敗しました:", error);
+      toast.error("削除に失敗しました");
+    }
   };
 
   const handleCloseDialog = () => {
@@ -270,6 +300,7 @@ export function HomeBoardArea({
           isOpen
           onClose={handleCloseDialog}
           anchorPosition={selectedItem.position}
+          onDelete={handleDelete}
         />
       ) : null}
       {createDate ? (

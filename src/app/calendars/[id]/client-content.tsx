@@ -44,7 +44,7 @@ import {
   getGitHubInstallationStatus,
   startGitHubAppInstall,
 } from "@/lib/api-github";
-import { createSchedule } from "@/lib/api-schedule";
+import { createSchedule, deleteSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 interface CalendarDetailClientProps {
@@ -723,6 +723,7 @@ export function CalendarDetailClient({
 
 function BoardArea({
   className,
+  calendarId,
   items,
   isLoading,
   error,
@@ -730,6 +731,7 @@ function BoardArea({
   onChangeViewDate,
   calendarName,
   calendarColor,
+  onScheduleCreated,
   onDateSelect,
   selectedDates,
   setCreateDialogData,
@@ -852,6 +854,22 @@ function BoardArea({
     setSelectedItem({ item, position });
   };
 
+  const handleDelete = async () => {
+    if (!selectedItem) return;
+
+    try {
+      await deleteSchedule(calendarId, selectedItem.item.id);
+
+      toast.success("予定を削除しました");
+
+      setSelectedItem(null); // ポップオーバーを閉じる
+      onScheduleCreated?.(); // ← 再取得（refresh）
+    } catch (error) {
+      console.error("削除に失敗しました:", error);
+      toast.error("削除に失敗しました");
+    }
+  };
+
   const handleCloseDialog = () => {
     setSelectedItem(null);
   };
@@ -900,6 +918,7 @@ function BoardArea({
           isOpen
           onClose={handleCloseDialog}
           anchorPosition={selectedItem.position}
+          onDelete={handleDelete}
         />
       ) : null}
     </Card>

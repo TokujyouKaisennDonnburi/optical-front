@@ -5,6 +5,7 @@ import {
   Clock3,
   MapPin,
   NotebookPen,
+  Trash,
   UserCircle2,
   X,
 } from "lucide-react";
@@ -23,6 +24,8 @@ export type GeneralCalendarEventPopoverProps = {
   onClose: () => void;
   /** クリックした要素の位置情報 */
   anchorPosition: { x: number; y: number };
+  /** 削除ボタンクリック時のコールバック */
+  onDelete?: () => void;
 };
 
 /** ダイアログのサイズ（位置計算用） */
@@ -35,6 +38,7 @@ export function GeneralCalendarEventPopover({
   isOpen,
   onClose,
   anchorPosition,
+  onDelete,
 }: GeneralCalendarEventPopoverProps) {
   const [mounted, setMounted] = useState(false);
   const [dialogPosition, setDialogPosition] = useState<{
@@ -174,6 +178,20 @@ export function GeneralCalendarEventPopover({
               <span>{timeLabel}</span>
             </div>
           ) : null}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.();
+              onClose();
+            }}
+            aria-label="削除"
+            className="absolute right-12 top-3 h-8 w-8 rounded-full text-white/80 hover:bg-white/20 hover:text-red-600 dark:hover:text-red-400"
+          >
+            <Icon icon={Trash} size="sm" />
+          </Button>
           <Button
             type="button"
             variant="ghost"
