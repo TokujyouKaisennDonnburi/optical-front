@@ -17,7 +17,7 @@ export interface AccountMenuProps {
     id: string;
     name: string;
     email: string;
-    avatarUrl: string | null;
+    avatarUrl?: string;
   } | null;
   isLoading?: boolean;
   error?: Error | null;
