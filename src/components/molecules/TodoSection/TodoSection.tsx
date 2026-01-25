@@ -71,6 +71,15 @@ export function TodoSection({
     }
   }, [isEditing]);
 
+  // コンポーネントアンマウント時に実行中のタイマーをクリーンアップ
+  React.useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+      }
+    };
+  }, []);
+
   // 長押し開始
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
@@ -210,6 +219,7 @@ export function TodoSection({
                     "transition-colors",
                   )}
                   title="セクションを削除"
+                  aria-label="セクションを削除"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

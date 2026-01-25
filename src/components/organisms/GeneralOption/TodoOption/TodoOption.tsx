@@ -94,15 +94,15 @@ export function TodoOption({ calendarId }: Props) {
   );
 
   // アイテムトグルハンドラを生成
-  const createToggleHandler = React.useCallback(
-    (listId: string) => (itemId: string, itemName: string, isDone: boolean) => {
-      toggleItem(listId, itemId, itemName, isDone);
+  const handleToggleItem = React.useCallback(
+    (listId: string) => (itemId: string, name: string, isDone: boolean) => {
+      toggleItem(listId, itemId, name, isDone);
     },
     [toggleItem],
   );
 
   // タスク編集を直接実行（インライン編集対応）
-  const createEditItemHandler = React.useCallback(
+  const handleEditItem = React.useCallback(
     (listId: string) => async (itemId: string, newName: string) => {
       await editTask(listId, itemId, newName);
     },
@@ -110,7 +110,7 @@ export function TodoOption({ calendarId }: Props) {
   );
 
   // タスク削除確認ダイアログを開く
-  const createDeleteItemHandler = React.useCallback(
+  const handleDeleteItem = React.useCallback(
     (listId: string) => (itemId: string) => {
       const list = todoLists.find((l) => l.id === listId);
       const item = list?.items.find((i) => i.id === itemId);
@@ -203,10 +203,10 @@ export function TodoOption({ calendarId }: Props) {
                     items={list.items}
                     isExpanded={expandedSections.has(list.id)}
                     onToggleExpand={toggleSection}
-                    onToggleItem={createToggleHandler(list.id)}
+                    onToggleItem={handleToggleItem(list.id)}
                     onAddTask={handleOpenAddTask}
-                    onEditItem={createEditItemHandler(list.id)}
-                    onDeleteItem={createDeleteItemHandler(list.id)}
+                    onEditItem={handleEditItem(list.id)}
+                    onDeleteItem={handleDeleteItem(list.id)}
                     onEditSection={handleEditSection}
                     onDeleteSection={handleDeleteSection}
                   />

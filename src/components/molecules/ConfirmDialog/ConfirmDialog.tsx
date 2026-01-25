@@ -21,7 +21,7 @@ export interface ConfirmDialogProps {
   cancelLabel?: string;
   variant?: "default" | "destructive";
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
 }
 
 export function ConfirmDialog({
@@ -41,6 +41,9 @@ export function ConfirmDialog({
     try {
       await onConfirm();
       onClose();
+    } catch (_error) {
+      // エラーはonConfirm側で処理されると想定
+      // ダイアログは開いたまま
     } finally {
       setIsSubmitting(false);
     }

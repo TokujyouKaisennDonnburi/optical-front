@@ -119,7 +119,7 @@ export function TodoPanel({
   );
 
   // アイテムトグルハンドラを生成
-  const createToggleHandler = React.useCallback(
+  const handleToggleItem = React.useCallback(
     (listId: string) => (itemId: string, name: string, isDone: boolean) => {
       onToggleItem?.(listId, itemId, name, isDone);
     },
@@ -127,7 +127,7 @@ export function TodoPanel({
   );
 
   // タスク編集を直接実行（インライン編集対応）
-  const createEditItemHandler = React.useCallback(
+  const handleEditItem = React.useCallback(
     (listId: string) => async (itemId: string, newName: string) => {
       await onEditTask?.(listId, itemId, newName);
     },
@@ -135,7 +135,7 @@ export function TodoPanel({
   );
 
   // タスク削除確認ダイアログを開く
-  const createDeleteItemHandler = React.useCallback(
+  const handleDeleteItem = React.useCallback(
     (listId: string) => (itemId: string) => {
       const list = todoLists.find((l) => l.id === listId);
       const item = list?.items.find((i) => i.id === itemId);
@@ -151,7 +151,7 @@ export function TodoPanel({
   );
 
   // セクション編集を直接実行（インライン編集対応）
-  const handleEditSectionOpen = React.useCallback(
+  const handleEditSection = React.useCallback(
     async (sectionId: string, newName: string) => {
       await onEditSection?.(sectionId, newName);
     },
@@ -159,7 +159,7 @@ export function TodoPanel({
   );
 
   // セクション削除確認ダイアログを開く
-  const handleDeleteSectionOpen = React.useCallback(
+  const handleDeleteSection = React.useCallback(
     (sectionId: string) => {
       const list = todoLists.find((l) => l.id === sectionId);
       setDeleteDialog({
@@ -247,12 +247,12 @@ export function TodoPanel({
                     items={list.items}
                     isExpanded={expandedSections.has(list.id)}
                     onToggleExpand={onToggleSection}
-                    onToggleItem={createToggleHandler(list.id)}
+                    onToggleItem={handleToggleItem(list.id)}
                     onAddTask={handleOpenAddTask}
-                    onEditItem={createEditItemHandler(list.id)}
-                    onDeleteItem={createDeleteItemHandler(list.id)}
-                    onEditSection={handleEditSectionOpen}
-                    onDeleteSection={handleDeleteSectionOpen}
+                    onEditItem={handleEditItem(list.id)}
+                    onDeleteItem={handleDeleteItem(list.id)}
+                    onEditSection={handleEditSection}
+                    onDeleteSection={handleDeleteSection}
                   />
                 ))}
               </div>

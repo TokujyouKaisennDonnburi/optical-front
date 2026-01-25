@@ -228,17 +228,18 @@ export function useTodo({
   const removeTask = useCallback(
     async (listId: string, itemId: string) => {
       // 楽観的更新：即座にUIから削除
-      const previousLists = todoLists;
-      setTodoLists((prev) =>
-        prev.map((list) =>
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.map((list) =>
           list.id === listId
             ? {
                 ...list,
                 items: list.items.filter((item) => item.id !== itemId),
               }
             : list,
-        ),
-      );
+        );
+      });
 
       try {
         await deleteTodoItem(calendarId, listId, itemId);
@@ -250,15 +251,18 @@ export function useTodo({
         toast.error("削除に失敗しました");
       }
     },
-    [calendarId, todoLists],
+    [calendarId],
   );
 
   // セクションを削除
   const removeSection = useCallback(
     async (listId: string) => {
       // 楽観的更新：即座にUIから削除
-      const previousLists = todoLists;
-      setTodoLists((prev) => prev.filter((list) => list.id !== listId));
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.filter((list) => list.id !== listId);
+      });
 
       try {
         await deleteTodoList(calendarId, listId);
@@ -270,7 +274,7 @@ export function useTodo({
         toast.error("削除に失敗しました");
       }
     },
-    [calendarId, todoLists],
+    [calendarId],
   );
 
   // タスク名を編集
@@ -282,9 +286,10 @@ export function useTodo({
       }
 
       // 楽観的更新：即座にUIに反映
-      const previousLists = todoLists;
-      setTodoLists((prev) =>
-        prev.map((list) =>
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.map((list) =>
           list.id === listId
             ? {
                 ...list,
@@ -293,8 +298,8 @@ export function useTodo({
                 ),
               }
             : list,
-        ),
-      );
+        );
+      });
 
       try {
         await updateTodoItem(calendarId, listId, itemId, {
@@ -308,7 +313,7 @@ export function useTodo({
         toast.error("更新に失敗しました");
       }
     },
-    [calendarId, todoLists],
+    [calendarId],
   );
 
   // セクション名を編集
@@ -320,12 +325,13 @@ export function useTodo({
       }
 
       // 楽観的更新：即座にUIに反映
-      const previousLists = todoLists;
-      setTodoLists((prev) =>
-        prev.map((list) =>
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.map((list) =>
           list.id === listId ? { ...list, name: newName.trim() } : list,
-        ),
-      );
+        );
+      });
 
       try {
         await updateTodoList(calendarId, listId, {
@@ -339,7 +345,7 @@ export function useTodo({
         toast.error("更新に失敗しました");
       }
     },
-    [calendarId, todoLists],
+    [calendarId],
   );
 
   return {

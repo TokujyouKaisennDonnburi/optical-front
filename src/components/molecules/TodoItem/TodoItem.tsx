@@ -73,6 +73,15 @@ export function TodoItem({
     }
   }, [isEditing]);
 
+  // コンポーネントアンマウント時に実行中のタイマーをクリーンアップ
+  React.useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+      }
+    };
+  }, []);
+
   // 長押し開始
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
