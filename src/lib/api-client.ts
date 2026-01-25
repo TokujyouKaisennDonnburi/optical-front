@@ -231,3 +231,16 @@ export async function apiPatch<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 }
+
+/**
+ * DELETE リクエスト
+ */
+export async function apiDelete<T>(
+  endpoint: string,
+  options?: ApiRequestOptions,
+): Promise<T> {
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "DELETE",
+  });
+}

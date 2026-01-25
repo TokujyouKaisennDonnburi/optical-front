@@ -10,6 +10,7 @@ import {
   deleteTodoList,
   getTodoLists,
   updateTodoItem,
+  updateTodoList,
 } from "@/lib/api-todo";
 import type { TodoList } from "@/types/todo";
 
@@ -49,6 +50,10 @@ interface UseTodoReturn {
   removeTask: (listId: string, itemId: string) => Promise<void>;
   /** セクションを削除 */
   removeSection: (listId: string) => Promise<void>;
+  /** タスク名を編集 */
+  editTask: (listId: string, itemId: string, newName: string) => Promise<void>;
+  /** セクション名を編集 */
+  editSection: (listId: string, newName: string) => Promise<void>;
 }
 
 /**
@@ -56,7 +61,7 @@ interface UseTodoReturn {
  *
  * @example
  * ```tsx
- * const { todoLists, isLoading, toggleItem, addTask, addSection } = useTodo({
+ * const { todoLists, isLoading, toggleItem, addTask, addSection, editTask, editSection } = useTodo({
  *   calendarId: "calendar-123",
  * });
  * ```
@@ -132,7 +137,7 @@ export function useTodo({
       );
 
       try {
-        await updateTodoItem(listId, itemId, {
+        await updateTodoItem(calendarId, listId, itemId, {
           name: itemName,
           isDone: isDone,
         });
@@ -154,7 +159,7 @@ export function useTodo({
         toast.error("更新に失敗しました");
       }
     },
-    [],
+    [calendarId],
   );
 
   // 新しいタスクを追加
@@ -166,7 +171,7 @@ export function useTodo({
       }
 
       try {
-        const newItem = await createTodoItem(listId, {
+        const newItem = await createTodoItem(calendarId, listId, {
           name: name.trim(),
         });
         // APIがavatarUrlを返さない場合、現在のユーザーのアバターと名前を使用
@@ -188,7 +193,7 @@ export function useTodo({
         toast.error("タスクの追加に失敗しました");
       }
     },
-    [currentUserAvatarUrl, currentUserName],
+    [calendarId, currentUserAvatarUrl, currentUserName],
   );
 
   // 新しいセクションを追加
@@ -220,37 +225,128 @@ export function useTodo({
   );
 
   // タスクを削除
-  const removeTask = useCallback(async (listId: string, itemId: string) => {
-    try {
-      await deleteTodoItem(itemId);
-      setTodoLists((prev) =>
-        prev.map((list) =>
+  const removeTask = useCallback(
+    async (listId: string, itemId: string) => {
+      // 楽観的更新：即座にUIから削除
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.map((list) =>
           list.id === listId
             ? {
                 ...list,
                 items: list.items.filter((item) => item.id !== itemId),
               }
             : list,
-        ),
-      );
-      toast.success("タスクを削除しました");
-    } catch (err) {
-      console.error("Failed to delete task:", err);
-      toast.error("削除に失敗しました");
-    }
-  }, []);
+        );
+      });
+
+      try {
+        await deleteTodoItem(calendarId, listId, itemId);
+        toast.success("タスクを削除しました");
+      } catch (err) {
+        console.error("Failed to delete task:", err);
+        // 失敗したら元に戻す
+        setTodoLists(previousLists);
+        toast.error("削除に失敗しました");
+      }
+    },
+    [calendarId],
+  );
 
   // セクションを削除
-  const removeSection = useCallback(async (listId: string) => {
-    try {
-      await deleteTodoList(listId);
-      setTodoLists((prev) => prev.filter((list) => list.id !== listId));
-      toast.success("セクションを削除しました");
-    } catch (err) {
-      console.error("Failed to delete section:", err);
-      toast.error("削除に失敗しました");
-    }
-  }, []);
+  const removeSection = useCallback(
+    async (listId: string) => {
+      // 楽観的更新：即座にUIから削除
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.filter((list) => list.id !== listId);
+      });
+
+      try {
+        await deleteTodoList(calendarId, listId);
+        toast.success("セクションを削除しました");
+      } catch (err) {
+        console.error("Failed to delete section:", err);
+        // 失敗したら元に戻す
+        setTodoLists(previousLists);
+        toast.error("削除に失敗しました");
+      }
+    },
+    [calendarId],
+  );
+
+  // タスク名を編集
+  const editTask = useCallback(
+    async (listId: string, itemId: string, newName: string) => {
+      if (!newName.trim()) {
+        toast.error("タスク名を入力してください");
+        return;
+      }
+
+      // 楽観的更新：即座にUIに反映
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.map((list) =>
+          list.id === listId
+            ? {
+                ...list,
+                items: list.items.map((item) =>
+                  item.id === itemId ? { ...item, name: newName.trim() } : item,
+                ),
+              }
+            : list,
+        );
+      });
+
+      try {
+        await updateTodoItem(calendarId, listId, itemId, {
+          name: newName.trim(),
+        });
+        toast.success("タスク名を更新しました");
+      } catch (err) {
+        console.error("Failed to edit task:", err);
+        // 失敗したら元に戻す
+        setTodoLists(previousLists);
+        toast.error("更新に失敗しました");
+      }
+    },
+    [calendarId],
+  );
+
+  // セクション名を編集
+  const editSection = useCallback(
+    async (listId: string, newName: string) => {
+      if (!newName.trim()) {
+        toast.error("セクション名を入力してください");
+        return;
+      }
+
+      // 楽観的更新：即座にUIに反映
+      let previousLists: TodoList[] = [];
+      setTodoLists((prev) => {
+        previousLists = prev;
+        return prev.map((list) =>
+          list.id === listId ? { ...list, name: newName.trim() } : list,
+        );
+      });
+
+      try {
+        await updateTodoList(calendarId, listId, {
+          name: newName.trim(),
+        });
+        toast.success("セクション名を更新しました");
+      } catch (err) {
+        console.error("Failed to edit section:", err);
+        // 失敗したら元に戻す
+        setTodoLists(previousLists);
+        toast.error("更新に失敗しました");
+      }
+    },
+    [calendarId],
+  );
 
   return {
     todoLists,
@@ -264,5 +360,7 @@ export function useTodo({
     addSection,
     removeTask,
     removeSection,
+    editTask,
+    editSection,
   };
 }

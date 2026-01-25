@@ -92,6 +92,10 @@ export function CalendarDetailClient({
     toggleItem,
     addTask,
     addSection,
+    removeTask,
+    removeSection,
+    editTask,
+    editSection,
   } = useTodo({ calendarId, currentUserAvatarUrl: user?.avatarUrl });
 
   // サイドバーの選択状態
@@ -649,6 +653,10 @@ export function CalendarDetailClient({
                 onToggleItem={toggleItem}
                 onAddTask={addTask}
                 onAddSection={addSection}
+                onEditTask={editTask}
+                onRemoveTask={removeTask}
+                onEditSection={editSection}
+                onRemoveSection={removeSection}
               />
             )}
 

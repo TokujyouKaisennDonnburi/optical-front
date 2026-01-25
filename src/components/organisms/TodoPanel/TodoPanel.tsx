@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/atoms/ScrollArea";
 import { Text } from "@/components/atoms/Text";
 import { AddSectionDialog } from "@/components/molecules/AddSectionDialog";
 import { AddTaskDialog } from "@/components/molecules/AddTaskDialog";
+import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 import { TodoSection } from "@/components/molecules/TodoSection";
 import type { TodoList } from "@/types/todo";
 import { cn } from "@/utils_constants_styles/utils";
@@ -35,6 +36,18 @@ export interface TodoPanelProps {
   onAddTask?: (listId: string, name: string) => Promise<void>;
   /** セクションを追加 */
   onAddSection?: (name: string) => Promise<void>;
+  /** タスクを編集 */
+  onEditTask?: (
+    listId: string,
+    itemId: string,
+    newName: string,
+  ) => Promise<void>;
+  /** タスクを削除 */
+  onRemoveTask?: (listId: string, itemId: string) => Promise<void>;
+  /** セクションを編集 */
+  onEditSection?: (sectionId: string, newName: string) => Promise<void>;
+  /** セクションを削除 */
+  onRemoveSection?: (sectionId: string) => Promise<void>;
 
   className?: string;
 }
@@ -48,6 +61,10 @@ export function TodoPanel({
   onToggleItem,
   onAddTask,
   onAddSection,
+  onEditTask,
+  onRemoveTask,
+  onEditSection,
+  onRemoveSection,
   className,
 }: TodoPanelProps) {
   // ダイアログ状態
@@ -58,6 +75,15 @@ export function TodoPanel({
   }>({ isOpen: false, listId: "", listName: "" });
 
   const [isAddSectionOpen, setIsAddSectionOpen] = React.useState(false);
+
+  // 削除確認ダイアログ状態
+  const [deleteDialog, setDeleteDialog] = React.useState<{
+    isOpen: boolean;
+    type: "task" | "section";
+    id: string;
+    listId: string;
+    name: string;
+  }>({ isOpen: false, type: "task", id: "", listId: "", name: "" });
 
   // タスク追加ダイアログを開く
   const handleOpenAddTask = React.useCallback(
@@ -93,12 +119,68 @@ export function TodoPanel({
   );
 
   // アイテムトグルハンドラを生成
-  const createToggleHandler = React.useCallback(
+  const handleToggleItem = React.useCallback(
     (listId: string) => (itemId: string, name: string, isDone: boolean) => {
       onToggleItem?.(listId, itemId, name, isDone);
     },
     [onToggleItem],
   );
+
+  // タスク編集を直接実行（インライン編集対応）
+  const handleEditItem = React.useCallback(
+    (listId: string) => async (itemId: string, newName: string) => {
+      await onEditTask?.(listId, itemId, newName);
+    },
+    [onEditTask],
+  );
+
+  // タスク削除確認ダイアログを開く
+  const handleDeleteItem = React.useCallback(
+    (listId: string) => (itemId: string) => {
+      const list = todoLists.find((l) => l.id === listId);
+      const item = list?.items.find((i) => i.id === itemId);
+      setDeleteDialog({
+        isOpen: true,
+        type: "task",
+        id: itemId,
+        listId,
+        name: item?.name || "",
+      });
+    },
+    [todoLists],
+  );
+
+  // セクション編集を直接実行（インライン編集対応）
+  const handleEditSection = React.useCallback(
+    async (sectionId: string, newName: string) => {
+      await onEditSection?.(sectionId, newName);
+    },
+    [onEditSection],
+  );
+
+  // セクション削除確認ダイアログを開く
+  const handleDeleteSection = React.useCallback(
+    (sectionId: string) => {
+      const list = todoLists.find((l) => l.id === sectionId);
+      setDeleteDialog({
+        isOpen: true,
+        type: "section",
+        id: sectionId,
+        listId: sectionId,
+        name: list?.name || "",
+      });
+    },
+    [todoLists],
+  );
+
+  // 削除を実行
+  const handleDelete = React.useCallback(async () => {
+    if (deleteDialog.type === "task") {
+      await onRemoveTask?.(deleteDialog.listId, deleteDialog.id);
+    } else {
+      await onRemoveSection?.(deleteDialog.id);
+    }
+  }, [deleteDialog, onRemoveTask, onRemoveSection]);
 
   return (
     <>
@@ -165,8 +247,12 @@ export function TodoPanel({
                     items={list.items}
                     isExpanded={expandedSections.has(list.id)}
                     onToggleExpand={onToggleSection}
-                    onToggleItem={createToggleHandler(list.id)}
+                    onToggleItem={handleToggleItem(list.id)}
                     onAddTask={handleOpenAddTask}
+                    onEditItem={handleEditItem(list.id)}
+                    onDeleteItem={handleDeleteItem(list.id)}
+                    onEditSection={handleEditSection}
+                    onDeleteSection={handleDeleteSection}
                   />
                 ))}
               </div>
@@ -206,6 +292,31 @@ export function TodoPanel({
         isOpen={isAddSectionOpen}
         onClose={() => setIsAddSectionOpen(false)}
         onSubmit={handleAddSection}
+      />
+
+      {/* 削除確認ダイアログ */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title={
+          deleteDialog.type === "task" ? "タスクを削除" : "セクションを削除"
+        }
+        description={
+          deleteDialog.type === "task"
+            ? `「${deleteDialog.name}」を削除してもよろしいですか？`
+            : `「${deleteDialog.name}」とその中のすべてのタスクを削除してもよろしいですか？`
+        }
+        confirmLabel="削除"
+        variant="destructive"
+        onClose={() =>
+          setDeleteDialog({
+            isOpen: false,
+            type: "task",
+            id: "",
+            listId: "",
+            name: "",
+          })
+        }
+        onConfirm={handleDelete}
       />
     </>
   );
