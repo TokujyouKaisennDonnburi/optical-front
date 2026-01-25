@@ -39,3 +39,12 @@ export type UpdateTodoListRequest = {
   name: string;
   isDone: boolean;
 };
+
+export type UpdateTodoListNameRequest = {
+  name: string;
+};
+
+export type UpdateTodoItemRequest = {
+  name?: string;
+  isDone?: boolean;
+};

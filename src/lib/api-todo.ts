@@ -3,9 +3,10 @@ import type {
   CreateTodoListRequest,
   TodoItem,
   TodoList,
-  UpdateTodoListRequest,
+  UpdateTodoItemRequest,
+  UpdateTodoListNameRequest,
 } from "@/types/todo";
-import { apiGet, apiPatch, apiPost } from "./api-client";
+import { apiDelete, apiGet, apiPatch, apiPost } from "./api-client";
 
 /**
  * Todoリスト一覧を取得
@@ -18,7 +19,7 @@ export async function getTodoLists(calendarId: string): Promise<TodoList[]> {
 /**
  * 新しいTodoリスト（セクション）を作成
  * @param calendarId カレンダーID
- * @param name リスト名
+ * @param payload リスト作成リクエスト
  */
 export async function createTodoList(
   calendarId: string,
@@ -28,45 +29,80 @@ export async function createTodoList(
 }
 
 /**
+ * Todoリストを更新（セクション名変更など）
+ * @param calendarId カレンダーID
+ * @param listId リストID
+ * @param payload 更新内容
+ */
+export async function updateTodoList(
+  calendarId: string,
+  listId: string,
+  payload: UpdateTodoListNameRequest,
+): Promise<TodoList> {
+  return apiPatch<TodoList>(
+    `/calendars/${calendarId}/todos/${listId}`,
+    payload,
+  );
+}
+
+/**
  * Todoリストを削除
+ * @param calendarId カレンダーID
  * @param listId リストID
  */
-export async function deleteTodoList(listId: string): Promise<void> {
-  await fetch(`/api/todos/${listId}`, { method: "DELETE" });
+export async function deleteTodoList(
+  calendarId: string,
+  listId: string,
+): Promise<void> {
+  await apiDelete(`/calendars/${calendarId}/todos/${listId}`);
 }
 
 /**
  * 新しいTodoアイテムを追加
+ * @param calendarId カレンダーID
  * @param listId リストID
- * @param name タスク名
+ * @param payload アイテム作成リクエスト
  */
 export async function createTodoItem(
+  calendarId: string,
   listId: string,
   payload: CreateTodoItemRequest,
 ): Promise<TodoItem> {
-  return apiPost(`/calendars/${listId}/todos/${listId}/items`, payload);
+  return apiPost<TodoItem>(
+    `/calendars/${calendarId}/todos/${listId}/items`,
+    payload,
+  );
 }
 
 /**
  * Todoアイテムの状態を更新
+ * @param calendarId カレンダーID
+ * @param listId リストID
  * @param itemId アイテムID
- * @param isDone 完了状態
+ * @param payload 更新内容
  */
 export async function updateTodoItem(
+  calendarId: string,
   listId: string,
   itemId: string,
-  payload: UpdateTodoListRequest,
+  payload: UpdateTodoItemRequest,
 ): Promise<TodoItem> {
-  return apiPatch(
-    `/calendars/${listId}/todos/${listId}/items/${itemId}`,
+  return apiPatch<TodoItem>(
+    `/calendars/${calendarId}/todos/${listId}/items/${itemId}`,
     payload,
   );
 }
 
 /**
  * Todoアイテムを削除
+ * @param calendarId カレンダーID
+ * @param listId リストID
  * @param itemId アイテムID
  */
-export async function deleteTodoItem(itemId: string): Promise<void> {
-  await fetch(`/api/todos/items/${itemId}`, { method: "DELETE" });
+export async function deleteTodoItem(
+  calendarId: string,
+  listId: string,
+  itemId: string,
+): Promise<void> {
+  await apiDelete(`/calendars/${calendarId}/todos/${listId}/items/${itemId}`);
 }

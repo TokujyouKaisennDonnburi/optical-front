@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
 import { AddSectionDialog } from "@/components/molecules/AddSectionDialog";
 import { AddTaskDialog } from "@/components/molecules/AddTaskDialog";
+import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 import { TodoSection } from "@/components/molecules/TodoSection";
 import { useAuth } from "@/hooks/useAuth";
 import { useTodo } from "@/hooks/useTodo";
@@ -41,6 +42,10 @@ export function TodoOption({ calendarId }: Props) {
     toggleItem,
     addTask,
     addSection,
+    removeTask,
+    removeSection,
+    editTask,
+    editSection,
   } = useTodo({
     calendarId,
     currentUserAvatarUrl: user?.avatarUrl,
@@ -55,6 +60,15 @@ export function TodoOption({ calendarId }: Props) {
   }>({ isOpen: false, listId: "", listName: "" });
 
   const [isAddSectionOpen, setIsAddSectionOpen] = React.useState(false);
+
+  // 削除確認ダイアログ状態
+  const [deleteDialog, setDeleteDialog] = React.useState<{
+    isOpen: boolean;
+    type: "task" | "section";
+    id: string;
+    listId: string;
+    name: string;
+  }>({ isOpen: false, type: "task", id: "", listId: "", name: "" });
 
   // タスク追加ダイアログを開く
   const handleOpenAddTask = React.useCallback(
@@ -86,6 +100,62 @@ export function TodoOption({ calendarId }: Props) {
     },
     [toggleItem],
   );
+
+  // タスク編集を直接実行（インライン編集対応）
+  const createEditItemHandler = React.useCallback(
+    (listId: string) => async (itemId: string, newName: string) => {
+      await editTask(listId, itemId, newName);
+    },
+    [editTask],
+  );
+
+  // タスク削除確認ダイアログを開く
+  const createDeleteItemHandler = React.useCallback(
+    (listId: string) => (itemId: string) => {
+      const list = todoLists.find((l) => l.id === listId);
+      const item = list?.items.find((i) => i.id === itemId);
+      setDeleteDialog({
+        isOpen: true,
+        type: "task",
+        id: itemId,
+        listId,
+        name: item?.name || "",
+      });
+    },
+    [todoLists],
+  );
+
+  // セクション編集を直接実行（インライン編集対応）
+  const handleEditSection = React.useCallback(
+    async (sectionId: string, newName: string) => {
+      await editSection(sectionId, newName);
+    },
+    [editSection],
+  );
+
+  // セクション削除確認ダイアログを開く
+  const handleDeleteSection = React.useCallback(
+    (sectionId: string) => {
+      const list = todoLists.find((l) => l.id === sectionId);
+      setDeleteDialog({
+        isOpen: true,
+        type: "section",
+        id: sectionId,
+        listId: sectionId,
+        name: list?.name || "",
+      });
+    },
+    [todoLists],
+  );
+
+  // 削除を実行
+  const handleDelete = React.useCallback(async () => {
+    if (deleteDialog.type === "task") {
+      await removeTask(deleteDialog.listId, deleteDialog.id);
+    } else {
+      await removeSection(deleteDialog.id);
+    }
+  }, [deleteDialog, removeTask, removeSection]);
 
   return (
     <>
@@ -135,6 +205,10 @@ export function TodoOption({ calendarId }: Props) {
                     onToggleExpand={toggleSection}
                     onToggleItem={createToggleHandler(list.id)}
                     onAddTask={handleOpenAddTask}
+                    onEditItem={createEditItemHandler(list.id)}
+                    onDeleteItem={createDeleteItemHandler(list.id)}
+                    onEditSection={handleEditSection}
+                    onDeleteSection={handleDeleteSection}
                   />
                 ))}
               </div>
@@ -169,6 +243,31 @@ export function TodoOption({ calendarId }: Props) {
         isOpen={isAddSectionOpen}
         onClose={() => setIsAddSectionOpen(false)}
         onSubmit={addSection}
+      />
+
+      {/* 削除確認ダイアログ */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title={
+          deleteDialog.type === "task" ? "タスクを削除" : "セクションを削除"
+        }
+        description={
+          deleteDialog.type === "task"
+            ? `「${deleteDialog.name}」を削除してもよろしいですか？`
+            : `「${deleteDialog.name}」とその中のすべてのタスクを削除してもよろしいですか？`
+        }
+        confirmLabel="削除"
+        variant="destructive"
+        onClose={() =>
+          setDeleteDialog({
+            isOpen: false,
+            type: "task",
+            id: "",
+            listId: "",
+            name: "",
+          })
+        }
+        onConfirm={handleDelete}
       />
     </>
   );
