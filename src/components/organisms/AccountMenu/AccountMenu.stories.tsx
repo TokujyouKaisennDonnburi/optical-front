@@ -47,7 +47,6 @@ export const WithoutAvatar: Story = {
       id: "3",
       name: "Jane Smith",
       email: "jane.smith@example.com",
-      avatarUrl: null,
     },
     onRequestEmailSave: (newEmail: string) =>
       console.log("Saving email:", newEmail),
