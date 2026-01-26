@@ -169,7 +169,7 @@ export function HomeBoardArea({
     }
 
     try {
-      console.log("🗑 削除開始:", { calendarId, id });
+      console.log("削除開始:", { calendarId, id });
 
       await deleteSchedule(calendarId, id);
 

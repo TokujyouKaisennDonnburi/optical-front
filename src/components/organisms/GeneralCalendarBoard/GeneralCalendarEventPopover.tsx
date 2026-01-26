@@ -104,6 +104,12 @@ export function GeneralCalendarEventPopover({
 
   // 時刻編集エリアのref（フォーカス管理用）
   const timeEditRef = useRef<HTMLDivElement>(null);
+  // 時刻入力フィールド用の ref
+  const startTimeRef = useRef<HTMLInputElement | null>(null);
+  const endTimeRef = useRef<HTMLInputElement | null>(null);
+  // 日付入力フィールド用の ref
+  const startDateRef = useRef<HTMLInputElement | null>(null);
+  const endDateRef = useRef<HTMLInputElement | null>(null);
 
   // 削除中フラグ（削除時は自動保存をスキップ）
   const [isDeleting, setIsDeleting] = useState(false);
@@ -623,6 +629,7 @@ export function GeneralCalendarEventPopover({
                         開始日
                       </Text>
                       <Input
+                        ref={startDateRef}
                         type="date"
                         value={formatDateInput(startDateValue)}
                         onChange={(e) => {
@@ -641,6 +648,14 @@ export function GeneralCalendarEventPopover({
                             }
                           }
                         }}
+                        onClick={(e) => {
+                          e.currentTarget.showPicker();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.currentTarget.showPicker();
+                          }
+                        }}
                         className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-gray-900/70"
                       />
                     </div>
@@ -653,6 +668,7 @@ export function GeneralCalendarEventPopover({
                         終了日
                       </Text>
                       <Input
+                        ref={endDateRef}
                         type="date"
                         value={formatDateInput(endDateValue || startDateValue)}
                         onChange={(e) => {
@@ -669,6 +685,14 @@ export function GeneralCalendarEventPopover({
                             setIsDateTimeDirty(true);
                           }
                         }}
+                        onClick={(e) => {
+                          e.currentTarget.showPicker();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.currentTarget.showPicker();
+                          }
+                        }}
                         className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
                       />
                     </div>
@@ -680,6 +704,7 @@ export function GeneralCalendarEventPopover({
                       日付
                     </Text>
                     <Input
+                      ref={startDateRef}
                       type="date"
                       value={formatDateInput(startDateValue)}
                       onChange={(e) => {
@@ -690,6 +715,14 @@ export function GeneralCalendarEventPopover({
                         ) {
                           setStartDateValue(next);
                           setIsDateTimeDirty(true);
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.currentTarget.showPicker();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.currentTarget.showPicker();
                         }
                       }}
                       className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
@@ -750,7 +783,8 @@ export function GeneralCalendarEventPopover({
                 </div>
               </div>
             ) : (
-              <span
+              <button
+                type="button"
                 className="cursor-pointer hover:text-white"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -760,41 +794,26 @@ export function GeneralCalendarEventPopover({
                   setEditingLocation(false);
                   setEditingDate(true);
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.stopPropagation();
-                    setEditingTitle(false);
-                    setEditingTime(false);
-                    setEditingMemo(false);
-                    setEditingLocation(false);
-                    setEditingDate(true);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
               >
                 {dateLabel}
-              </span>
+              </button>
             )}
           </div>
-          {timeLabel ? (
-            <div className="flex items-center gap-2 text-sm text-white/85 mix-blend-plus-lighter">
+          {!isAllDayValue && (
+            <div
+              className="flex items-center gap-2 text-sm text-white/85 mix-blend-plus-lighter"
+              ref={timeEditRef}
+            >
               <Icon icon={Clock3} size="sm" className="text-white/75" />
               {editingTime ? (
                 <div
-                  ref={timeEditRef}
                   className="flex gap-2"
                   onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      e.stopPropagation();
-                      setEditingTime(false);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  role="group"
                 >
                   <Input
+                    ref={startTimeRef}
                     type="time"
                     value={startTimeValue}
                     onChange={(e) => {
@@ -803,18 +822,19 @@ export function GeneralCalendarEventPopover({
                     }}
                     onBlur={(e) => {
                       const nextFocused = e.relatedTarget as Node | null;
-
-                      // まだ time 編集エリアの中なら何もしない
                       if (timeEditRef.current?.contains(nextFocused)) {
                         return;
                       }
-
                       handleStopEditingTime();
                     }}
-                    className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    className="h-8 flex-1 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    onClick={(e) => {
+                      e.currentTarget.showPicker();
+                    }}
                   />
                   <span className="text-white/60">-</span>
                   <Input
+                    ref={endTimeRef}
                     type="time"
                     value={endTimeValue}
                     onChange={(e) => {
@@ -823,58 +843,40 @@ export function GeneralCalendarEventPopover({
                     }}
                     onBlur={(e) => {
                       const nextFocused = e.relatedTarget as Node | null;
-
-                      // まだ time 編集エリアの中なら何もしない
                       if (timeEditRef.current?.contains(nextFocused)) {
                         return;
                       }
-
                       handleStopEditingTime();
                     }}
-                    className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
-                    tabIndex={0}
+                    className="h-8 flex-1 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    onClick={(e) => {
+                      e.currentTarget.showPicker();
+                    }}
                   />
                 </div>
               ) : (
-                <span
-                  className="cursor-pointer hover:text-white"
+                <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setEditingTime(true);
                     setEditingTitle(false);
                     setEditingDate(false);
                     setEditingMemo(false);
                     setEditingLocation(false);
-
-                    // ここで元の時刻を保存
                     setOriginalTime({
                       start: startTimeValue,
                       end: endTimeValue,
                     });
-
-                    setEditingTime(true);
+                    setTimeout(() => startTimeRef.current?.focus(), 0);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.stopPropagation();
-                      setEditingTitle(false);
-                      setEditingDate(false);
-                      setEditingMemo(false);
-                      setEditingLocation(false);
-                      setOriginalTime({
-                        start: startTimeValue,
-                        end: endTimeValue,
-                      });
-                      setEditingTime(true);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
+                  className="cursor-pointer hover:text-white"
                 >
                   {timeLabel}
-                </span>
+                </button>
               )}
             </div>
-          ) : null}
+          )}
           {/* 削除ボタン（本番環境: onDelete で DELETE /api/calendars/{id}/events/{eventId} を呼び出す） */}
           <Button
             type="button"

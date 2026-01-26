@@ -118,6 +118,12 @@ export function SingleScheduleEventPopover({
 
   // 時刻編集エリアのref（フォーカス管理用）
   const timeEditRef = useRef<HTMLDivElement>(null);
+  // 時刻入力フィールド用の ref
+  const startTimeRef = useRef<HTMLInputElement | null>(null);
+  const endTimeRef = useRef<HTMLInputElement | null>(null);
+  // 日付入力フィールド用の ref
+  const startDateRef = useRef<HTMLInputElement | null>(null);
+  const endDateRef = useRef<HTMLInputElement | null>(null);
 
   // 削除中フラグ（削除時は自動保存をスキップ）
   const [isDeleting, setIsDeleting] = useState(false);
@@ -609,6 +615,7 @@ export function SingleScheduleEventPopover({
                         開始日
                       </Text>
                       <Input
+                        ref={startDateRef}
                         type="date"
                         value={formatDateInput(startDateValue)}
                         onChange={(e) => {
@@ -624,6 +631,14 @@ export function SingleScheduleEventPopover({
                             }
                           }
                         }}
+                        onClick={(e) => {
+                          e.currentTarget.showPicker();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.currentTarget.showPicker();
+                          }
+                        }}
                         className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-gray-900/70"
                       />
                     </div>
@@ -636,6 +651,7 @@ export function SingleScheduleEventPopover({
                         終了日
                       </Text>
                       <Input
+                        ref={endDateRef}
                         type="date"
                         value={formatDateInput(endDateValue || startDateValue)}
                         onChange={(e) => {
@@ -649,6 +665,14 @@ export function SingleScheduleEventPopover({
                             setIsDateTimeDirty(true);
                           }
                         }}
+                        onClick={(e) => {
+                          e.currentTarget.showPicker();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.currentTarget.showPicker();
+                          }
+                        }}
                         className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
                       />
                     </div>
@@ -659,6 +683,7 @@ export function SingleScheduleEventPopover({
                       日付
                     </Text>
                     <Input
+                      ref={startDateRef}
                       type="date"
                       value={formatDateInput(startDateValue)}
                       onChange={(e) => {
@@ -666,6 +691,14 @@ export function SingleScheduleEventPopover({
                         if (!Number.isNaN(next.getTime())) {
                           setStartDateValue(next);
                           setIsDateTimeDirty(true);
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.currentTarget.showPicker();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.currentTarget.showPicker();
                         }
                       }}
                       className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
@@ -716,7 +749,8 @@ export function SingleScheduleEventPopover({
                 </div>
               </div>
             ) : (
-              <span
+              <button
+                type="button"
                 className="cursor-pointer hover:text-white"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -726,42 +760,26 @@ export function SingleScheduleEventPopover({
                   setEditingLocation(false);
                   setEditingDate(true);
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.stopPropagation();
-                    setEditingTitle(false);
-                    setEditingTime(false);
-                    setEditingMemo(false);
-                    setEditingLocation(false);
-                    setEditingDate(true);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
               >
                 {dateLabel}
-              </span>
+              </button>
             )}
           </div>
-          {timeLabel ? (
-            <div className="flex items-center gap-2 text-sm text-white/85 mix-blend-plus-lighter">
+          {!isAllDayValue && (
+            <div
+              className="flex items-center gap-2 text-sm text-white/85 mix-blend-plus-lighter"
+              ref={timeEditRef}
+            >
               <Icon icon={Clock3} size="sm" className="text-white/75" />
               {editingTime ? (
-                // biome-ignore lint/a11y/noStaticElementInteractions: Time editing container with keyboard support
                 <div
-                  ref={timeEditRef}
                   className="flex gap-2"
                   onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      e.stopPropagation();
-                      setEditingTime(false);
-                    }
-                  }}
-                  role="presentation"
-                  tabIndex={-1}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  role="group"
                 >
                   <Input
+                    ref={startTimeRef}
                     type="time"
                     value={startTimeValue}
                     onChange={(e) => {
@@ -775,10 +793,14 @@ export function SingleScheduleEventPopover({
                       }
                       handleStopEditingTime();
                     }}
-                    className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    className="h-8 flex-1 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    onClick={(e) => {
+                      e.currentTarget.showPicker();
+                    }}
                   />
                   <span className="text-white/60">-</span>
                   <Input
+                    ref={endTimeRef}
                     type="time"
                     value={endTimeValue}
                     onChange={(e) => {
@@ -792,52 +814,35 @@ export function SingleScheduleEventPopover({
                       }
                       handleStopEditingTime();
                     }}
-                    className="h-8 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    className="h-8 flex-1 text-xs bg-transparent text-white border-white/50 focus:border-white/70 focus:bg-white/10"
+                    onClick={(e) => {
+                      e.currentTarget.showPicker();
+                    }}
                   />
                 </div>
               ) : (
-                <span
-                  className="cursor-pointer hover:text-white"
+                <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setEditingTime(true);
                     setEditingTitle(false);
                     setEditingDate(false);
                     setEditingMemo(false);
                     setEditingLocation(false);
-
-                    // 時刻編集開始時に現在の時刻値を保存
                     setOriginalTime({
                       start: startTimeValue,
                       end: endTimeValue,
                     });
-
-                    setEditingTime(true);
+                    setTimeout(() => startTimeRef.current?.focus(), 0);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.stopPropagation();
-                      setEditingTitle(false);
-                      setEditingDate(false);
-                      setEditingMemo(false);
-                      setEditingLocation(false);
-                      setOriginalTime({
-                        start: startTimeValue,
-                        end: endTimeValue,
-                      });
-                      setEditingTime(true);
-                    }
-                    if (e.key === "Escape") {
-                      e.stopPropagation();
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
+                  className="cursor-pointer hover:text-white"
                 >
                   {timeLabel}
-                </span>
+                </button>
               )}
             </div>
-          ) : null}
+          )}
           {/* 削除ボタン（本番環境: onDeleteで DELETE /api/calendars/{id}/events/{eventId} を呼び出し） */}
           <Button
             type="button"
