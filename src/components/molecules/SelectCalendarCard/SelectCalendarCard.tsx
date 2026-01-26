@@ -39,12 +39,6 @@ export type LinkableSelectCalendarCardProps = {
   onEditOptions?: () => void;
 };
 
-export type LinkableSelectCalendarCardProps = {
-  calendar: SelectCalendarCardData;
-  href: string;
-  className?: string;
-};
-
 export type SelectCalendarAddCardProps = {
   className?: string;
   onClick?: () => void;
