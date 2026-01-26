@@ -28,7 +28,7 @@ export function useGeneralCalendar(viewDate?: Date) {
     async (calendarId: string) => {
       try {
         await apiDeleteCalendar(calendarId);
-        toast.success("カレンダーを削除しました");
+        toast.warning("カレンダーを削除しました");
         refresh();
       } catch (err) {
         console.error("Failed to delete calendar:", err);
