@@ -154,7 +154,9 @@ export function GeneralCalendarEventPopover({
   // 日付と時刻文字列を結合してDate型を生成
   const combineDateAndTime = useCallback(
     (date: Date, timeStr: string): Date => {
-      const [hours, minutes] = timeStr.split(":").map(Number);
+      const parts = timeStr.split(":").map(Number);
+      const hours = parts[0] ?? 0;
+      const minutes = parts[1] ?? 0;
       const result = new Date(date);
       result.setHours(hours, minutes, 0, 0);
       return result;
@@ -213,8 +215,21 @@ export function GeneralCalendarEventPopover({
   };
 
   const parseDateInput = (value: string) => {
-    const [y, m, d] = value.split("-").map(Number);
-    return new Date(y, (m ?? 1) - 1, d ?? 1);
+    const parts = value.split("-");
+    if (parts.length !== 3) {
+      return new Date(NaN);
+    }
+    const [yStr, mStr, dStr] = parts;
+    const y = Number(yStr);
+    const m = Number(mStr);
+    const d = Number(dStr);
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+      return new Date(NaN);
+    }
+    if (m < 1 || m > 12 || d < 1 || d > 31) {
+      return new Date(NaN);
+    }
+    return new Date(y, m - 1, d);
   };
 
   // ==================== 初期化処理 ====================
@@ -325,7 +340,14 @@ export function GeneralCalendarEventPopover({
           return;
         }
 
-        if (!isAllDayValue) {
+        if (isAllDayValue) {
+          const start = new Date(startDateValue);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(endDateValue ?? startDateValue);
+          end.setHours(23, 59, 59, 999);
+          updates.startTime = start.toISOString();
+          updates.endTime = end.toISOString();
+        } else {
           const start = combineDateAndTime(startDateValue, startTimeValue);
           let end: Date;
           if (endTimeValue) {
@@ -359,6 +381,7 @@ export function GeneralCalendarEventPopover({
     locationValue,
     titleValue,
     startDateValue,
+    endDateValue,
     startTimeValue,
     endTimeValue,
     isAllDayValue,
@@ -485,8 +508,6 @@ export function GeneralCalendarEventPopover({
     return null;
   }
 
-  const _startDate = safeDate(item.start);
-  const _endDate = item.end ? safeDate(item.end) : null;
   const headerColor = item.calendarColor ?? "#1e293b";
   const dateLabel = formatEventDateLabel(startDateValue, endDateValue);
   const timeLabel = isAllDayValue
@@ -583,12 +604,14 @@ export function GeneralCalendarEventPopover({
                   setEditingMemo(false);
                   setEditingLocation(false);
 
-                  setOriginalTime({
-                    start: startTimeValue,
-                    end: endTimeValue,
-                  });
-
                   setEditingTitle(true);
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    setEditingTitle(true);
+                  }
                 }}
               >
                 {isTitleDirty ? titleValue : item.title}
@@ -965,8 +988,7 @@ export function GeneralCalendarEventPopover({
                       setEditingMemo(false);
                     }
                   }}
-                  role="button"
-                  tabIndex={0}
+                  role="group"
                 >
                   <Textarea
                     value={memoValue}
@@ -993,6 +1015,7 @@ export function GeneralCalendarEventPopover({
                     setEditingMemo(true);
                   }}
                   role="button"
+                  tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       setEditingMemo(true);
@@ -1132,40 +1155,6 @@ function formatEventDateLabel(start: Date, end: Date | null) {
     return formatter.format(start);
   }
 
-  return `${formatter.format(start)} 〜 ${formatter.format(end)}`;
-}
-
-function _formatEventTimeLabel(
-  start: Date,
-  end: Date | null,
-  isAllDay: boolean,
-) {
-  if (!start) return "";
-
-  const formatter = new Intl.DateTimeFormat("ja-JP", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-  // 終日フラグが立っている、または 00:00〜23:59 の場合は終日
-  if (isAllDay) {
-    return "終日";
-  }
-
-  if (end) {
-    const isStartMidnight = start.getHours() === 0 && start.getMinutes() === 0;
-    const isEndDayEnd = end.getHours() === 23 && end.getMinutes() >= 59;
-    if (isStartMidnight && isEndDayEnd) {
-      return "終日";
-    }
-  }
-
-  // 終了時刻が無い場合は「何も表示しない」
-  if (!end) {
-    return "";
-  }
-
-  // 通常表示
   return `${formatter.format(start)} 〜 ${formatter.format(end)}`;
 }
 

@@ -44,6 +44,28 @@ export async function deleteSchedule(calendarId: string, eventId: string) {
   return apiDelete(`/calendars/${calendarId}/events/${eventId}`);
 }
 
+/**
+ * スケジュール更新API（部分更新対応）
+ * 本番環境: PATCH /api/calendars/{calendarId}/events/{eventId}
+ *
+ * @param calendarId - カレンダーID
+ * @param eventId - イベント/スケジュールID
+ * @param updates - 更新内容（title, memo, location, startTime, endTime, isAllDay）
+ * @returns 更新結果
+ *
+ * 実装例（親コンポーネント）:
+ * try {
+ *   await updateSchedule(calendarId, eventId, {
+ *     title: '新しいタイトル',
+ *     memo: 'メモ',
+ *     isAllDay: true
+ *   });
+ *   toast.success('変更が保存されました');
+ *   onRefresh(); // データ再取得
+ * } catch (error) {
+ *   toast.error('保存に失敗しました');
+ * }
+ */
 export async function updateSchedule(
   calendarId: string,
   eventId: string,

@@ -165,12 +165,34 @@ export function SingleScheduleEventPopover({
   }, []);
 
   // 日付と時刻文字列を結合してDate型を生成
-  const combineDateAndTime = useCallback((date: Date, time: string) => {
-    const [h, m] = time.split(":").map(Number);
-    const d = new Date(date);
-    d.setHours(h ?? 0, m ?? 0, 0, 0);
-    return d;
-  }, []);
+  const combineDateAndTime = useCallback(
+    (date: Date, timeStr: string): Date => {
+      if (!timeStr) {
+        return new Date(date);
+      }
+      const parts = timeStr.split(":");
+      if (parts.length !== 2) {
+        return new Date(date);
+      }
+      const [hStr, mStr] = parts;
+      const h = Number(hStr);
+      const m = Number(mStr);
+      if (
+        !Number.isFinite(h) ||
+        !Number.isFinite(m) ||
+        h < 0 ||
+        h > 23 ||
+        m < 0 ||
+        m > 59
+      ) {
+        return new Date(date);
+      }
+      const result = new Date(date);
+      result.setHours(h, m, 0, 0);
+      return result;
+    },
+    [],
+  );
 
   /**
    * 日時バリデーション
@@ -274,8 +296,21 @@ export function SingleScheduleEventPopover({
   };
 
   const parseDateInput = (value: string) => {
-    const [y, m, d] = value.split("-").map(Number);
-    return new Date(y, (m ?? 1) - 1, d ?? 1);
+    const parts = value.split("-");
+    if (parts.length !== 3) {
+      return new Date(NaN);
+    }
+    const [yStr, mStr, dStr] = parts;
+    const y = Number(yStr);
+    const m = Number(mStr);
+    const d = Number(dStr);
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+      return new Date(NaN);
+    }
+    if (m < 1 || m > 12 || d < 1 || d > 31) {
+      return new Date(NaN);
+    }
+    return new Date(y, m - 1, d);
   };
 
   /**
@@ -324,7 +359,7 @@ export function SingleScheduleEventPopover({
           const start = new Date(startDateValue);
           start.setHours(0, 0, 0, 0);
           const end = new Date(endDateValue ?? startDateValue);
-          end.setHours(23, 59, 59, 0);
+          end.setHours(23, 59, 59, 999);
           updates.startTime = start.toISOString();
           updates.endTime = end.toISOString();
         } else {
@@ -506,7 +541,6 @@ export function SingleScheduleEventPopover({
         if (e.key === "Escape") handleClose();
       }}
       role="presentation"
-      tabIndex={-1}
     >
       <div
         ref={dialogRef}
@@ -540,7 +574,6 @@ export function SingleScheduleEventPopover({
               setEditingLocation(false);
             }
           }}
-          role="presentation"
         >
           <div className="pr-24">
             {editingTitle ? (
@@ -582,18 +615,16 @@ export function SingleScheduleEventPopover({
           <div className="flex items-center gap-2 text-sm text-white/90 mix-blend-plus-lighter">
             <Icon icon={CalendarDays} size="sm" className="text-white/80" />
             {editingDate ? (
-              // biome-ignore lint/a11y/noStaticElementInteractions: Date editing container with keyboard support
               <div
                 className="flex flex-col gap-1"
                 onClick={(e) => e.stopPropagation()}
-                role="presentation"
+                role="group"
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
                     e.stopPropagation();
                     setEditingDate(false);
                   }
                 }}
-                tabIndex={-1}
               >
                 {Object.keys(dateTimeErrors).length > 0 && (
                   <div className="rounded-md bg-destructive/15 border border-destructive/30 p-2">
@@ -848,11 +879,16 @@ export function SingleScheduleEventPopover({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               setIsDeleting(true);
-              onDelete?.();
-              onClose();
+              try {
+                await onDelete?.();
+              } catch {
+                // エラーはポップオーバーで処理済み
+              } finally {
+                onClose();
+              }
             }}
             aria-label="削除"
             className="absolute right-12 top-3 h-8 w-8 rounded-full text-white/80 hover:bg-white/20 hover:text-red-600 dark:hover:text-red-400"
@@ -908,7 +944,6 @@ export function SingleScheduleEventPopover({
                 className="mt-0.5 text-muted-foreground/70"
               />
               {editingMemo ? (
-                // biome-ignore lint/a11y/noStaticElementInteractions: Memo editing container with keyboard support
                 <div
                   className="flex flex-1 flex-col gap-2"
                   onClick={(e) => e.stopPropagation()}
@@ -918,8 +953,7 @@ export function SingleScheduleEventPopover({
                       setEditingMemo(false);
                     }
                   }}
-                  role="presentation"
-                  tabIndex={-1}
+                  role="group"
                 >
                   <Textarea
                     value={memoValue}
@@ -977,7 +1011,6 @@ export function SingleScheduleEventPopover({
                       setEditingLocation(false);
                     }
                   }}
-                  role="presentation"
                   tabIndex={-1}
                 >
                   <Input

@@ -65,7 +65,7 @@ export function HomeBoardArea({
     if (lastWeekday !== 6) {
       gridEnd.setDate(gridEnd.getDate() + (6 - lastWeekday));
     }
-    gridEnd.setHours(23, 59, 59, 0);
+    gridEnd.setHours(23, 59, 59, 999);
 
     return items
       .map((item) => {
@@ -280,7 +280,7 @@ export function HomeBoardArea({
       startIso = startDay.toISOString();
 
       const endDate = new Date(allDayEndDate);
-      endDate.setHours(23, 59, 59, 0);
+      endDate.setHours(23, 59, 59, 999);
       endIso = endDate.toISOString();
     } else {
       const [startHour, startMin] = startTime.split(":").map(Number);
