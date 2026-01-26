@@ -60,3 +60,15 @@ export async function deleteCalendar(calendarId: string) {
     method: "DELETE",
   });
 }
+
+export async function updateCalendar(
+  calendarId: string,
+  payload: {
+    name?: string;
+    color?: string;
+    imageUrl?: string | null;
+    options?: string[];
+  },
+) {
+  return apiPatch<void>(`/calendars/${calendarId}`, payload);
+}
