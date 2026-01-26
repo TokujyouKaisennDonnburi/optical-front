@@ -447,6 +447,11 @@ export const scheduleHandlers = [
   }),
 
   // DELETE /calendars/:calendarId/events/:eventId - スケジュール削除
+  // ==================== 削除機能 ====================
+  // イベント削除エンドポイント
+  // 本番環境: /api/calendars/{calendarId}/events/{eventId} に変更
+  // リクエスト: DELETE メソッド + Authorization ヘッダー
+  // レスポンス: { success: true }
   http.delete(
     "http://localhost:8000/calendars/:calendarId/events/:eventId",
     ({ params, request }) => {
@@ -478,6 +483,65 @@ export const scheduleHandlers = [
       console.log("[MSW] 削除前:", before, "削除後:", after);
 
       return HttpResponse.json({ success: true }, { status: 200 });
+    },
+  ),
+
+  // PATCH /calendars/:calendarId/events/:eventId - スケジュール更新
+  http.patch(
+    "http://localhost:8000/calendars/:calendarId/events/:eventId",
+    async ({ params, request }) => {
+      const { calendarId, eventId } = params;
+
+      console.log(
+        "[MSW] PATCH /calendars/:calendarId/events/:eventId",
+        calendarId,
+        eventId,
+      );
+
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return HttpResponse.json(
+          { error: { code: 401, message: "認証が必要です" } },
+          { status: 401 },
+        );
+      }
+
+      try {
+        const body = (await request.json()) as {
+          title?: string;
+          memo?: string;
+          location?: string;
+          startTime?: string;
+          endTime?: string;
+          isAllDay?: boolean;
+        };
+
+        // mock の配列からアイテムを更新
+        const item = scheduleStore.items.find((i) => i.id === eventId);
+        if (!item) {
+          return HttpResponse.json(
+            { error: { code: 404, message: "イベントが見つかりません" } },
+            { status: 404 },
+          );
+        }
+
+        if (body.title !== undefined) item.title = body.title;
+        if (body.memo !== undefined) item.memo = body.memo;
+        if (body.location !== undefined) item.location = body.location;
+        if (body.startTime !== undefined) item.startAt = body.startTime;
+        if (body.endTime !== undefined) item.endAt = body.endTime;
+        if (body.isAllDay !== undefined) item.isAllDay = body.isAllDay;
+
+        console.log("[MSW] Update successful:", item);
+
+        return HttpResponse.json({ success: true, item }, { status: 200 });
+      } catch (error) {
+        console.error("[MSW] Update failed:", error);
+        return HttpResponse.json(
+          { error: { code: 400, message: "リクエストが無効です" } },
+          { status: 400 },
+        );
+      }
     },
   ),
 ];

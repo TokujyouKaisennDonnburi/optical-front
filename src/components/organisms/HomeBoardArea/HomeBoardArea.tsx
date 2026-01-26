@@ -11,7 +11,11 @@ import {
   GeneralCreateCalendarDialog,
 } from "@/components/organisms/GeneralCalendarBoard";
 import type { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
-import { createSchedule, deleteSchedule } from "@/lib/api-schedule";
+import {
+  createSchedule,
+  deleteSchedule,
+  updateSchedule,
+} from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 type HomeBoardAreaProps = {
@@ -61,7 +65,7 @@ export function HomeBoardArea({
     if (lastWeekday !== 6) {
       gridEnd.setDate(gridEnd.getDate() + (6 - lastWeekday));
     }
-    gridEnd.setHours(23, 59, 59, 999);
+    gridEnd.setHours(23, 59, 59, 0);
 
     return items
       .map((item) => {
@@ -139,6 +143,17 @@ export function HomeBoardArea({
     setSelectedItem({ item, position });
   };
 
+  /**
+   * スケジュール削除ハンドラー
+   * ポップオーバーの削除ボタンクリック時に呼び出される
+   *
+   * 処理フロー:
+   * 1. 選択アイテムからカレンダーID・イベントIDを取得
+   * 2. calendarId が無い場合はエラー処理
+   * 3. deleteSchedule API呼び出し
+   * 4. 成功時: toast.warning + 画面再取得
+   * 5. 失敗時: toast.error
+   */
   const handleDelete = async () => {
     if (!selectedItem) return;
 
@@ -165,6 +180,51 @@ export function HomeBoardArea({
     } catch (error) {
       console.error("削除に失敗しました:", error);
       toast.error("削除に失敗しました");
+    }
+  };
+
+  /**
+   * スケジュール更新ハンドラー
+   * ポップオーバーのインライン編集時に呼び出される
+   *
+   * 処理フロー:
+   * 1. 選択アイテムからカレンダーID・イベントIDを取得
+   * 2. calendarId が無い場合はエラー処理
+   * 3. updateSchedule API呼び出し（部分更新対応）
+   * 4. 成功時: toast.success + 画面再取得（重要！）
+   * 5. 失敗時: toast.error をスロー
+   */
+  const handleUpdate = async (updates: {
+    title?: string;
+    memo?: string;
+    location?: string;
+    startTime?: string;
+    endTime?: string;
+    isAllDay?: boolean;
+  }) => {
+    if (!selectedItem) return;
+
+    const { calendarId, id } = selectedItem.item;
+
+    if (!calendarId) {
+      toast.error("更新できない予定です");
+      return;
+    }
+
+    try {
+      console.log("✏️ 更新開始:", { calendarId, id, updates });
+
+      await updateSchedule(calendarId, id, updates);
+
+      console.log("更新成功 → 再取得");
+
+      toast.success("変更が保存されました");
+
+      onRefresh(); // ← これが本命
+    } catch (error) {
+      console.error("更新に失敗しました:", error);
+      toast.error("保存に失敗しました");
+      throw error;
     }
   };
 
@@ -220,7 +280,7 @@ export function HomeBoardArea({
       startIso = startDay.toISOString();
 
       const endDate = new Date(allDayEndDate);
-      endDate.setHours(23, 59, 59, 999);
+      endDate.setHours(23, 59, 59, 0);
       endIso = endDate.toISOString();
     } else {
       const [startHour, startMin] = startTime.split(":").map(Number);
@@ -301,6 +361,7 @@ export function HomeBoardArea({
           onClose={handleCloseDialog}
           anchorPosition={selectedItem.position}
           onDelete={handleDelete}
+          onUpdate={handleUpdate}
         />
       ) : null}
       {createDate ? (
