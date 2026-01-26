@@ -7,8 +7,6 @@ import { scheduleStore } from "@/mocks/data/scheduleStore";
  * ログインユーザーのスケジュールのみを返却
  */
 export const scheduleHandlers = [
-  // ... (existing handlers)
-
   http.delete("http://localhost:8000/calendars/:calendarId", ({ params }) => {
     console.log("[MSW] DELETE /calendars/:calendarId handler called");
     const { calendarId } = params;
