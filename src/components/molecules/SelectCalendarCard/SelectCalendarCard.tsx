@@ -2,7 +2,6 @@
 
 import { MoreVertical, Plus } from "lucide-react";
 import Image from "next/image";
-
 import { Button } from "@/components/atoms/Button";
 import { Card } from "@/components/atoms/Card";
 import {
