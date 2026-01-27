@@ -82,6 +82,24 @@ export function SchedulerCreate({
     endTime: new Date(`${date}T23:59:59Z`).toISOString(),
   });
 
+  // 回答締切の日付が変わったら時刻を23:59に設定
+  const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (!newValue) {
+      setLimit("");
+      return;
+    }
+
+    const newDate = newValue.slice(0, 10);
+    const oldDate = limit.slice(0, 10);
+
+    if (newDate !== oldDate) {
+      setLimit(`${newDate}T23:59`);
+    } else {
+      setLimit(newValue);
+    }
+  };
+
   // 開始変更 → 自動で +1時間
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -115,7 +133,7 @@ export function SchedulerCreate({
     onNext({
       title,
       memo,
-      limitTime: limit ? new Date(limit).toISOString() : null,
+      limitTime: limit ? new Date(`${limit}:59Z`).toISOString() : null,
       isAllDay,
       dates: backendDates,
       defaultStartTime,
@@ -229,7 +247,7 @@ export function SchedulerCreate({
             id="limit"
             type="datetime-local"
             value={limit}
-            onChange={(e) => setLimit(e.target.value)}
+            onChange={handleLimitChange}
           />
         </div>
 
