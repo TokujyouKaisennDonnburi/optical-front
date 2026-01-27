@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/atoms/Button";
 import { DemoVideoModal } from "./DemoVideoModal";
 
 export const LandingHeroV2 = () => {

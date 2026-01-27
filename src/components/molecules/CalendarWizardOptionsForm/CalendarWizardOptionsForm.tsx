@@ -1,4 +1,3 @@
-import { Icon } from "@/components/atoms/Icon";
 import {
   Activity,
   Calendar,
@@ -9,7 +8,8 @@ import {
   ListTodo,
   Minus,
   Zap,
-} from "@/components/ui/icons";
+} from "lucide-react";
+import { Icon } from "@/components/atoms/Icon";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type CalendarWizardTemplate = {

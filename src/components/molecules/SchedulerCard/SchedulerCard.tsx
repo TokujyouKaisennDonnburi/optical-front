@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { ja } from "date-fns/locale/ja";
-import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardHeader, CardTitle } from "@/components/atoms/Card";
 import type { SchedulerCardProps } from "@/types/scheduler";
 
 export const SchedulerCard: React.FC<SchedulerCardProps> = ({
