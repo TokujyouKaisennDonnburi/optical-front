@@ -10,7 +10,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
 import { cn } from "@/utils_constants_styles/utils";
@@ -26,8 +25,17 @@ export type SelectCalendarCardData = {
 export type SelectCalendarCardProps = {
   calendar: SelectCalendarCardData;
   className?: string;
-  onClick?: () => void;
+  // SelectCalendarCard自体はクリックハンドラと削除ハンドラを持たない
+  // LinkableSelectCalendarCard がこれらのアクションを処理する
+};
+
+export type LinkableSelectCalendarCardProps = {
+  calendar: SelectCalendarCardData;
+  href: string;
+  className?: string;
   onDelete?: () => void;
+  onRename?: (calendarId: string, currentName: string) => void;
+  onEditOptions?: () => void;
 };
 
 export type LinkableSelectCalendarCardProps = {
