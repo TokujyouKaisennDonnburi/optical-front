@@ -54,3 +54,21 @@ export async function createCalendar(payload: CreateCalendarRequest) {
 export async function joinCalendar(calendarId: string) {
   return apiPatch<void>(`/calendars/${calendarId}/members`);
 }
+
+export async function deleteCalendar(calendarId: string) {
+  return apiRequest<void>(`/calendars/${calendarId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function updateCalendar(
+  calendarId: string,
+  payload: {
+    name?: string;
+    color?: string;
+    imageUrl?: string | null;
+    options?: string[];
+  },
+) {
+  return apiPatch<void>(`/calendars/${calendarId}`, payload);
+}

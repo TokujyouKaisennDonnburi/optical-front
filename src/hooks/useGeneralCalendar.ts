@@ -1,8 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { DailyPanelItem } from "@/components/organisms/DailyPanel";
-import { getCalendarList } from "@/lib/api-calendars";
+import {
+  deleteCalendar as apiDeleteCalendar,
+  updateCalendar as apiUpdateCalendar,
+  getCalendarList,
+} from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 
@@ -18,6 +23,36 @@ export function useGeneralCalendar(viewDate?: Date) {
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
+
+  const deleteCalendar = useCallback(
+    async (calendarId: string) => {
+      try {
+        await apiDeleteCalendar(calendarId);
+        toast.warning("カレンダーを削除しました");
+        refresh();
+      } catch (err) {
+        console.error("Failed to delete calendar:", err);
+        toast.error("カレンダーの削除に失敗しました");
+      }
+    },
+    [refresh],
+  );
+  const updateCalendar = useCallback(
+    async (
+      calendarId: string,
+      payload: { name?: string; color?: string; imageUrl?: string | null },
+    ) => {
+      try {
+        await apiUpdateCalendar(calendarId, payload);
+        toast.success("カレンダーを更新しました");
+        refresh();
+      } catch (err) {
+        console.error("Failed to update calendar:", err);
+        toast.error("カレンダーの更新に失敗しました");
+      }
+    },
+    [refresh],
+  );
 
   // viewDateから月のパラメータを生成
   const getMonthParam = useCallback((date: Date) => {
@@ -148,6 +183,8 @@ export function useGeneralCalendar(viewDate?: Date) {
     isLoading,
     error,
     refresh,
+    deleteCalendar,
+    updateCalendar,
   };
 }
 
