@@ -330,6 +330,12 @@ export function GeneralCalendarEventPopover({
         isAllDay?: boolean;
       } = {};
 
+      // タイトルが変更されていて、かつ空の場合はエラーで中止
+      if (isTitleDirty && !titleValue.trim()) {
+        toast.error("タイトルは必須入力です");
+        return;
+      }
+
       if (isMemoDirty) {
         updates.memo = memoValue;
       }
@@ -543,21 +549,28 @@ export function GeneralCalendarEventPopover({
   /**
    * ポップオーバーを閉じる
    * 1. 時刻編集中なら編集終了
-   * 2. 削除中でなければ未保存の変更を自動保存
-   * 3. 親の onClose を呼び出す
+   * 2. 削除中でなければ未保存の変更を自動保存（エラー時も続行）
+   * 3. 親の onClose を呼び出す（エラー時でも必ず実行）
    */
   const handleClose = useCallback(async () => {
-    if (editingTime) {
-      handleStopEditingTime();
-    }
-
-    if (!isDeleting) {
-      if (isMemoDirty || isLocationDirty || isTitleDirty || isDateTimeDirty) {
-        await handleAutoSave();
+    try {
+      if (editingTime) {
+        handleStopEditingTime();
       }
-    }
 
-    onClose();
+      if (!isDeleting) {
+        if (isMemoDirty || isLocationDirty || isTitleDirty || isDateTimeDirty) {
+          try {
+            await handleAutoSave();
+          } catch (error) {
+            console.error("Auto-save error on close:", error);
+            // エラーが発生しても続行
+          }
+        }
+      }
+    } finally {
+      onClose();
+    }
   }, [
     isDeleting,
     isMemoDirty,

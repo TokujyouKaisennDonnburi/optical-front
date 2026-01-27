@@ -151,8 +151,8 @@ export function HomeBoardArea({
    * 1. 選択アイテムからカレンダーID・イベントIDを取得
    * 2. calendarId が無い場合はエラー処理
    * 3. deleteSchedule API呼び出し
-   * 4. 成功時: toast.warning + 画面再取得
-   * 5. 失敗時: toast.error
+   * 4. 成功時: toast.warning + 画面再取得 + ポップオーバー閉じる
+   * 5. 失敗時: toast.error + ポップオーバー閉じる（エラー時でも閉じる）
    */
   const handleDelete = async () => {
     if (!selectedItem) return;
@@ -180,6 +180,9 @@ export function HomeBoardArea({
     } catch (error) {
       console.error("削除に失敗しました:", error);
       toast.error("削除に失敗しました");
+    } finally {
+      // エラー時でも必ずポップオーバーを閉じる
+      handleCloseDialog();
     }
   };
 

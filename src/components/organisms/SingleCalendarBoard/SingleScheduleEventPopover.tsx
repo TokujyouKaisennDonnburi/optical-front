@@ -345,6 +345,12 @@ export function SingleScheduleEventPopover({
         isAllDay?: boolean;
       } = {};
 
+      // タイトルが変更されていて、かつ空の場合はエラーで中止
+      if (isTitleDirty && !titleValue.trim()) {
+        toast.error("タイトルは必須入力です");
+        return;
+      }
+
       if (isMemoDirty) {
         updates.memo = memoValue;
       }
@@ -555,21 +561,28 @@ export function SingleScheduleEventPopover({
   /**
    * ポップオーバーを閉じる処理
    * 1. 時刻編集中の場合は編集を終了
-   * 2. 削除中でない場合、未保存の変更があれば自動保存
-   * 3. 親コンポーネントのonCloseを呼び出し
+   * 2. 削除中でない場合、未保存の変更があれば自動保存（エラー時も続行）
+   * 3. 親コンポーネントのonCloseを呼び出し（エラー時でも必ず実行）
    */
   const handleClose = useCallback(async () => {
-    if (editingTime) {
-      handleStopEditingTime();
-    }
-
-    if (!isDeleting) {
-      if (isMemoDirty || isLocationDirty || isTitleDirty || isDateTimeDirty) {
-        await handleAutoSave();
+    try {
+      if (editingTime) {
+        handleStopEditingTime();
       }
-    }
 
-    onClose();
+      if (!isDeleting) {
+        if (isMemoDirty || isLocationDirty || isTitleDirty || isDateTimeDirty) {
+          try {
+            await handleAutoSave();
+          } catch (error) {
+            console.error("Auto-save error on close:", error);
+            // エラーが発生しても続行
+          }
+        }
+      }
+    } finally {
+      onClose();
+    }
   }, [
     isDeleting,
     isMemoDirty,
