@@ -1,7 +1,7 @@
 "use client";
 
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/atoms/Dialog";
 
 interface DemoVideoModalProps {
   isOpen: boolean;

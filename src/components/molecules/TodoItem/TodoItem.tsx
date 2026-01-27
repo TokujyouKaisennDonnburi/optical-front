@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import * as React from "react";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Input } from "@/components/atoms/Input";
 import { Text } from "@/components/atoms/Text";
 import { UserAvatar } from "@/components/atoms/UserAvatar";
-import { Checkbox } from "@/components/ui/Checkbox";
 import { cn } from "@/utils_constants_styles/utils";
 
 export interface TodoItemProps {

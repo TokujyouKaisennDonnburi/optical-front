@@ -10,9 +10,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/Dialog";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+} from "@/components/atoms/Dialog";
+import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
 
 export interface AddSectionDialogProps {
   isOpen: boolean;

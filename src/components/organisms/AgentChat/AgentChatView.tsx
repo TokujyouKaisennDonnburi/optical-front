@@ -9,6 +9,12 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/atoms/Button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/atoms/DropdownMenu";
 import { Text } from "@/components/atoms/Text";
 import { Textarea } from "@/components/atoms/Textarea";
 import {
@@ -16,12 +22,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/atoms/Tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
 import { useAuth } from "@/hooks/useAuth";
 import {
   STAGE_MESSAGES,
