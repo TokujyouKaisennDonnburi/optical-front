@@ -84,17 +84,17 @@ export const getSchedulerAttendance = async (
 };
 
 export type SchedulerResponse = {
-  SchedulerId: string;
-  CalendarId: string;
-  UserId: string;
-  Title: string;
-  Memo: string;
-  LimitTime: string;
-  IsAllDay: boolean;
-  PossibleDate: {
-    Date: string;
-    StartTime: string;
-    EndTime: string;
+  id: string;
+  calendarId: string;
+  userId: string;
+  title: string;
+  memo: string;
+  limitTime: string;
+  isAllDay: boolean;
+  possibleDate: {
+    date: string;
+    startTime: string;
+    endTime: string;
   }[];
 };
 

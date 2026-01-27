@@ -153,11 +153,11 @@ export function SchedulerOption({
       // Fetch poll data to pre-fill the availability form
       try {
         const pollDetails = await getScheduler(calendarId, id);
-        const dates = pollDetails.PossibleDate.map((d) => {
-          const startDatetime = new Date(d.StartTime);
-          const endDatetime = new Date(d.EndTime);
+        const dates = pollDetails.possibleDate.map((d) => {
+          const startDatetime = new Date(d.startTime);
+          const endDatetime = new Date(d.endTime);
           return {
-            date: new Date(d.Date)
+            date: new Date(d.date)
               .toISOString()
               .slice(0, 10)
               .replace(/-/g, "/"),
@@ -172,16 +172,16 @@ export function SchedulerOption({
           };
         });
         onDatesChange(dates.map((d) => d.date));
-        const isAllDay = !pollDetails.PossibleDate[0]?.StartTime;
+        const isAllDay = pollDetails.isAllDay;
         const defaultStartTime = isAllDay
           ? null
-          : new Date(pollDetails.PossibleDate[0]?.StartTime);
+          : new Date(pollDetails.possibleDate[0]?.startTime);
         const defaultEndTime = isAllDay
           ? null
-          : new Date(pollDetails.PossibleDate[0]?.EndTime);
+          : new Date(pollDetails.possibleDate[0]?.endTime);
         setNewSchedulerData({
-          title: pollDetails.Title,
-          memo: pollDetails.Memo,
+          title: pollDetails.title,
+          memo: pollDetails.memo,
           defaultStartTime: defaultStartTime
             ? defaultStartTime.getHours().toString() +
               ":" +
