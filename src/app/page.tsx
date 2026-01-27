@@ -42,7 +42,7 @@ function HomeContent() {
   const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
 
   // カレンダーグリッド用のスケジュール（viewDateに基づく）
-  const { items, calendars, isLoading, error, refresh } =
+  const { items, calendars, isLoading, error, refresh, deleteCalendar } =
     useGeneralCalendar(viewDate);
 
   // 今日の予定パネル用のスケジュール（常に今日の月）
@@ -145,31 +145,55 @@ function HomeContent() {
     setViewDate(startOfDay(next));
   };
 
-  // モーダル制御用の state
-  const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+  // メール保存モーダル制御
+  const [isEmailConfirmOpen, setIsEmailConfirmOpen] = React.useState(false);
   const [pendingEmail, setPendingEmail] = React.useState<string | null>(null);
   const [confirmSaveTrigger, setConfirmSaveTrigger] = useState(0);
+
+  // カレンダー削除モーダル制御
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deletingCalendarId, setDeletingCalendarId] = useState<string | null>(
+    null,
+  );
 
   // メール保存リクエストを受け取るハンドラ
   const handleRequestEmailSave = (newEmail: string) => {
     setPendingEmail(newEmail);
-    setIsConfirmOpen(true);
+    setIsEmailConfirmOpen(true);
   };
 
   // モーダルの「保存」ボタン押下時のハンドラ
-  const handleConfirm = () => {
+  const handleConfirmEmailSave = () => {
     // ここで実際の保存処理を実装
     console.log("保存:", pendingEmail);
 
     setConfirmSaveTrigger((prev) => prev + 1);
-    setIsConfirmOpen(false);
+    setIsEmailConfirmOpen(false);
     setPendingEmail(null);
   };
 
   // モーダルの「キャンセル」ボタン押下時のハンドラ
-  const handleCancel = () => {
-    setIsConfirmOpen(false);
+  const handleCancelEmailSave = () => {
+    setIsEmailConfirmOpen(false);
     setPendingEmail(null);
+  };
+
+  const handleDeleteCalendar = (calendarId: string) => {
+    setDeletingCalendarId(calendarId);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deletingCalendarId) {
+      await deleteCalendar(deletingCalendarId);
+      setDeletingCalendarId(null);
+    }
+    setIsDeleteConfirmOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setDeletingCalendarId(null);
+    setIsDeleteConfirmOpen(false);
   };
 
   // 認証中またはリダイレクト中
@@ -188,6 +212,9 @@ function HomeContent() {
     // 未認証でリダイレクト待ち - 何も表示せず即座にリダイレクト
     return null;
   }
+
+  const deletingCalendarName =
+    calendars.find((c) => c.id === deletingCalendarId)?.name ?? "";
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-muted/10">
@@ -326,14 +353,27 @@ function HomeContent() {
         onAddCalendar={() => {
           router.push("/calendars/new");
         }}
+        onDeleteCalendar={handleDeleteCalendar}
       />
 
       {/* メールアドレス変更確認モーダル */}
       <ConfirmModal
-        isOpen={isConfirmOpen}
+        isOpen={isEmailConfirmOpen}
         message={`メールアドレスを「${pendingEmail}」に変更しますか？`}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
+        onConfirm={handleConfirmEmailSave}
+        onCancel={handleCancelEmailSave}
+      />
+
+      {/* カレンダー削除確認モーダル */}
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        title="カレンダー削除"
+        message={`カレンダー「${deletingCalendarName}」を本当に削除しますか？`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        saveButtonText="削除"
+        variant="destructive"
+        confirmationText={deletingCalendarName}
       />
     </div>
   );
