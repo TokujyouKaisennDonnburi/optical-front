@@ -7,6 +7,33 @@ import { scheduleStore } from "@/mocks/data/scheduleStore";
  * ログインユーザーのスケジュールのみを返却
  */
 export const scheduleHandlers = [
+  http.delete("http://localhost:8000/calendars/:calendarId", ({ params }) => {
+    console.log("[MSW] DELETE /calendars/:calendarId handler called");
+    const { calendarId } = params;
+
+    const calendarIndex = scheduleStore.calendars.findIndex(
+      (c) => c.id === calendarId,
+    );
+
+    if (calendarIndex === -1) {
+      return HttpResponse.json(
+        { error: { code: 404, message: "カレンダーが見つかりません" } },
+        { status: 404 },
+      );
+    }
+
+    // カレンダーを削除
+    scheduleStore.calendars.splice(calendarIndex, 1);
+
+    // 関連するスケジュールも削除
+    scheduleStore.items = scheduleStore.items.filter(
+      (item) => item.calendarId !== calendarId,
+    );
+
+    console.log(`[MSW] Deleted calendar ${calendarId}`);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
   http.get("http://localhost:8000/events/months", ({ request }) => {
     console.log(
       "[MSW] GET /events/months - returning all mock data for debugging",
