@@ -81,6 +81,7 @@ export function SingleScheduleEventPopover({
     top: number;
     left: number;
     showOnRight: boolean;
+    vertical: "up" | "down";
   } | null>(null);
 
   // 各フィールドの編集状態管理
@@ -106,6 +107,8 @@ export function SingleScheduleEventPopover({
 
   // 変更検知フラグ（自動保存のトリガー判定に使用）
   const [isTitleDirty, setIsTitleDirty] = useState(false);
+  // タイトルがスクロール可能かどうか
+  const [isTitleScrollable, setIsTitleScrollable] = useState(false);
   const [isDateTimeDirty, setIsDateTimeDirty] = useState(false);
   const [isMemoDirty, setIsMemoDirty] = useState(false);
   const [isLocationDirty, setIsLocationDirty] = useState(false);
@@ -142,6 +145,8 @@ export function SingleScheduleEventPopover({
 
   // ダイアログ要素のref
   const dialogRef = useRef<HTMLDivElement>(null);
+  // タイトルコンテナのref（スクロール状態監視用）
+  const titleContainerRef = useRef<HTMLDivElement>(null);
 
   // ==================== ユーティリティ関数 ====================
   // 開始・終了日時から終日イベントかどうかを判定
@@ -422,22 +427,107 @@ export function SingleScheduleEventPopover({
       }
     }
 
-    let top = anchorPosition.y - DIALOG_HEIGHT / 2;
-    if (top < MARGIN) {
-      top = MARGIN;
-    }
-    if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
-      top = viewportHeight - DIALOG_HEIGHT - MARGIN;
+    // 垂直方向の判定（初期段階では DIALOG_HEIGHT を使用）
+    const spaceBelow = viewportHeight - (anchorPosition.y + MARGIN);
+    const spaceAbove = anchorPosition.y - MARGIN;
+    const showBelow =
+      spaceBelow >= DIALOG_HEIGHT + MARGIN || spaceBelow >= spaceAbove;
+
+    let top: number;
+    let vertical: "up" | "down";
+
+    if (showBelow) {
+      // 下側に表示
+      vertical = "down";
+      top = anchorPosition.y + MARGIN;
+      // 下端からはみ出す場合は上げる
+      if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
+        top = Math.max(MARGIN, viewportHeight - DIALOG_HEIGHT - MARGIN);
+      }
+    } else {
+      // 上側に表示
+      vertical = "up";
+      top = anchorPosition.y - DIALOG_HEIGHT - MARGIN;
+      // 上端からはみ出す場合は下げる
+      if (top < MARGIN) {
+        top = Math.max(MARGIN, anchorPosition.y - DIALOG_HEIGHT - MARGIN);
+        // 画面内に収まるようにクランプ
+        if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
+          top = Math.max(MARGIN, viewportHeight - DIALOG_HEIGHT - MARGIN);
+        }
+      }
     }
 
-    return { top, left, showOnRight };
+    return { top, left, showOnRight, vertical };
+  }, [anchorPosition]);
+
+  const updatePositionWithCurrentHeight = useCallback(() => {
+    if (!dialogRef.current) return;
+
+    const dialogHeight = dialogRef.current.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const showOnRight = anchorPosition.x < viewportWidth / 2;
+
+    let left: number;
+    if (showOnRight) {
+      left = anchorPosition.x + MARGIN;
+      if (left + DIALOG_WIDTH + MARGIN > viewportWidth) {
+        left = viewportWidth - DIALOG_WIDTH - MARGIN;
+      }
+    } else {
+      left = anchorPosition.x - DIALOG_WIDTH - MARGIN;
+      if (left < MARGIN) {
+        left = MARGIN;
+      }
+    }
+
+    // 実際のダイアログ高さを使用した垂直方向の判定
+    const spaceBelow = viewportHeight - (anchorPosition.y + MARGIN);
+    const spaceAbove = anchorPosition.y - MARGIN;
+    const showBelow =
+      spaceBelow >= dialogHeight + MARGIN || spaceBelow >= spaceAbove;
+
+    let top: number;
+    let vertical: "up" | "down";
+
+    if (showBelow) {
+      // 下側に表示
+      vertical = "down";
+      top = anchorPosition.y + MARGIN;
+      // 下端からはみ出す場合は上げる
+      if (top + dialogHeight + MARGIN > viewportHeight) {
+        top = Math.max(MARGIN, viewportHeight - dialogHeight - MARGIN);
+      }
+    } else {
+      // 上側に表示
+      vertical = "up";
+      top = anchorPosition.y - dialogHeight - MARGIN;
+      // 上端からはみ出す場合は下げる
+      if (top < MARGIN) {
+        top = Math.max(MARGIN, anchorPosition.y - dialogHeight - MARGIN);
+        // 画面内に収まるようにクランプ
+        if (top + dialogHeight + MARGIN > viewportHeight) {
+          top = Math.max(MARGIN, viewportHeight - dialogHeight - MARGIN);
+        }
+      }
+    }
+
+    setDialogPosition({ top, left, showOnRight, vertical });
   }, [anchorPosition]);
 
   useEffect(() => {
     if (isOpen) {
       setDialogPosition(calculatePosition());
+
+      // ダイアログの実際の高さを測定して位置を再調整
+      const timer = setTimeout(() => {
+        updatePositionWithCurrentHeight();
+      }, 0);
+
+      return () => clearTimeout(timer);
     }
-  }, [isOpen, calculatePosition]);
+  }, [isOpen, calculatePosition, updatePositionWithCurrentHeight]);
 
   // ==================== イベントハンドラー ====================
   // タイトル編集終了
@@ -502,11 +592,82 @@ export function SingleScheduleEventPopover({
       }
     };
 
+    // ウィンドウリサイズ時にダイアログ位置を再計算
+    const handleResize = () => {
+      updatePositionWithCurrentHeight();
+    };
+
     window.addEventListener("keydown", handleKey);
+    window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("keydown", handleKey);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [isOpen, handleClose]);
+  }, [isOpen, handleClose, updatePositionWithCurrentHeight]);
+
+  // タイトル改行後のダイアログ高さ変化を監視して位置を再計算
+  useEffect(() => {
+    if (!isOpen || !dialogRef.current) return;
+
+    const recalculatePosition = () => {
+      updatePositionWithCurrentHeight();
+    };
+
+    const resizeObserver = new ResizeObserver(recalculatePosition);
+    resizeObserver.observe(dialogRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isOpen, updatePositionWithCurrentHeight]);
+
+  // 編集状態の変更時に位置を再計算（requestAnimationFrameでバッチ処理）
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let rafId: number;
+    rafId = requestAnimationFrame(() => {
+      updatePositionWithCurrentHeight();
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [isOpen, updatePositionWithCurrentHeight]);
+
+  // タイトルコンテナのスクロール可能状態を監視
+  useEffect(() => {
+    const checkTitleScrollable = () => {
+      if (titleContainerRef.current) {
+        const isScrollable =
+          titleContainerRef.current.scrollHeight >
+          titleContainerRef.current.clientHeight;
+        setIsTitleScrollable(isScrollable);
+      }
+    };
+
+    // 初期チェック
+    checkTitleScrollable();
+
+    // 内容変更時に再チェック
+    const observer = new MutationObserver(checkTitleScrollable);
+    if (titleContainerRef.current) {
+      observer.observe(titleContainerRef.current, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    // ResizeObserverで要素サイズ変化を監視
+    const resizeObserver = new ResizeObserver(checkTitleScrollable);
+    if (titleContainerRef.current) {
+      resizeObserver.observe(titleContainerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // ==================== レンダリング ====================
   // クライアントサイドマウント前、非表示時、位置未計算時は何も表示しない
@@ -527,10 +688,15 @@ export function SingleScheduleEventPopover({
     ? item.calendarName
     : "カレンダー";
 
-  // スライドアニメーションの方向（右から来るか左から来るか）
-  const slideDirection = dialogPosition.showOnRight
+  // スライドアニメーションの方向（左右・上下）
+  const horizontalDirection = dialogPosition.showOnRight
     ? "animate-slide-in-right"
     : "animate-slide-in-left";
+  const verticalDirection =
+    dialogPosition.vertical === "down"
+      ? "animate-slide-in-down"
+      : "animate-slide-in-up";
+  const slideDirection = `${horizontalDirection} ${verticalDirection}`;
 
   return createPortal(
     // biome-ignore lint/a11y/noStaticElementInteractions: Backdrop overlay for closing dialog
@@ -544,7 +710,7 @@ export function SingleScheduleEventPopover({
     >
       <div
         ref={dialogRef}
-        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl backdrop-blur-sm ${slideDirection}`}
+        className={`absolute flex max-h-[50vh] w-[380px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl backdrop-blur-sm ${slideDirection}`}
         style={{
           top: dialogPosition.top,
           left: dialogPosition.left,
@@ -556,7 +722,7 @@ export function SingleScheduleEventPopover({
       >
         {/* biome-ignore lint/a11y/noStaticElementInteractions: Header click to cancel editing mode */}
         <div
-          className="relative flex flex-col gap-2.5 px-5 py-4 text-foreground"
+          className="relative flex flex-shrink-0 flex-col gap-2.5 px-5 py-4 text-foreground"
           style={{ backgroundColor: headerColor }}
           onClick={() => {
             setEditingTitle(false);
@@ -575,7 +741,14 @@ export function SingleScheduleEventPopover({
             }
           }}
         >
-          <div className="pr-24">
+          <div
+            ref={titleContainerRef}
+            className={`max-h-[3.5rem] overflow-y-auto pr-24 ${
+              isTitleScrollable
+                ? "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded"
+                : "[&::-webkit-scrollbar]:hidden"
+            }`}
+          >
             {editingTitle ? (
               <Input
                 value={titleValue}
@@ -598,7 +771,7 @@ export function SingleScheduleEventPopover({
               <Text
                 as="h2"
                 weight="semibold"
-                className="pr-24 text-lg leading-tight text-white mix-blend-plus-lighter cursor-pointer hover:text-white/90"
+                className="text-lg leading-tight text-white mix-blend-plus-lighter cursor-pointer hover:text-white/90 whitespace-pre-wrap break-words"
                 onClick={(e) => {
                   e.stopPropagation();
                   setEditingDate(false);
@@ -920,7 +1093,7 @@ export function SingleScheduleEventPopover({
         </div>
         {/* biome-ignore lint/a11y/noStaticElementInteractions: Details card for displaying event information */}
         <div
-          className="max-h-[300px] space-y-4 overflow-y-auto px-5 py-4 text-sm text-foreground"
+          className="flex-1 space-y-4 overflow-y-auto px-5 py-4 text-sm text-foreground"
           onClick={() => {
             setEditingTitle(false);
             setEditingDate(false);
@@ -970,7 +1143,7 @@ export function SingleScheduleEventPopover({
                 <Text
                   as="p"
                   size="sm"
-                  className="cursor-pointer whitespace-pre-wrap leading-relaxed text-foreground transition-colors hover:text-foreground/80"
+                  className="cursor-pointer whitespace-pre-wrap break-words leading-relaxed text-foreground transition-colors hover:text-foreground/80"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingTitle(false);
@@ -1046,7 +1219,7 @@ export function SingleScheduleEventPopover({
                   <Text
                     as="span"
                     size="sm"
-                    className="leading-relaxed text-foreground transition-colors hover:text-foreground/80"
+                    className="leading-relaxed text-foreground transition-colors hover:text-foreground/80 whitespace-pre-wrap break-words"
                   >
                     {isLocationDirty ? locationValue : item.location}
                   </Text>

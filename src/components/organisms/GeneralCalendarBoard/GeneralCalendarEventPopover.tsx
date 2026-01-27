@@ -68,6 +68,7 @@ export function GeneralCalendarEventPopover({
     top: number;
     left: number;
     showOnRight: boolean;
+    vertical: "up" | "down";
   } | null>(null);
   // メモ/場所の編集状態と値
   const [editingMemo, setEditingMemo] = useState(false);
@@ -115,6 +116,8 @@ export function GeneralCalendarEventPopover({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [isAllDayValue, setIsAllDayValue] = useState(false);
+  // タイトルがスクロール可能かどうか
+  const [isTitleScrollable, setIsTitleScrollable] = useState(false);
 
   // 時刻編集開始時の元の値（バリデーションエラー時に復元）
   const [originalTime, setOriginalTime] = useState<{
@@ -129,6 +132,8 @@ export function GeneralCalendarEventPopover({
   } | null>(null);
 
   const dialogRef = useRef<HTMLDivElement>(null);
+  // タイトルコンテナのref（スクロール状態監視用）
+  const titleContainerRef = useRef<HTMLDivElement>(null);
 
   // ==================== ユーティリティ関数 ====================
   // 開始・終了日時から終日イベントかどうかを判定
@@ -433,27 +438,107 @@ export function GeneralCalendarEventPopover({
       }
     }
 
-    // 縦位置はクリック位置を中心に
-    let top = anchorPosition.y - DIALOG_HEIGHT / 2;
+    // 垂直方向の判定（初期段階では DIALOG_HEIGHT を使用）
+    const spaceBelow = viewportHeight - (anchorPosition.y + MARGIN);
+    const spaceAbove = anchorPosition.y - MARGIN;
+    const showBelow =
+      spaceBelow >= DIALOG_HEIGHT + MARGIN || spaceBelow >= spaceAbove;
 
-    // 上端からはみ出す場合
-    if (top < MARGIN) {
-      top = MARGIN;
+    let top: number;
+    let vertical: "up" | "down";
+
+    if (showBelow) {
+      // 下側に表示
+      vertical = "down";
+      top = anchorPosition.y + MARGIN;
+      // 下端からはみ出す場合は上げる
+      if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
+        top = Math.max(MARGIN, viewportHeight - DIALOG_HEIGHT - MARGIN);
+      }
+    } else {
+      // 上側に表示
+      vertical = "up";
+      top = anchorPosition.y - DIALOG_HEIGHT - MARGIN;
+      // 上端からはみ出す場合は下げる
+      if (top < MARGIN) {
+        top = Math.max(MARGIN, anchorPosition.y - DIALOG_HEIGHT - MARGIN);
+        // 画面内に収まるようにクランプ
+        if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
+          top = Math.max(MARGIN, viewportHeight - DIALOG_HEIGHT - MARGIN);
+        }
+      }
     }
 
-    // 下端からはみ出す場合
-    if (top + DIALOG_HEIGHT + MARGIN > viewportHeight) {
-      top = viewportHeight - DIALOG_HEIGHT - MARGIN;
+    return { top, left, showOnRight, vertical };
+  }, [anchorPosition]);
+
+  const updatePositionWithCurrentHeight = useCallback(() => {
+    if (!dialogRef.current) return;
+
+    const dialogHeight = dialogRef.current.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const showOnRight = anchorPosition.x < viewportWidth / 2;
+
+    let left: number;
+    if (showOnRight) {
+      left = anchorPosition.x + MARGIN;
+      if (left + DIALOG_WIDTH + MARGIN > viewportWidth) {
+        left = viewportWidth - DIALOG_WIDTH - MARGIN;
+      }
+    } else {
+      left = anchorPosition.x - DIALOG_WIDTH - MARGIN;
+      if (left < MARGIN) {
+        left = MARGIN;
+      }
     }
 
-    return { top, left, showOnRight };
+    // 実際のダイアログ高さを使用した垂直方向の判定
+    const spaceBelow = viewportHeight - (anchorPosition.y + MARGIN);
+    const spaceAbove = anchorPosition.y - MARGIN;
+    const showBelow =
+      spaceBelow >= dialogHeight + MARGIN || spaceBelow >= spaceAbove;
+
+    let top: number;
+    let vertical: "up" | "down";
+
+    if (showBelow) {
+      // 下側に表示
+      vertical = "down";
+      top = anchorPosition.y + MARGIN;
+      // 下端からはみ出す場合は上げる
+      if (top + dialogHeight + MARGIN > viewportHeight) {
+        top = Math.max(MARGIN, viewportHeight - dialogHeight - MARGIN);
+      }
+    } else {
+      // 上側に表示
+      vertical = "up";
+      top = anchorPosition.y - dialogHeight - MARGIN;
+      // 上端からはみ出す場合は下げる
+      if (top < MARGIN) {
+        top = Math.max(MARGIN, anchorPosition.y - dialogHeight - MARGIN);
+        // 画面内に収まるようにクランプ
+        if (top + dialogHeight + MARGIN > viewportHeight) {
+          top = Math.max(MARGIN, viewportHeight - dialogHeight - MARGIN);
+        }
+      }
+    }
+
+    setDialogPosition({ top, left, showOnRight, vertical });
   }, [anchorPosition]);
 
   useEffect(() => {
     if (isOpen) {
       setDialogPosition(calculatePosition());
+
+      // ダイアログの実際の高さを測定して位置を再調整
+      const timer = setTimeout(() => {
+        updatePositionWithCurrentHeight();
+      }, 0);
+
+      return () => clearTimeout(timer);
     }
-  }, [isOpen, calculatePosition]);
+  }, [isOpen, calculatePosition, updatePositionWithCurrentHeight]);
 
   /**
    * ポップオーバーを閉じる
@@ -494,13 +579,82 @@ export function GeneralCalendarEventPopover({
       }
     };
 
+    // ウィンドウリサイズ時にダイアログ位置を再計算
+    const handleResize = () => {
+      updatePositionWithCurrentHeight();
+    };
+
     window.addEventListener("keydown", handleKey);
+    window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("keydown", handleKey);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [isOpen, handleClose]);
+  }, [isOpen, handleClose, updatePositionWithCurrentHeight]);
 
-  // スクロールロックは削除（ポップオーバーではスクロールを許可）
+  // タイトル改行後のダイアログ高さ変化を監視して位置を再計算
+  useEffect(() => {
+    if (!isOpen || !dialogRef.current) return;
+
+    const recalculatePosition = () => {
+      updatePositionWithCurrentHeight();
+    };
+
+    const resizeObserver = new ResizeObserver(recalculatePosition);
+    resizeObserver.observe(dialogRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isOpen, updatePositionWithCurrentHeight]);
+
+  // 編集状態の変更時に位置を再計算（requestAnimationFrameでバッチ処理）
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let rafId: number;
+    rafId = requestAnimationFrame(() => {
+      updatePositionWithCurrentHeight();
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [isOpen, updatePositionWithCurrentHeight]);
+
+  // タイトルコンテナのスクロール可能状態を監視
+  useEffect(() => {
+    const checkTitleScrollable = () => {
+      if (titleContainerRef.current) {
+        const isScrollable =
+          titleContainerRef.current.scrollHeight >
+          titleContainerRef.current.clientHeight;
+        setIsTitleScrollable(isScrollable);
+      }
+    };
+
+    // 初期チェック
+    checkTitleScrollable();
+
+    // 内容変更時に再チェック
+    const observer = new MutationObserver(checkTitleScrollable);
+    if (titleContainerRef.current) {
+      observer.observe(titleContainerRef.current, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    // ResizeObserverで要素サイズ変化を監視
+    const resizeObserver = new ResizeObserver(checkTitleScrollable);
+    if (titleContainerRef.current) {
+      resizeObserver.observe(titleContainerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // ==================== レンダリング ====================
   // マウント前・非表示・位置未計算の場合は描画しない
@@ -520,10 +674,15 @@ export function GeneralCalendarEventPopover({
     ? item.calendarName
     : "登録カレンダー";
 
-  // スライドアニメーションの方向（右から来るか左から来るか）
-  const slideDirection = dialogPosition.showOnRight
+  // スライドアニメーションの方向（左右・上下）
+  const horizontalDirection = dialogPosition.showOnRight
     ? "animate-slide-in-right"
     : "animate-slide-in-left";
+  const verticalDirection =
+    dialogPosition.vertical === "down"
+      ? "animate-slide-in-down"
+      : "animate-slide-in-up";
+  const slideDirection = `${horizontalDirection} ${verticalDirection}`;
 
   return createPortal(
     // biome-ignore lint/a11y/noStaticElementInteractions: Backdrop overlay for closing dialog on click
@@ -541,7 +700,7 @@ export function GeneralCalendarEventPopover({
     >
       <div
         ref={dialogRef}
-        className={`absolute w-[380px] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl backdrop-blur-sm ${slideDirection}`}
+        className={`absolute flex max-h-[55vh] w-[380px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl backdrop-blur-sm ${slideDirection}`}
         style={{
           top: dialogPosition.top,
           left: dialogPosition.left,
@@ -553,7 +712,7 @@ export function GeneralCalendarEventPopover({
       >
         {/* biome-ignore lint/a11y/noStaticElementInteractions: Header click to cancel editing mode */}
         <div
-          className="relative flex flex-col gap-2.5 px-5 py-4 text-foreground"
+          className="relative flex flex-shrink-0 flex-col gap-2.5 px-5 py-4 text-foreground"
           style={{ backgroundColor: headerColor }}
           onClick={() => {
             // ヘッダーのクリックで全ての編集モードをキャンセル
@@ -573,7 +732,14 @@ export function GeneralCalendarEventPopover({
             }
           }}
         >
-          <div className="pr-24">
+          <div
+            ref={titleContainerRef}
+            className={`max-h-[3.5rem] overflow-y-auto pr-24 ${
+              isTitleScrollable
+                ? "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded"
+                : "[&::-webkit-scrollbar]:hidden"
+            }`}
+          >
             {editingTitle ? (
               <Input
                 value={titleValue}
@@ -596,7 +762,7 @@ export function GeneralCalendarEventPopover({
               <Text
                 as="h2"
                 weight="semibold"
-                className="pr-24 text-lg leading-tight text-white mix-blend-plus-lighter cursor-pointer hover:text-white/90"
+                className="text-lg leading-tight text-white mix-blend-plus-lighter cursor-pointer hover:text-white/90 whitespace-pre-wrap break-words"
                 onClick={(e) => {
                   e.stopPropagation();
                   setEditingDate(false);
@@ -956,7 +1122,7 @@ export function GeneralCalendarEventPopover({
 
         {/* biome-ignore lint/a11y/noStaticElementInteractions: Details card click to cancel editing mode */}
         <div
-          className="max-h-[300px] space-y-4 overflow-y-auto px-5 py-4 text-sm text-foreground"
+          className="flex-1 space-y-4 overflow-y-auto px-5 py-4 text-sm text-foreground"
           onClick={() => {
             // 詳細カードのクリックで全ての編集モードをキャンセル
             setEditingTitle(false);
@@ -1005,7 +1171,7 @@ export function GeneralCalendarEventPopover({
                 <Text
                   as="p"
                   size="sm"
-                  className="cursor-pointer whitespace-pre-wrap leading-relaxed text-foreground transition-colors hover:text-foreground/80"
+                  className="cursor-pointer whitespace-pre-wrap break-words leading-relaxed text-foreground transition-colors hover:text-foreground/80"
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingTitle(false);
@@ -1080,7 +1246,7 @@ export function GeneralCalendarEventPopover({
                   <Text
                     as="span"
                     size="sm"
-                    className="leading-relaxed text-foreground transition-colors hover:text-foreground/80"
+                    className="leading-relaxed text-foreground transition-colors hover:text-foreground/80 whitespace-pre-wrap break-words"
                   >
                     {isLocationDirty ? locationValue : item.location}
                   </Text>
