@@ -11,7 +11,11 @@ import {
   GeneralCreateCalendarDialog,
 } from "@/components/organisms/GeneralCalendarBoard";
 import type { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
-import { createSchedule } from "@/lib/api-schedule";
+import {
+  createSchedule,
+  deleteSchedule,
+  updateSchedule,
+} from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 type HomeBoardAreaProps = {
@@ -98,6 +102,7 @@ export function HomeBoardArea({
           members: item.members ?? [],
           calendarName: item.calendarName,
           calendarColor: item.calendarColor,
+          calendarId: item.calendarId, // 追加
         };
       })
       .filter((value): value is NonNullable<typeof value> => Boolean(value))
@@ -136,6 +141,94 @@ export function HomeBoardArea({
     position: { x: number; y: number },
   ) => {
     setSelectedItem({ item, position });
+  };
+
+  /**
+   * スケジュール削除ハンドラー
+   * ポップオーバーの削除ボタンクリック時に呼び出される
+   *
+   * 処理フロー:
+   * 1. 選択アイテムからカレンダーID・イベントIDを取得
+   * 2. calendarId が無い場合はエラー処理
+   * 3. deleteSchedule API呼び出し
+   * 4. 成功時: toast.warning + 画面再取得 + ポップオーバー閉じる
+   * 5. 失敗時: toast.error + ポップオーバー閉じる（エラー時でも閉じる）
+   */
+  const handleDelete = async () => {
+    if (!selectedItem) return;
+
+    const { calendarId, id } = selectedItem.item;
+
+    if (!calendarId) {
+      console.error(
+        "calendarId が無い予定を削除しようとしました",
+        selectedItem.item,
+      );
+      toast.error("削除できない予定です（カレンダー情報がありません）");
+      return;
+    }
+
+    try {
+      console.log("削除開始:", { calendarId, id });
+
+      await deleteSchedule(calendarId, id);
+
+      console.log("削除成功");
+
+      toast.warning("予定を削除しました");
+      onRefresh();
+    } catch (error) {
+      console.error("削除に失敗しました:", error);
+      toast.error("削除に失敗しました");
+    } finally {
+      // エラー時でも必ずポップオーバーを閉じる
+      handleCloseDialog();
+    }
+  };
+
+  /**
+   * スケジュール更新ハンドラー
+   * ポップオーバーのインライン編集時に呼び出される
+   *
+   * 処理フロー:
+   * 1. 選択アイテムからカレンダーID・イベントIDを取得
+   * 2. calendarId が無い場合はエラー処理
+   * 3. updateSchedule API呼び出し（部分更新対応）
+   * 4. 成功時: toast.success + 画面再取得（重要！）
+   * 5. 失敗時: toast.error をスロー
+   */
+  const handleUpdate = async (updates: {
+    title?: string;
+    memo?: string;
+    location?: string;
+    startTime?: string;
+    endTime?: string;
+    isAllDay?: boolean;
+  }) => {
+    if (!selectedItem) return;
+
+    const { calendarId, id } = selectedItem.item;
+
+    if (!calendarId) {
+      toast.error("更新できない予定です");
+      return;
+    }
+
+    try {
+      console.log("✏️ 更新開始:", { calendarId, id, updates });
+
+      await updateSchedule(calendarId, id, updates);
+
+      console.log("更新成功 → 再取得");
+
+      toast.success("変更が保存されました");
+
+      onRefresh(); // ← これが本命
+    } catch (error) {
+      console.error("更新に失敗しました:", error);
+      toast.error("保存に失敗しました");
+      throw error;
+    }
   };
 
   const handleCloseDialog = () => {
@@ -270,6 +363,8 @@ export function HomeBoardArea({
           isOpen
           onClose={handleCloseDialog}
           anchorPosition={selectedItem.position}
+          onDelete={handleDelete}
+          onUpdate={handleUpdate}
         />
       ) : null}
       {createDate ? (
