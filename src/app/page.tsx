@@ -44,7 +44,6 @@ function HomeContent() {
   // カレンダーグリッド用のスケジュール（viewDateに基づく）
   const { items, calendars, isLoading, error, refresh, deleteCalendar } =
     useGeneralCalendar(viewDate);
-
   // 今日の予定パネル用のスケジュール（常に今日の月）
   const {
     items: todayMonthItems,
@@ -162,17 +161,13 @@ function HomeContent() {
     setIsEmailConfirmOpen(true);
   };
 
-  // モーダルの「保存」ボタン押下時のハンドラ
   const handleConfirmEmailSave = () => {
-    // ここで実際の保存処理を実装
     console.log("保存:", pendingEmail);
-
     setConfirmSaveTrigger((prev) => prev + 1);
     setIsEmailConfirmOpen(false);
     setPendingEmail(null);
   };
 
-  // モーダルの「キャンセル」ボタン押下時のハンドラ
   const handleCancelEmailSave = () => {
     setIsEmailConfirmOpen(false);
     setPendingEmail(null);
@@ -367,7 +362,7 @@ function HomeContent() {
       {/* カレンダー削除確認モーダル */}
       <ConfirmModal
         isOpen={isDeleteConfirmOpen}
-        title="カレンダー削除"
+        title="カレンダーの削除"
         message={`カレンダー「${deletingCalendarName}」を本当に削除しますか？`}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}

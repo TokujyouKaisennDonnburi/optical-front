@@ -1,5 +1,4 @@
 "use client";
-
 import { Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -182,7 +181,7 @@ export function LinkableSelectCalendarCard({
   href,
   className,
 }: LinkableSelectCalendarCardProps) {
-  const accentBorder = toRgba(calendar.color, 0.35) ?? "rgba(56,189,248,.35)";
+  const accentBorder = toRgba(calendar.color, 0.35) ?? "rgba(56, 189, 248, 0.35)";
 
   return (
     <div className="relative min-w-[10rem] flex-shrink-0">
@@ -198,8 +197,6 @@ export function LinkableSelectCalendarCard({
       >
         <SelectCalendarCard calendar={calendar} />
       </Link>
-
-      {/* Delete menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
