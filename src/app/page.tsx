@@ -13,7 +13,6 @@ import React, {
 } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
-import { Loading } from "@/components/atoms/Loading";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
 import { InitialLoading } from "@/components/molecules/InitialLoading/InitialLoading";
 import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
@@ -77,7 +76,6 @@ function HomeContent() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
-  const [isNavigating, setIsNavigating] = useState(false);
   const [isAgentOpen, setIsAgentOpen] = useState(false);
 
   const filteredItems = useMemo(() => {
@@ -316,28 +314,13 @@ function HomeContent() {
           </div>
         </main>
       </div>
+      {/* カレンダー選択ストリップ - next/link使用で自動プリフェッチ */}
       <SelectCalendarStrip
         calendars={calendars}
-        onSelectCalendar={(cal) => {
-          setIsNavigating(true);
-          // 0.5秒待ってからナビゲーション
-          setTimeout(() => {
-            router.push(`/calendars/${cal.id}`);
-          }, 500);
-        }}
         onAddCalendar={() => {
           router.push("/calendars/new");
         }}
       />
-
-      {/* 遷移時のローディングオーバーレイ */}
-      {isNavigating && (
-        <Loading
-          variant="overlay"
-          size="lg"
-          message="カレンダーを読み込み中..."
-        />
-      )}
 
       {/* メールアドレス変更確認モーダル */}
       <ConfirmModal

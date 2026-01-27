@@ -1,8 +1,8 @@
 "use client";
 
 import {
+  LinkableSelectCalendarCard,
   SelectCalendarAddCard,
-  SelectCalendarCard,
   type SelectCalendarCardData,
 } from "@/components/molecules/SelectCalendarCard";
 import { SelectCalendarGrid } from "@/components/molecules/SelectCalendarGrid";
@@ -13,6 +13,7 @@ export type SelectCalendarStripItem = SelectCalendarCardData;
 export type SelectCalendarStripProps = {
   calendars: SelectCalendarStripItem[];
   className?: string;
+  /** @deprecated Use next/link's automatic navigation instead */
   onSelectCalendar?: (calendar: SelectCalendarStripItem) => void;
   onAddCalendar?: () => void;
 };
@@ -20,13 +21,8 @@ export type SelectCalendarStripProps = {
 export function SelectCalendarStrip({
   calendars,
   className,
-  onSelectCalendar,
   onAddCalendar,
 }: SelectCalendarStripProps) {
-  const handleSelect = (calendar: SelectCalendarStripItem) => {
-    onSelectCalendar?.(calendar);
-  };
-
   const handleAdd = () => {
     onAddCalendar?.();
   };
@@ -40,10 +36,10 @@ export function SelectCalendarStrip({
     >
       <SelectCalendarGrid>
         {calendars.map((cal) => (
-          <SelectCalendarCard
+          <LinkableSelectCalendarCard
             key={cal.id}
             calendar={cal}
-            onClick={() => handleSelect(cal)}
+            href={`/calendars/${cal.id}`}
           />
         ))}
         <SelectCalendarAddCard onClick={handleAdd} />
