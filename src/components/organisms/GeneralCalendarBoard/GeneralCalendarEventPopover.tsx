@@ -1137,134 +1137,140 @@ export function GeneralCalendarEventPopover({
             }
           }}
         >
-          {item.memo ? (
-            <div className="flex items-start gap-2">
-              <Icon
-                icon={NotebookPen}
-                size="sm"
-                className="mt-0.5 flex-shrink-0 text-muted-foreground/70"
-              />
-              {editingMemo ? (
-                <div
-                  className="flex flex-1 flex-col gap-2"
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      e.stopPropagation();
-                      setEditingMemo(false);
-                    }
-                  }}
-                  role="group"
-                >
-                  <Textarea
-                    value={memoValue}
-                    onChange={(e) => {
-                      setMemoValue(e.target.value);
-                      setIsMemoDirty(true);
-                    }}
-                    placeholder="メモを入力"
-                    className="min-h-[80px] resize-none text-sm"
-                    autoFocus
-                  />
-                </div>
-              ) : (
-                <Text
-                  as="p"
-                  size="sm"
-                  className="cursor-pointer whitespace-pre-wrap break-words leading-relaxed text-foreground transition-colors hover:text-foreground/80"
-                  onClick={(e) => {
+          <div className="flex items-start gap-2">
+            <Icon
+              icon={NotebookPen}
+              size="sm"
+              className="mt-0.5 flex-shrink-0 text-muted-foreground/70"
+            />
+            {editingMemo ? (
+              <div
+                className="flex flex-1 flex-col gap-2"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
                     e.stopPropagation();
-                    setEditingTitle(false);
-                    setEditingDate(false);
-                    setEditingTime(false);
-                    setEditingLocation(false);
-                    setEditingMemo(true);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      setEditingMemo(true);
-                    }
-                  }}
-                >
-                  {isMemoDirty ? memoValue : item.memo}
-                </Text>
-              )}
-            </div>
-          ) : null}
-
-          {item.location ? (
-            <div className="flex items-start gap-2">
-              <Icon
-                icon={MapPin}
-                size="sm"
-                className="mt-0.5 flex-shrink-0 text-muted-foreground/70"
-              />
-              {editingLocation ? (
-                <button
-                  type="button"
-                  className="flex flex-1 flex-col gap-2 appearance-none border-none bg-transparent p-0 text-left cursor-auto"
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      e.stopPropagation();
-                      setEditingLocation(false);
-                    }
-                  }}
-                >
-                  <Input
-                    value={locationValue}
-                    onChange={(e) => {
-                      setLocationValue(e.target.value);
-                      setIsLocationDirty(true);
-                    }}
-                    placeholder="場所を入力"
-                    className="text-sm"
-                    autoFocus
-                  />
-                </button>
-              ) : (
-                <div
-                  className="flex flex-1 cursor-pointer flex-col gap-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingTitle(false);
-                    setEditingDate(false);
-                    setEditingTime(false);
                     setEditingMemo(false);
+                  }
+                }}
+                role="group"
+              >
+                <Textarea
+                  value={memoValue}
+                  onChange={(e) => {
+                    setMemoValue(e.target.value);
+                    setIsMemoDirty(true);
+                  }}
+                  placeholder="メモを追加…"
+                  className="min-h-[80px] resize-none text-sm"
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <Text
+                as="p"
+                size="sm"
+                className={`cursor-pointer whitespace-pre-wrap break-words leading-relaxed transition-colors hover:text-foreground/80 ${
+                  (isMemoDirty ? memoValue : item.memo)?.trim()
+                    ? "text-foreground"
+                    : "text-muted-foreground italic"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingTitle(false);
+                  setEditingDate(false);
+                  setEditingTime(false);
+                  setEditingLocation(false);
+                  setEditingMemo(true);
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    setEditingMemo(true);
+                  }
+                }}
+              >
+                {(isMemoDirty ? memoValue : item.memo)?.trim() || "メモを追加…"}
+              </Text>
+            )}
+          </div>
+
+          <div className="flex items-start gap-2">
+            <Icon
+              icon={MapPin}
+              size="sm"
+              className="mt-0.5 flex-shrink-0 text-muted-foreground/70"
+            />
+            {editingLocation ? (
+              <button
+                type="button"
+                className="flex flex-1 flex-col gap-2 appearance-none border-none bg-transparent p-0 text-left cursor-auto"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.stopPropagation();
+                    setEditingLocation(false);
+                  }
+                }}
+              >
+                <Input
+                  value={locationValue}
+                  onChange={(e) => {
+                    setLocationValue(e.target.value);
+                    setIsLocationDirty(true);
+                  }}
+                  placeholder="場所を追加…"
+                  className="text-sm"
+                  autoFocus
+                />
+              </button>
+            ) : (
+              <div
+                className="flex flex-1 cursor-pointer flex-col gap-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingTitle(false);
+                  setEditingDate(false);
+                  setEditingTime(false);
+                  setEditingMemo(false);
+                  setEditingLocation(true);
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
                     setEditingLocation(true);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      setEditingLocation(true);
-                    }
-                  }}
+                  }
+                }}
+              >
+                <Text
+                  as="span"
+                  size="sm"
+                  className={`leading-relaxed whitespace-pre-wrap break-words transition-colors hover:text-foreground/80 ${
+                    (isLocationDirty ? locationValue : item.location)?.trim()
+                      ? "text-foreground"
+                      : "text-muted-foreground italic"
+                  }`}
                 >
-                  <Text
-                    as="span"
-                    size="sm"
-                    className="leading-relaxed text-foreground transition-colors hover:text-foreground/80 whitespace-pre-wrap break-words"
+                  {(isLocationDirty ? locationValue : item.location)?.trim() ||
+                    "場所を追加…"}
+                </Text>
+                {(isLocationDirty ? locationValue : item.location)?.trim() &&
+                item.locationUrl ? (
+                  <a
+                    href={item.locationUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-primary underline hover:text-primary/80"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {isLocationDirty ? locationValue : item.location}
-                  </Text>
-                  {item.locationUrl ? (
-                    <a
-                      href={item.locationUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-xs text-primary underline hover:text-primary/80"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {item.locationUrl}
-                    </a>
-                  ) : null}
-                </div>
-              )}
-            </div>
-          ) : null}
+                    {item.locationUrl}
+                  </a>
+                ) : null}
+              </div>
+            )}
+          </div>
 
           {members.length ? (
             <div className="flex items-start gap-2 text-muted-foreground">
