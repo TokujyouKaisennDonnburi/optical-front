@@ -9,7 +9,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
-import { Loading } from "@/components/atoms/Loading";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import { CalendarSwitcher } from "@/components/molecules/CalendarSwitcher";
@@ -132,9 +131,6 @@ export function CalendarDetailClient({
         : [...prev, dateStr],
     );
   };
-
-  // ナビゲーション中のローディング状態
-  const [isNavigating, setIsNavigating] = useState(false);
 
   // GitHub レビューオプションの状態
   // const [pullRequests, setPullRequests] = useState<GitHubPullRequest[]>([]);
@@ -263,14 +259,6 @@ export function CalendarDetailClient({
     setViewDate(startOfDay(next));
   };
 
-  const handleBack = () => {
-    setIsNavigating(true);
-    // 0.4秒待ってからナビゲーション
-    setTimeout(() => {
-      router.push("/");
-    }, 400);
-  };
-
   const handleClear = () => {
     setSearchTerm("");
     const today = startOfDay(new Date());
@@ -372,15 +360,15 @@ export function CalendarDetailClient({
       {/* ヘッダー */}
       <header className="border-b border-border bg-card/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2.5 px-4 py-2.5 lg:px-8">
-          {/* 戻るボタン - 最左 */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBack}
+          {/* 戻るボタン - next/link使用で高速ナビゲーション */}
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10"
             aria-label="戻る"
+            prefetch={true}
           >
             <ArrowLeft className="h-5 w-5" />
-          </Button>
+          </Link>
 
           {/* OptiCal ロゴ */}
           <Link href="/" className="flex shrink-0 items-center">
@@ -694,15 +682,6 @@ export function CalendarDetailClient({
           installedOptions={calendar?.options}
         />
       </div>
-
-      {/* 遷移時のローディングオーバーレイ */}
-      {isNavigating && (
-        <Loading
-          variant="overlay"
-          size="lg"
-          message="総合スケジュールを読み込み中..."
-        />
-      )}
       {createDialogData ? (
         <SingleCreateScheduleDialog
           date={createDialogData.date}

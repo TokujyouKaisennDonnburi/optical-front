@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@/components/atoms/Loading";
 
 interface InitialLoadingProps {
   message?: string;

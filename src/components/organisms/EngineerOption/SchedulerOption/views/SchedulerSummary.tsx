@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Label } from "@/components/atoms/Label";
+import { RadioGroup, RadioGroupItem } from "@/components/atoms/RadioGroup";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
 import {
@@ -21,7 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/atoms/ui/table";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getSchedulerPoll } from "@/lib/api-scheduler-polls";
 import type { SchedulerPollDetailResponse } from "@/types/scheduler-poll";
 import { cn } from "@/utils_constants_styles/utils";

@@ -1,3 +1,4 @@
+export { Spinner } from "@/components/ui/spinner";
 export {
   Loading,
   type LoadingProps,
