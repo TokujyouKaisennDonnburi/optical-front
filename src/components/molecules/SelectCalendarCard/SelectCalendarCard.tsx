@@ -1,6 +1,5 @@
 "use client";
-
-import { MoreVertical, Plus } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/atoms/Button";
@@ -183,10 +182,10 @@ export function SelectCalendarCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-full text-white/80 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/20 hover:text-white focus:opacity-100"
+              className="h-7 w-7 rounded-full text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive focus:opacity-100"
               aria-label="カレンダーオプション"
             >
-              <MoreVertical size={16} />
+              <Trash2 size={16} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
