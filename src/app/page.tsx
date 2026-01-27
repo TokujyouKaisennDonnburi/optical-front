@@ -173,33 +173,21 @@ function HomeContent() {
     setPendingEmail(null);
   };
 
-  const handleDeleteCalendar = (calendarId: string) => {
-    setDeletingCalendarId(calendarId);
-    setIsDeleteConfirmOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (deletingCalendarId) {
-      await deleteCalendar(deletingCalendarId);
-      setDeletingCalendarId(null);
-    }
-    setIsDeleteConfirmOpen(false);
-  };
-
-  const handleCancelDelete = () => {
-    setDeletingCalendarId(null);
-    setIsDeleteConfirmOpen(false);
-  };
-
-  // 認証中またはリダイレクト中はローディング表示
+  // 認証中またはリダイレクト中
   if (authLoading || !user) {
     // ログアウト中の場合
     if (isLoggingOut) {
       return <InitialLoading message="ログアウト中..." />;
     }
 
-    // その他のローディング/リダイレクト待機中
-    return <InitialLoading />;
+    // 認証確認中のみローディング表示
+    // 未認証の場合（!user && !authLoading）はリダイレクト中なので何も表示しない
+    if (authLoading) {
+      return <InitialLoading />;
+    }
+
+    // 未認証でリダイレクト待ち - 何も表示せず即座にリダイレクト
+    return null;
   }
 
   const deletingCalendarName =
