@@ -7,6 +7,7 @@ import {
   createScheduler,
   getScheduler,
   getSchedulerList,
+  postSchedulerAttendance,
 } from "@/types/scheduler";
 import type { SchedulerPollResponse } from "@/types/scheduler-poll";
 import { SchedulerAvailability } from "./views/SchedulerAvailability";
@@ -221,35 +222,34 @@ export function SchedulerOption({
   const handleRespondNext = async () => {
     if (!selectedSchedulerId) return;
     try {
-      const response = await fetch(
-        `/api/scheduler-polls/${encodeURIComponent(selectedSchedulerId)}/responses`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            availability,
-            comment,
-          }),
-        },
-      );
+      // Convert availability map to status array
+      const availabilityToStatus = (av: Availability): 1 | 2 | 3 => {
+        switch (av) {
+          case "ok":
+            return 1;
+          case "maybe":
+            return 2;
+          case "ng":
+            return 3;
+        }
+      };
 
-      if (!response.ok) {
-        toast.error(
-          "回答の送信に失敗しました。時間をおいて再度お試しください。",
-        );
-        return;
-      }
+      const status = Object.entries(availability).map(([date, av]) => ({
+        date: new Date(date).toISOString(),
+        status: availabilityToStatus(av),
+      }));
+
+      await postSchedulerAttendance(calendarId, selectedSchedulerId, {
+        comment,
+        status,
+      });
 
       toast.success("回答を送信しました");
       setAvailability({});
       setComment("");
       setViewMode("summary");
     } catch (_error) {
-      toast.error(
-        "ネットワークエラーが発生しました。接続状況を確認してください。",
-      );
+      toast.error("回答の送信に失敗しました。時間をおいて再度お試しください。");
     }
   };
 

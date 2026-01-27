@@ -79,7 +79,26 @@ export const getSchedulerAttendance = async (
   schedulerId: string,
 ) => {
   return apiPost<SchedulerAttendaceResponse>(
-    `/calendars/${calendarId}/schedulers/${schedulerId}/attendaces`,
+    `/calendars/${calendarId}/schedulers/${schedulerId}/attendance`,
+  );
+};
+
+export type PostSchedulerAttendanceRequest = {
+  comment: string;
+  status: {
+    date: string;
+    status: 1 | 2 | 3; // 1=ok, 2=maybe, 3=ng
+  }[];
+};
+
+export const postSchedulerAttendance = async (
+  calendarId: string,
+  schedulerId: string,
+  request: PostSchedulerAttendanceRequest,
+) => {
+  return apiPost(
+    `/calendars/${calendarId}/schedulers/${schedulerId}/attendance`,
+    request,
   );
 };
 

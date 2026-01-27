@@ -94,7 +94,6 @@ export function SchedulerCreate({
     const today = new Date().toISOString().slice(0, 10);
     const newDate = newValue.slice(0, 10);
     const newTime = newValue.slice(11, 16);
-    const oldDate = limit.slice(0, 10);
     const oldTime = limit.slice(11, 16);
 
     // 「今日」ボタン検知：日付が今日で、時刻が変わらない場合
