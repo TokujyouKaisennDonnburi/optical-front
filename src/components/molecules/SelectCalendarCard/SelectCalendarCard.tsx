@@ -1,5 +1,5 @@
 "use client";
-import { Plus, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
@@ -9,7 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
 import { cn } from "@/utils_constants_styles/utils";
@@ -25,14 +24,17 @@ export type SelectCalendarCardData = {
 export type SelectCalendarCardProps = {
   calendar: SelectCalendarCardData;
   className?: string;
-  onClick?: () => void;
-  onDelete?: () => void;
+  // SelectCalendarCard自体はクリックハンドラと削除ハンドラを持たない
+  // LinkableSelectCalendarCard がこれらのアクションを処理する
 };
 
 export type LinkableSelectCalendarCardProps = {
   calendar: SelectCalendarCardData;
   href: string;
   className?: string;
+  onDelete?: () => void;
+  onRename?: (calendarId: string, currentName: string) => void;
+  onEditOptions?: () => void;
 };
 
 export type SelectCalendarAddCardProps = {
@@ -69,12 +71,12 @@ const toRgba = (hex: string | undefined, alpha: number) => {
 
 const _stopPropagation = (e: React.MouseEvent | React.KeyboardEvent) => {
   e.stopPropagation();
+  // e.preventDefault(); // preventDefaultは必要に応じて追加
 };
 
 export function SelectCalendarCard({
   calendar,
   className,
-  onClick,
 }: SelectCalendarCardProps) {
   const accentColor = calendar.color ?? "#38bdf8";
 
@@ -115,64 +117,57 @@ export function SelectCalendarCard({
   })();
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={!onClick}
+    <div
       className={cn(
-        "group relative min-w-[10rem] flex-shrink-0 overflow-hidden rounded-lg border bg-background/90 p-0 text-left shadow-sm transition",
+        "group relative grid aspect-[16/8] w-full overflow-hidden rounded-lg border bg-background/90 p-0 text-left shadow-sm transition",
         "hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-        !onClick && "cursor-default",
         className,
       )}
       style={{ borderColor: accentBorder }}
-      aria-label={`${calendar.name} を開く`}
     >
-      <div className="relative grid aspect-[16/8] w-full">
-        <div className="relative h-full w-full overflow-hidden">
-          {isValidImageUrl && imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={calendar.name}
-              fill
-              sizes="200px"
-              className="object-cover"
-              draggable={false}
-              unoptimized={isInlineImage}
-            />
-          ) : (
-            <>
-              <div
-                className="absolute inset-0"
-                style={{ backgroundImage: fallbackBackground }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="text-3xl font-semibold text-white drop-shadow-lg">
-                  {initial}
-                </span>
-              </div>
-            </>
-          )}
-
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ backgroundImage: overlayGradient }}
+      <div className="relative h-full w-full overflow-hidden">
+        {isValidImageUrl && imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={calendar.name}
+            fill
+            sizes="200px"
+            className="object-cover"
+            draggable={false}
+            unoptimized={isInlineImage}
           />
-
-          <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/75 via-black/25 to-transparent px-2.5 pt-2.5 pb-7 pointer-events-none">
-            <div className="flex items-center gap-2">
-              <span
-                className="h-2 w-2 rounded-full shadow-inner"
-                style={{ background: accentSolid }}
-              />
-              <span className="line-clamp-1 text-sm font-semibold text-white drop-shadow">
-                {calendar.name}
+        ) : (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{ backgroundImage: fallbackBackground }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="text-3xl font-semibold text-white drop-shadow-lg">
+                {initial}
               </span>
             </div>
+          </>
+        )}
+
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundImage: overlayGradient }}
+        />
+
+        <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/75 via-black/25 to-transparent px-2.5 pt-2.5 pb-7 pointer-events-none">
+          <div className="flex items-center gap-2">
+            <span
+              className="h-2 w-2 rounded-full shadow-inner"
+              style={{ background: accentSolid }}
+            />
+            <span className="line-clamp-1 text-sm font-semibold text-white drop-shadow">
+              {calendar.name}
+            </span>
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -180,6 +175,9 @@ export function LinkableSelectCalendarCard({
   calendar,
   href,
   className,
+  onDelete,
+  onRename,
+  onEditOptions,
 }: LinkableSelectCalendarCardProps) {
   const accentBorder =
     toRgba(calendar.color, 0.35) ?? "rgba(56, 189, 248, 0.35)";
@@ -198,29 +196,61 @@ export function LinkableSelectCalendarCard({
       >
         <SelectCalendarCard calendar={calendar} />
       </Link>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <div className="absolute bottom-1.5 right-1.5 flex gap-1">
+        {onRename && (
           <Button
             size="icon"
             variant="outline"
-            className="absolute bottom-1.5 right-1.5 h-7 w-7 rounded-full bg-black/20 backdrop-blur-sm text-destructive hover:bg-black/80"
+            className="h-7 w-7 rounded-full bg-black/20 backdrop-blur-sm text-white/80 hover:bg-black/80"
             onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
+              _stopPropagation(e);
+              onRename(calendar.id, calendar.name);
             }}
-            aria-label="カレンダーオプション"
+            aria-label="カレンダー名を変更"
+          >
+            <Pencil size={16} />
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-7 w-7 rounded-full bg-black/20 backdrop-blur-sm text-destructive hover:bg-black/80"
+            onClick={(e) => {
+              _stopPropagation(e);
+              onDelete();
+            }}
+            aria-label="カレンダーを削除"
           >
             <Trash2 size={16} />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem className="text-destructive">
-              カレンダーを削除
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
-      </DropdownMenu>
+        )}
+        {onEditOptions && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-7 w-7 rounded-full bg-black/20 backdrop-blur-sm text-white/80 hover:bg-black/80"
+                onClick={_stopPropagation}
+                aria-label="カレンダーオプション"
+              >
+                <MoreVertical size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  _stopPropagation(e);
+                  onEditOptions();
+                }}
+              >
+                オプションの編集
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
     </div>
   );
 }
