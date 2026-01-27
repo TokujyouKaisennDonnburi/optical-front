@@ -93,12 +93,12 @@ export default function TermsPage() {
           </section>
 
           <div className="pt-10 flex justify-center">
-            <Link href="/">
-              <Button variant="outline" className="gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/">
                 <ArrowLeft className="w-4 h-4" />
                 トップページに戻る
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </main>
