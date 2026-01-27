@@ -2,6 +2,7 @@
 
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { ApiClientError } from "@/lib/api-client";
 import {
   createScheduler,
   getScheduler,
@@ -132,8 +133,15 @@ export function SchedulerOption({
       setComment("");
       setSelectedSchedulerId(createdScheduler.id); // Set the ID of the newly created scheduler
       setViewMode("summary"); // Navigate to summary of the newly created scheduler
-    } catch (_error) {
-      toast.error("スケジューラーの作成に失敗しました");
+    } catch (error) {
+      if (
+        error instanceof ApiClientError &&
+        error.message.includes("limit time must be after current time")
+      ) {
+        toast.error("回答締切は現在時刻より後に設定してください");
+      } else {
+        toast.error("スケジューラーの作成に失敗しました");
+      }
     }
   };
 
