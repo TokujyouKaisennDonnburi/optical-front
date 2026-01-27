@@ -82,7 +82,8 @@ export function SchedulerCreate({
     endTime: new Date(`${date}T23:59:59Z`).toISOString(),
   });
 
-  // 回答締切の日付が変わったら時刻を23:59に設定
+  // 回答締切の変更ハンドラ
+  // 「今日」ボタンを押した場合（日付だけ今日に変わり、時刻は変わらない）は23:59に設定
   const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     if (!newValue) {
@@ -90,11 +91,15 @@ export function SchedulerCreate({
       return;
     }
 
+    const today = new Date().toISOString().slice(0, 10);
     const newDate = newValue.slice(0, 10);
+    const newTime = newValue.slice(11, 16);
     const oldDate = limit.slice(0, 10);
+    const oldTime = limit.slice(11, 16);
 
-    if (newDate !== oldDate) {
-      setLimit(`${newDate}T23:59`);
+    // 「今日」ボタン検知：日付が今日で、時刻が変わらない場合
+    if (newDate === today && newTime === oldTime) {
+      setLimit(`${today}T23:59`);
     } else {
       setLimit(newValue);
     }
