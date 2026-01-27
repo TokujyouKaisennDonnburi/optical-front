@@ -171,11 +171,11 @@ export function SelectCalendarCard({
       </div>
 
       <div
-        className="absolute bottom-1.5 right-1.5"
-        onClick={handleMenuClick}
-        onKeyDown={handleMenuClick}
-        role="button"
-        tabIndex={0}
+        className="absolute bottom-1.5 right-1.5 flex gap-1" // Remove flex gap-1 if only one button/dropdown
+        onClick={handleInteraction}
+        onKeyDown={handleInteraction}
+        role="group" // Change role to group as it contains multiple interactive elements
+        tabIndex={-1} // Make group not focusable directly
       >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -188,26 +188,19 @@ export function SelectCalendarCard({
               <Trash2 size={16} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                // onEdit?.();
-              }}
-              disabled
-            >
-              編集
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete?.();
-              }}
-              className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-            >
-              削除
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.();
+                }}
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+              >
+                カレンダーを削除
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
         </DropdownMenu>
       </div>
     </div>
