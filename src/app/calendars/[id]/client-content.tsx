@@ -375,7 +375,7 @@ export function CalendarDetailClient({
             <Image src="/optical.png" alt="OptiCal" width={36} height={36} />
           </Link>
 
-          {/* カレンダー切り替え */}
+          {/* カレンダー切り替え - next/link使用で自動プリフェッチ */}
           <CalendarSwitcher
             currentCalendarId={calendarId}
             currentCalendarName={calendar?.name}
@@ -385,7 +385,6 @@ export function CalendarDetailClient({
               name: c.name,
               color: c.color,
             }))}
-            onSelect={(id) => router.push(`/calendars/${id}`)}
             isLoading={calendarsLoading}
           />
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ChevronsUpDown } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import {
@@ -33,8 +34,8 @@ type CalendarSwitcherProps = {
   currentCalendarColor?: string;
   /** 選択可能なカレンダー一覧 */
   calendars: CalendarOption[];
-  /** カレンダー選択時のコールバック */
-  onSelect: (calendarId: string) => void;
+  /** @deprecated Use next/link's automatic navigation instead */
+  onSelect?: (calendarId: string) => void;
   /** ローディング状態 */
   isLoading?: boolean;
   /** カスタムクラス名 */
@@ -43,24 +44,17 @@ type CalendarSwitcherProps = {
 
 /**
  * カレンダー切り替えドロップダウン
+ * next/linkを使用してプリフェッチを有効化
  */
 export function CalendarSwitcher({
   currentCalendarId,
   currentCalendarName = "読み込み中...",
   currentCalendarColor,
   calendars,
-  onSelect,
   isLoading = false,
   className,
 }: CalendarSwitcherProps) {
   const [open, setOpen] = useState(false);
-
-  const handleSelect = (calendarId: string) => {
-    if (calendarId !== currentCalendarId) {
-      onSelect(calendarId);
-    }
-    setOpen(false);
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -98,20 +92,27 @@ export function CalendarSwitcher({
                 <CommandItem
                   key={calendar.id}
                   value={calendar.name}
-                  onSelect={() => handleSelect(calendar.id)}
-                  className="cursor-pointer"
+                  asChild
+                  className="cursor-pointer p-0"
                 >
-                  {/* カレンダー色 */}
-                  <div
-                    className="h-3 w-3 shrink-0 rounded-full mr-2"
-                    style={{ backgroundColor: calendar.color }}
-                  />
-                  {/* カレンダー名 */}
-                  <span className="flex-1 truncate">{calendar.name}</span>
-                  {/* 選択中マーク */}
-                  {calendar.id === currentCalendarId && (
-                    <Check className="ml-auto h-4 w-4 text-primary" />
-                  )}
+                  <Link
+                    href={`/calendars/${calendar.id}`}
+                    prefetch={true}
+                    className="flex items-center w-full px-2 py-1.5"
+                    onClick={() => setOpen(false)}
+                  >
+                    {/* カレンダー色 */}
+                    <div
+                      className="h-3 w-3 shrink-0 rounded-full mr-2"
+                      style={{ backgroundColor: calendar.color }}
+                    />
+                    {/* カレンダー名 */}
+                    <span className="flex-1 truncate">{calendar.name}</span>
+                    {/* 選択中マーク */}
+                    {calendar.id === currentCalendarId && (
+                      <Check className="ml-auto h-4 w-4 text-primary" />
+                    )}
+                  </Link>
                 </CommandItem>
               ))}
             </CommandGroup>
