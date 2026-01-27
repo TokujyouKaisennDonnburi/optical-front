@@ -1,7 +1,6 @@
 "use client";
 import { Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "@/components/atoms/Button";
 import { Card } from "@/components/atoms/Card";
 import {
@@ -180,9 +179,15 @@ export function SelectCalendarCard({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
-              className="h-7 w-7 rounded-full text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive focus:opacity-100"
+              className="
+                h-7 w-7 rounded-full
+                bg-black/20
+                backdrop-blur-sm
+                text-destructive
+                hover:bg-destructive/80
+                transition-colors"
               aria-label="カレンダーオプション"
             >
               <Trash2 size={16} />

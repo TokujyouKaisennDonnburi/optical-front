@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  LinkableSelectCalendarCard,
   SelectCalendarAddCard,
+  SelectCalendarCard,
   type SelectCalendarCardData,
 } from "@/components/molecules/SelectCalendarCard";
 import { SelectCalendarGrid } from "@/components/molecules/SelectCalendarGrid";
@@ -42,10 +42,10 @@ export function SelectCalendarStrip({
     >
       <SelectCalendarGrid>
         {calendars.map((cal) => (
-          <LinkableSelectCalendarCard
+          <SelectCalendarCard
             key={cal.id}
             calendar={cal}
-            href={`/calendars/${cal.id}`}
+            onDelete={() => handleDelete(cal.id)}
           />
         ))}
         <SelectCalendarAddCard onClick={handleAdd} />
