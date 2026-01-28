@@ -47,6 +47,7 @@ export async function getCalendarDetail(
         userId: m.userId,
         name: m.name,
         joinedAt: m.joinedAt,
+        avatarUrl: m.avatarUrl,
       })),
     },
   };

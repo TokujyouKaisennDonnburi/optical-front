@@ -53,6 +53,7 @@ export type CalendarDetailApiResponse = {
     userId: string;
     name: string;
     joinedAt: string;
+    avatarUrl?: string;
   }>;
   option?: Array<{
     id: number;
