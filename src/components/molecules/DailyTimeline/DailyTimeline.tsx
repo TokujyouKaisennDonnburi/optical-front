@@ -105,8 +105,7 @@ export function DailyTimeline({
   // Reset auto-scroll flag when items change (e.g. date change)
   useEffect(() => {
     hasAutoScrolledRef.current = false;
-    void items;
-  }, [items]);
+  }, []);
 
   useLayoutEffect(() => {
     if (hasAutoScrolledRef.current) return;
@@ -122,8 +121,7 @@ export function DailyTimeline({
       viewport.scrollTo({ top, behavior: "smooth" });
       hasAutoScrolledRef.current = true;
     }
-    void slots;
-  }, [slots]);
+  }, []);
 
   /* ===== イベント正規化 ===== */
   const events = useMemo<NormalizedEvent[]>(() => {
@@ -214,7 +212,6 @@ export function DailyTimeline({
         }
 
         maxCols = Math.max(maxCols, active.length);
-
         placed.push({ ...ev, col, colCount: 0 });
       }
 
@@ -368,20 +365,23 @@ export function DailyTimeline({
           })}
         </div>
 
-        {/* ===== 時刻目盛り描画 ===== */}
+        {/* ===== 時刻目盛り描画（グリッド厳密化済み） ===== */}
         {slots.map((slot) => (
           <div
             key={slot.time}
             ref={slot.isCurrent ? setCurrentSlotRef : undefined}
-            className="border-b border-border px-2.5 py-2 bg-background"
+            className="border-b border-border bg-background"
             style={{ height: SLOT_HEIGHT_PX }}
           >
-            <TimeLabel
-              time={slot.time}
-              suffix={slot.suffix}
-              isCurrent={slot.isCurrent}
-              size="md"
-            />
+            {/* padding は内側に寄せる（外側は純粋なグリッド） */}
+            <div className="h-full px-2.5 py-2 flex items-start">
+              <TimeLabel
+                time={slot.time}
+                suffix={slot.suffix}
+                isCurrent={slot.isCurrent}
+                size="md"
+              />
+            </div>
           </div>
         ))}
       </div>
