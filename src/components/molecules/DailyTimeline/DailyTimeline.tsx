@@ -103,9 +103,10 @@ export function DailyTimeline({
 
   /* ===== スクロール同期 ===== */
   // Reset auto-scroll flag when items change (e.g. date change)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: items 変更時に自動スクロールをリセットする必要があるため
   useEffect(() => {
     hasAutoScrolledRef.current = false;
-  }, []);
+  }, [items]);
 
   useLayoutEffect(() => {
     if (hasAutoScrolledRef.current) return;
@@ -282,7 +283,7 @@ export function DailyTimeline({
                   height: ev.displayHeight,
                   left: `calc(${leftBase}px + ((100% - ${leftBase}px) / ${ev.colCount}) * ${ev.col})`,
                   width: `calc((100% - ${leftBase}px) / ${ev.colCount} - ${gap}px)`,
-                  zIndex: 10,
+                  zIndex: hoveredEventId === ev.id ? 1000 : 10,
                   opacity: mounted ? 1 : 0,
                   transform: mounted
                     ? "translateX(0)"
@@ -297,11 +298,7 @@ export function DailyTimeline({
                   onMouseEnter={() => setHoveredEventId(ev.id)}
                   onMouseLeave={() => setHoveredEventId(null)}
                 >
-                  <HoverCard
-                    open={hoveredEventId === ev.id}
-                    openDelay={120}
-                    closeDelay={120}
-                  >
+                  <HoverCard openDelay={120} closeDelay={120}>
                     <HoverCardTrigger asChild>
                       {/* タイムライン上のイベントカード */}
                       <div
