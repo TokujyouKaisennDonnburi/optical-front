@@ -43,10 +43,7 @@ import {
   getGitHubInstallationStatus,
   startGitHubAppInstall,
 } from "@/lib/api-github";
-import {
-  createSchedule,
-  deleteSchedule,
-} from "@/lib/api-schedule";
+import { createSchedule, deleteSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 interface CalendarDetailClientProps {
