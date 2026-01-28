@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
+import { UserAvatar } from "@/components/atoms/UserAvatar/UserAvatar";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type CalendarBoardHeaderProps = {
@@ -13,6 +14,11 @@ export type CalendarBoardHeaderProps = {
   onToday: () => void;
   badgeIcon?: LucideIcon;
   className?: string;
+  members?: Array<{
+    userId: string;
+    name: string;
+    avatarUrl?: string;
+  }>;
 };
 
 export function CalendarBoardHeader({
@@ -23,13 +29,35 @@ export function CalendarBoardHeader({
   onToday,
   badgeIcon,
   className,
+  members = [],
 }: CalendarBoardHeaderProps) {
   return (
     <div className={cn("flex items-center justify-between", className)}>
-      <Badge variant="secondary" className="gap-1 px-2.5 py-0.5 text-xs">
-        {badgeIcon ? <Icon icon={badgeIcon} size="sm" /> : null}
-        {badgeLabel}
-      </Badge>
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="gap-1 px-2.5 py-0.5 text-xs">
+          {badgeIcon ? <Icon icon={badgeIcon} size="sm" /> : null}
+          {badgeLabel}
+        </Badge>
+        {members.length > 0 && (
+          <div className="flex items-center -space-x-1.5 hover:space-x-0.5 transition-all">
+            {members.slice(0, 5).map((member) => (
+              <UserAvatar
+                key={member.userId}
+                userId={member.userId}
+                name={member.name}
+                avatarUrl={member.avatarUrl}
+                size="sm"
+                className="border-2 border-background ring-0"
+              />
+            ))}
+            {members.length > 5 && (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-medium text-muted-foreground ring-0">
+                +{members.length - 5}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <div
         className={cn(
           "flex items-center gap-1.5 text-sm",

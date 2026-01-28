@@ -43,6 +43,11 @@ export async function getCalendarDetail(
       color: apiResponse.color,
       imageUrl: apiResponse.imageUrl,
       options,
+      members: apiResponse.member?.map((m) => ({
+        userId: m.userId,
+        name: m.name,
+        joinedAt: m.joinedAt,
+      })),
     },
   };
 }

@@ -35,6 +35,12 @@ export type CalendarQueryResponse = {
   color: string;
   imageUrl?: string;
   options?: string[];
+  members?: Array<{
+    userId: string;
+    name: string;
+    joinedAt?: string;
+    avatarUrl?: string; // Add if available or derive from userId if needed
+  }>;
 };
 
 /** バックエンドのカレンダー詳細APIレスポンス形式 */
