@@ -444,7 +444,7 @@ export function CalendarCreationWizard() {
       const response = await createCalendar(payload);
       setState((prev) => ({
         ...prev,
-        createdCalendarId: response.calendar.id,
+        createdCalendarId: response.id,
       }));
       setIsSubmitting(false);
       setIsComplete(true);
