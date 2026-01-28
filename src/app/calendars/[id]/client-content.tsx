@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import { CalendarSwitcher } from "@/components/molecules/CalendarSwitcher";
-import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
+import { DailyScheduleHeader } from "@/components/molecules/DailyScheduleHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { AgentChatView } from "@/components/organisms/AgentChat";
 import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrapper";
@@ -79,8 +79,15 @@ export function CalendarDetailClient({
   const [searchTerm, setSearchTerm] = useState("");
   const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
 
-  const { calendar, items, isLoading, error, hasGitHubOptions, refresh } =
-    useSingleCalendarSchedule(calendarId, viewDate);
+  const {
+    calendar,
+    items,
+    isLoading,
+    error,
+    hasGitHubOptions,
+    refresh,
+    dateLabel,
+  } = useSingleCalendarSchedule(calendarId, viewDate);
 
   // 全カレンダー一覧を取得（カレンダー切り替え用）
   const { calendars: allCalendars, isLoading: calendarsLoading } =
@@ -454,8 +461,9 @@ export function CalendarDetailClient({
             {selectedSidebarItem === "agent" && (
               <>
                 <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
-                  <TodayScheduleHeader
+                  <DailyScheduleHeader
                     title="OptiCal Agent"
+                    dateLabel={dateLabel}
                     actions={
                       <Button
                         variant="ghost"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
+import type { DailySchedulePanelItem } from "@/components/organisms/DailySchedulePanel";
 import { getCalendarDetail } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
@@ -134,7 +134,7 @@ export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
   ]);
 
   // TodaySchedulePanelItem 形式に変換
-  const items: TodaySchedulePanelItem[] = useMemo(() => {
+  const items: DailySchedulePanelItem[] = useMemo(() => {
     return scheduleItems.map((item) => ({
       id: item.id,
       title: item.title,
