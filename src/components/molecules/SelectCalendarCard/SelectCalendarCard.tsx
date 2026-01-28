@@ -26,6 +26,7 @@ export type SelectCalendarCardData = {
 export type SelectCalendarCardProps = {
   calendar: SelectCalendarCardData;
   className?: string;
+  onClick?: () => void;
   // SelectCalendarCard自体はクリックハンドラと削除ハンドラを持たない
   // LinkableSelectCalendarCard がこれらのアクションを処理する
 };
@@ -42,6 +43,8 @@ export type LinkableSelectCalendarCardProps = {
 export type SelectCalendarAddCardProps = {
   className?: string;
   onClick?: () => void;
+  // SelectCalendarCard自体はクリックハンドラと削除ハンドラを持たない
+  // LinkableSelectCalendarCard がこれらのアクションを処理する
 };
 
 const toRgba = (hex: string | undefined, alpha: number) => {
