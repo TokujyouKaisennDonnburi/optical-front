@@ -41,6 +41,7 @@ type CalendarCreationState = {
   selectedTemplateId: string | null;
   customOptions: Record<number, boolean>;
   useSolo: boolean;
+  createdCalendarId: string | null;
 };
 
 const STEPS = [
@@ -182,6 +183,7 @@ const createInitialState = (): CalendarCreationState => ({
     {},
   ),
   useSolo: true,
+  createdCalendarId: null,
 });
 
 export function CalendarCreationWizard() {
@@ -439,7 +441,11 @@ export function CalendarCreationWizard() {
         "[CalendarCreationWizard] Calling POST /api/calendars",
         payload,
       );
-      await createCalendar(payload);
+      const response = await createCalendar(payload);
+      setState((prev) => ({
+        ...prev,
+        createdCalendarId: response.calendar.id,
+      }));
       setIsSubmitting(false);
       setIsComplete(true);
       toast.success("カレンダーを作成しました", { duration: 2000 });
@@ -534,9 +540,17 @@ export function CalendarCreationWizard() {
             <Button
               type="button"
               className="order-1 w-full sm:order-2 sm:w-auto"
-              onClick={() => router.push("/?refresh=true")}
+              onClick={() => {
+                if (state.createdCalendarId) {
+                  router.push(`/calendars/${state.createdCalendarId}`);
+                } else {
+                  router.push("/?refresh=true");
+                }
+              }}
             >
-              ダッシュボードに戻る
+              {state.createdCalendarId
+                ? "カレンダーを表示"
+                : "ダッシュボードに戻る"}
             </Button>
           </CardFooter>
         </Card>
