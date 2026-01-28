@@ -276,13 +276,13 @@ export function DailyTimeline({
             return (
               <div
                 key={ev.id}
-                className="absolute pointer-events-auto transition-all ease-out"
+                className="absolute pointer-events-auto transition-[opacity,transform] ease-out"
                 style={{
                   top: ev.start * PX_PER_MIN,
                   height: ev.displayHeight,
                   left: `calc(${leftBase}px + ((100% - ${leftBase}px) / ${ev.colCount}) * ${ev.col})`,
                   width: `calc((100% - ${leftBase}px) / ${ev.colCount} - ${gap}px)`,
-                  zIndex: hoveredEventId === ev.id ? 1000 : 10,
+                  zIndex: 10,
                   opacity: mounted ? 1 : 0,
                   transform: mounted
                     ? "translateX(0)"
@@ -297,7 +297,11 @@ export function DailyTimeline({
                   onMouseEnter={() => setHoveredEventId(ev.id)}
                   onMouseLeave={() => setHoveredEventId(null)}
                 >
-                  <HoverCard openDelay={120} closeDelay={120}>
+                  <HoverCard
+                    open={hoveredEventId === ev.id}
+                    openDelay={120}
+                    closeDelay={120}
+                  >
                     <HoverCardTrigger asChild>
                       {/* タイムライン上のイベントカード */}
                       <div
@@ -328,7 +332,7 @@ export function DailyTimeline({
                     <HoverCardContent
                       side="left"
                       align="center"
-                      className="w-72 space-y-1.5"
+                      className="w-72 space-y-1.5 z-[9999]"
                     >
                       <Text as="p" weight="semibold" className="leading-tight">
                         {ev.title}
