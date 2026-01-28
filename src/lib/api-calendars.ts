@@ -32,7 +32,7 @@ export async function getCalendarDetail(
 
   // フロントエンド用の形式に変換
   const options =
-    apiResponse.option
+    apiResponse.options
       ?.filter((opt) => !opt.deprecated)
       .map((opt) => opt.name) ?? [];
 
@@ -43,7 +43,7 @@ export async function getCalendarDetail(
       color: apiResponse.color,
       imageUrl: apiResponse.imageUrl,
       options,
-      members: apiResponse.member?.map((m) => ({
+      members: apiResponse.members?.map((m) => ({
         userId: m.userId,
         name: m.name,
         joinedAt: m.joinedAt,

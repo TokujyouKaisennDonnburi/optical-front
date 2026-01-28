@@ -50,13 +50,13 @@ export type CalendarDetailApiResponse = {
   name: string;
   color: string;
   imageUrl?: string;
-  member?: Array<{
+  members?: Array<{
     userId: string;
     name: string;
     joinedAt: string;
     avatarUrl?: string;
   }>;
-  option?: Array<{
+  options?: Array<{
     id: number;
     name: string;
     deprecated: boolean;
