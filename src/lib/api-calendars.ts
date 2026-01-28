@@ -69,7 +69,7 @@ export async function deleteCalendar(calendarId: string) {
 
 /** メンバー招待 */
 export async function inviteMembers(calendarId: string, emails: string[]) {
-  return apiPost<void>(`/calendars/${calendarId}/members`, { emails });
+  return apiPost<void>(`/calendars/${calendarId}/members`, { email: emails });
 }
 
 /** メンバー一覧取得 */
