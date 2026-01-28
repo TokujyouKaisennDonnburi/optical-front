@@ -451,6 +451,7 @@ export function CalendarDetailClient({
               }
               selectedDates={selectedDates}
               setCreateDialogData={setCreateDialogData}
+              members={calendar?.members}
             />
           </div>
         </main>
@@ -725,6 +726,7 @@ function BoardArea({
   onDateSelect,
   selectedDates,
   setCreateDialogData,
+  members,
 }: {
   className?: string;
   calendarId: string;
@@ -741,6 +743,11 @@ function BoardArea({
   setCreateDialogData: React.Dispatch<
     React.SetStateAction<CreateDialogData | null>
   >;
+  members?: Array<{
+    userId: string;
+    name: string;
+    avatarUrl?: string;
+  }>;
 }) {
   const [selectedItem, setSelectedItem] = useState<{
     item: SingleCalendarBoardItem;
@@ -925,6 +932,7 @@ function BoardArea({
         onPrev={() => handleShiftMonth(-1)}
         onNext={() => handleShiftMonth(1)}
         onToday={handleResetToday}
+        members={members}
       />
       <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
         <SingleCalendarBoard
