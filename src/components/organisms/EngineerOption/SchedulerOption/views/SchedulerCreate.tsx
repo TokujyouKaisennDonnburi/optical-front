@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Calendar } from "lucide-react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import {
   Card,
@@ -48,12 +49,12 @@ export function SchedulerCreate({
 }: Props) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [memo, setMemo] = useState(initialData?.memo || "");
-  // datetime-local input needs a specific format `YYYY-MM-DDTHH:mm`
-  const [limit, setLimit] = useState(
+  const [limitDate, setLimitDate] = useState(
     initialData?.limitTime
       ? new Date(initialData.limitTime).toISOString().slice(0, 10)
       : "",
   );
+  const limitInputRef = useRef<HTMLInputElement | null>(null);
   const [isAllDay, setIsAllDay] = useState(initialData?.isAllDay ?? true);
   const [defaultStartTime, setDefaultStartTime] = useState(
     initialData?.defaultStartTime || "",
@@ -115,7 +116,9 @@ export function SchedulerCreate({
     onNext({
       title,
       memo,
-      limitTime: limit ? new Date(`${limit}T23:59:59Z`).toISOString() : null,
+      limitTime: limitDate
+        ? new Date(`${limitDate}T23:59:59Z`).toISOString()
+        : null,
       isAllDay,
       dates: backendDates,
       defaultStartTime,
@@ -225,12 +228,50 @@ export function SchedulerCreate({
         {/* 回答期限 */}
         <div className="space-y-1">
           <Label htmlFor="limit">回答締切</Label>
-          <Input
-            id="limit"
-            type="date"
-            value={limit}
-            onChange={(e) => setLimit(e.target.value)}
-          />
+          <div className="relative">
+            <Input
+              id="limit"
+              type="text"
+              readOnly
+              placeholder="MM/DD"
+              value={limitDate ? limitDate.slice(5).replace("-", "/") : ""}
+              onClick={() => {
+                const input = limitInputRef.current;
+                if (!input) return;
+                if ("showPicker" in input) {
+                  input.showPicker();
+                } else {
+                  input.focus();
+                  input.click();
+                }
+              }}
+              className="pr-9"
+            />
+            <button
+              type="button"
+              aria-label="回答締切のカレンダーを開く"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                const input = limitInputRef.current;
+                if (!input) return;
+                if ("showPicker" in input) {
+                  input.showPicker();
+                } else {
+                  input.focus();
+                  input.click();
+                }
+              }}
+            >
+              <Calendar className="h-4 w-4" />
+            </button>
+            <input
+              ref={limitInputRef}
+              type="date"
+              className="absolute inset-0 h-0 w-0 opacity-0"
+              value={limitDate}
+              onChange={(e) => setLimitDate(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* メモ */}
