@@ -847,6 +847,8 @@ function BoardArea({
     setCreateDialogData({ date });
   };
 
+  const isDateSelectable = Boolean(onDateSelect);
+
   return (
     <Card
       className={cn(
@@ -855,6 +857,8 @@ function BoardArea({
         "border-stone-300 bg-stone-100/90 text-stone-800",
         // ダークモード
         "dark:border-primary/30 dark:bg-slate-800/90 dark:text-white",
+        isDateSelectable &&
+          "border-2 border-emerald-500 ring-4 ring-emerald-500/35 dark:border-emerald-400 dark:ring-emerald-400/45",
         className,
       )}
     >

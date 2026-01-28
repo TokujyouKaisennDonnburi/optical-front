@@ -312,7 +312,9 @@ export function SingleCalendarBoard({
                         (onCreateItem || onDateSelect) &&
                           cell.isCurrentMonth &&
                           "cursor-pointer hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
-                        isSelected && "bg-blue-200/50",
+                        isSelected && "bg-emerald-100/70 dark:bg-emerald-500/15",
+                        isSelected &&
+                          "hover:bg-emerald-200/80 dark:hover:bg-emerald-500/25",
                       )}
                     >
                       {cell.isToday ? (
