@@ -132,15 +132,22 @@ export function LinkableSelectCalendarCard({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             className="
               absolute bottom-1.5 right-1.5
               h-7 w-7 rounded-full
-              bg-black/20 backdrop-blur-sm
-              text-destructive
+              bg-white/20 backdrop-blur-sm
+              
+              text-white
+              hover:text-white
               hover:bg-destructive/80
-              transition-colors
+
+              opacity-0 pointer-events-none
+              group-hover:opacity-100 group-hover:pointer-events-auto
+              group-focus-within:opacity-100 group-focus-within:pointer-events-auto
+
+              transition-all
             "
             onClick={(e) => {
               e.stopPropagation();
