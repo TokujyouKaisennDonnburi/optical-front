@@ -3,14 +3,12 @@
 import { Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type React from "react";
 import { Button } from "@/components/atoms/Button";
 import { Card } from "@/components/atoms/Card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu";
 import { cn } from "@/utils_constants_styles/utils";
@@ -72,10 +70,6 @@ const toRgba = (hex: string | undefined, alpha: number) => {
 
   const clampedAlpha = Math.min(Math.max(alpha, 0), 1);
   return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
-};
-
-const _stopPropagation = (e: React.MouseEvent | React.KeyboardEvent) => {
-  e.stopPropagation();
 };
 
 export function SelectCalendarCard({
@@ -221,13 +215,11 @@ export function LinkableSelectCalendarCard({
             <Trash2 size={16} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem className="text-destructive">
-              カレンダーを削除
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenuPortal>
+        <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuItem className="text-destructive">
+            カレンダーを削除
+          </DropdownMenuItem>
+        </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
