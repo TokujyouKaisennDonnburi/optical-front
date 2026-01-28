@@ -67,8 +67,8 @@ export function CalendarWizardSummary({
             </div>
             <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="shrink-0">
-                  <Eye className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="lg" className="shrink-0">
+                  <Eye className="mr-2 h-5 w-5" />
                   プレビュー
                 </Button>
               </DialogTrigger>

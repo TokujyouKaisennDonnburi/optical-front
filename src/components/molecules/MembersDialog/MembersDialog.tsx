@@ -28,15 +28,15 @@ export function MembersDialog({ members, children }: MembersDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-full max-w-sm">
         <DialogHeader>
           <DialogTitle>
             <Text as="span" weight="semibold">
-              招待メンバー一覧
+              招待メンバー一覧 ({members.length}名)
             </Text>
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-2 max-h-64 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="space-y-2 max-h-60 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {members.map((member) => (
             <div
               key={member.id}
