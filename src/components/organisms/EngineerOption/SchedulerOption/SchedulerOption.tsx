@@ -308,6 +308,7 @@ export function SchedulerOption({
 
       {viewMode === "summary" && selectedSchedulerId && (
         <SchedulerSummary
+          calendarId={calendarId}
           schedulerId={selectedSchedulerId}
           onBack={handleBackToList} // Back from summary goes to list and clears selected ID
           onConfirm={onScheduleConfirm}

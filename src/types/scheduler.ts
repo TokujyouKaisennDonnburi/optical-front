@@ -65,12 +65,12 @@ export const createScheduler = async (
   );
 };
 
-export type SchedulerAttendaceResponse = {
-  user_id: string;
+export type SchedulerAttendanceResponse = {
+  userId: string;
   comment: string;
   status: {
     date: string;
-    status: number;
+    status: 1 | 2 | 3;
   }[];
 };
 
@@ -78,7 +78,7 @@ export const getSchedulerAttendance = async (
   calendarId: string,
   schedulerId: string,
 ) => {
-  return apiPost<SchedulerAttendaceResponse>(
+  return apiGet<SchedulerAttendanceResponse[]>(
     `/calendars/${calendarId}/schedulers/${schedulerId}/attendance`,
   );
 };
@@ -100,6 +100,27 @@ export const postSchedulerAttendance = async (
     `/calendars/${calendarId}/schedulers/${schedulerId}/attendance`,
     request,
   );
+};
+
+export type SchedulerResultResponse = {
+  ownerId: string;
+  title: string;
+  memo: string;
+  limitTime: string;
+  isAllDay: boolean;
+  members: {
+    userId: string;
+    userName: string;
+  }[];
+  date: {
+    date: string;
+    startTime: string;
+    endTime: string;
+  }[];
+};
+
+export const getSchedulerResult = async (schedulerId: string) => {
+  return apiGet<SchedulerResultResponse>(`/schedulers/${schedulerId}/result`);
 };
 
 export type SchedulerResponse = {
