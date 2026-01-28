@@ -54,6 +54,7 @@ type Props = {
     date: string;
     startTime: string;
     endTime: string;
+    isAllDay: boolean;
   }) => void;
 };
 

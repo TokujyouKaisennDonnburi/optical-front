@@ -39,6 +39,7 @@ type Props = {
     date: string;
     startTime: string;
     endTime: string;
+    isAllDay: boolean;
   }) => void;
 };
 
@@ -108,6 +109,7 @@ function getBestDates(summaryCounts: SummaryCount[]): string[] {
 type PollViewData = {
   title: string;
   memo: string;
+  isAllDay: boolean;
   dates: {
     date: string;
     startTime: string;
@@ -172,6 +174,7 @@ const buildPollViewData = (
   return {
     title: result.title,
     memo: result.memo,
+    isAllDay: result.isAllDay,
     dates,
     submissions,
   };
@@ -234,6 +237,7 @@ export function SchedulerSummary({
       date: dateInfo.date,
       startTime: dateInfo.startTime,
       endTime: dateInfo.endTime,
+      isAllDay: poll.isAllDay,
     };
     onConfirm(confirmationData);
   };
@@ -330,7 +334,9 @@ export function SchedulerSummary({
                               </Text>
                             </div>
                             <Text size="sm">
-                              {dateInfo.startTime}~{dateInfo.endTime}
+                              {poll.isAllDay
+                                ? "終日"
+                                : `${dateInfo.startTime}~${dateInfo.endTime}`}
                             </Text>
                           </div>
                         </Label>
