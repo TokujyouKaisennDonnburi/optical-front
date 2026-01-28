@@ -43,11 +43,7 @@ import {
   getGitHubInstallationStatus,
   startGitHubAppInstall,
 } from "@/lib/api-github";
-import {
-  createSchedule,
-  deleteSchedule,
-  updateSchedule,
-} from "@/lib/api-schedule";
+import { createSchedule, deleteSchedule } from "@/lib/api-schedule";
 import { cn } from "@/utils_constants_styles/utils";
 
 interface CalendarDetailClientProps {
@@ -877,35 +873,6 @@ function BoardArea({
     }
   };
 
-  /**
-   * スケジュール更新ハンドラー（単体カレンダー表示時）
-   * ポップオーバーのインライン編集時に呼び出される
-   *
-   * 処理フロー:
-   * 1. 選択アイテムからイベントIDを取得
-   * 2. updateSchedule API呼び出し（部分更新）
-   * 3. 成功時: onScheduleCreated（画面再取得）
-   * 4. 失敗時: エラーをポップオーバー側で処理させる（throw）
-   */
-  const handleUpdate = async (updates: {
-    title?: string;
-    startTime?: string;
-    endTime?: string;
-    isAllDay?: boolean;
-    memo?: string;
-    location?: string;
-  }) => {
-    if (!selectedItem) return;
-
-    try {
-      await updateSchedule(calendarId, selectedItem.item.id, updates);
-      onScheduleCreated?.(); // 再取得（refresh）
-    } catch (error) {
-      console.error("更新に失敗しました:", error);
-      throw error; // エラーをポップオーバー側で処理させる
-    }
-  };
-
   const handleCloseDialog = () => {
     setSelectedItem(null);
   };
@@ -956,7 +923,6 @@ function BoardArea({
           onClose={handleCloseDialog}
           anchorPosition={selectedItem.position}
           onDelete={handleDelete}
-          onUpdate={handleUpdate}
         />
       ) : null}
     </Card>
