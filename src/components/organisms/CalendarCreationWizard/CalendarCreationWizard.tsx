@@ -548,7 +548,9 @@ export function CalendarCreationWizard() {
                 }
               }}
             >
-              カレンダーを表示
+              {state.createdCalendarId
+                ? "カレンダーを表示"
+                : "ダッシュボードに戻る"}
             </Button>
           </CardFooter>
         </Card>

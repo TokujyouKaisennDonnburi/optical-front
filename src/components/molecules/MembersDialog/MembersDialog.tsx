@@ -44,7 +44,7 @@ export function MembersDialog({ members, children }: MembersDialogProps) {
             >
               <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
               <Text size="sm" className="truncate">
-                {member.email}
+                {member.email.trim()}
               </Text>
             </div>
           ))}

@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/atoms/Dialog";
 import { Text } from "@/components/atoms/Text";
-import { MembersDialog } from "@/components/molecules/MembersDialog/MembersDialog";
+import { MembersDialog } from "@/components/molecules/MembersDialog";
 import {
   SelectCalendarCard,
   type SelectCalendarCardData,
