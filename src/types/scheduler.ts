@@ -52,7 +52,7 @@ export type CreateSchedulerRequest = {
 };
 
 export type CreateSchedulerResponse = {
-  id: string;
+  schedulerId: string;
 };
 
 export const createScheduler = async (

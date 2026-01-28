@@ -72,6 +72,23 @@ export function SchedulerOption({
     null,
   );
 
+  const availabilityToStatus = (av: Availability): 1 | 2 | 3 => {
+    switch (av) {
+      case "ok":
+        return 1;
+      case "maybe":
+        return 2;
+      case "ng":
+        return 3;
+    }
+  };
+
+  const buildAttendanceStatus = (map: AvailabilityMap) =>
+    Object.entries(map).map(([date, av]) => ({
+      date: new Date(date).toISOString(),
+      status: availabilityToStatus(av),
+    }));
+
   useEffect(() => {
     if (viewMode === "list") {
       const fetchSchedulers = async () => {
@@ -128,11 +145,21 @@ export function SchedulerOption({
         isAllDay: newSchedulerData.isAllDay,
         dates: newSchedulerData.dates,
       });
-      toast.success("スケジューラーを作成しました");
+      try {
+        await postSchedulerAttendance(calendarId, createdScheduler.schedulerId, {
+          comment,
+          status: buildAttendanceStatus(availability),
+        });
+        toast.success("スケジューラーを作成しました");
+      } catch (_attendanceError) {
+        toast.error(
+          "出欠の送信に失敗しました。スケジューラーは作成されています。",
+        );
+      }
       setNewSchedulerData(null);
       setAvailability({});
       setComment("");
-      setSelectedSchedulerId(createdScheduler.id); // Set the ID of the newly created scheduler
+      setSelectedSchedulerId(createdScheduler.schedulerId); // Set the ID of the newly created scheduler
       setViewMode("summary"); // Navigate to summary of the newly created scheduler
     } catch (error) {
       if (
@@ -222,26 +249,9 @@ export function SchedulerOption({
   const handleRespondNext = async () => {
     if (!selectedSchedulerId) return;
     try {
-      // Convert availability map to status array
-      const availabilityToStatus = (av: Availability): 1 | 2 | 3 => {
-        switch (av) {
-          case "ok":
-            return 1;
-          case "maybe":
-            return 2;
-          case "ng":
-            return 3;
-        }
-      };
-
-      const status = Object.entries(availability).map(([date, av]) => ({
-        date: new Date(date).toISOString(),
-        status: availabilityToStatus(av),
-      }));
-
       await postSchedulerAttendance(calendarId, selectedSchedulerId, {
         comment,
-        status,
+        status: buildAttendanceStatus(availability),
       });
 
       toast.success("回答を送信しました");
