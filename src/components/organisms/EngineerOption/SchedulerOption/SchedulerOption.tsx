@@ -294,7 +294,11 @@ export function SchedulerOption({
     <div>
       {viewMode === "list" && (
         <SchedulerList
-          onCreate={() => setViewMode("create")}
+          onCreate={() => {
+            onLimitDateChange("");
+            onDateSelectionModeChange("candidates");
+            setViewMode("create");
+          }}
           schedulers={schedulers}
           onSelectPoll={handleSelectPoll}
         />
