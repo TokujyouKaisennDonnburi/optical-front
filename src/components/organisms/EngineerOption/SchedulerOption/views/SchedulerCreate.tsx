@@ -135,6 +135,19 @@ export function SchedulerCreate({
     return dateString.replace(/-/g, "/");
   };
 
+  const openLimitPicker = () => {
+    const input = limitInputRef.current;
+    if (!input) return;
+    const picker = (input as HTMLInputElement & { showPicker?: () => void })
+      .showPicker;
+    if (typeof picker === "function") {
+      picker.call(input);
+      return;
+    }
+    input.focus();
+    input.click();
+  };
+
   return (
     <Card className="border-stone-300 bg-stone-50 dark:border-slate-700 dark:bg-slate-900">
       <CardHeader className="space-y-1 pb-3">
@@ -235,32 +248,14 @@ export function SchedulerCreate({
               readOnly
               placeholder="MM/DD"
               value={limitDate ? limitDate.slice(5).replace("-", "/") : ""}
-              onClick={() => {
-                const input = limitInputRef.current;
-                if (!input) return;
-                if ("showPicker" in input) {
-                  input.showPicker();
-                } else {
-                  input.focus();
-                  input.click();
-                }
-              }}
+              onClick={openLimitPicker}
               className="pr-9"
             />
             <button
               type="button"
               aria-label="回答締切のカレンダーを開く"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={() => {
-                const input = limitInputRef.current;
-                if (!input) return;
-                if ("showPicker" in input) {
-                  input.showPicker();
-                } else {
-                  input.focus();
-                  input.click();
-                }
-              }}
+              onClick={openLimitPicker}
             >
               <Calendar className="h-4 w-4" />
             </button>
