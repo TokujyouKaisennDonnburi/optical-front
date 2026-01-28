@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
+import { UserAvatar } from "@/components/atoms/UserAvatar/UserAvatar";
 import { cn } from "@/utils_constants_styles/utils";
 
 // アカウントメニューボタンのプロパティ型
@@ -7,13 +7,14 @@ export interface AccountMenuButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   avatarUrl: string | null;
   name?: string;
+  userId?: string; // userId is now optional but recommended for consistent colors
   avatarSizeClass?: string;
 }
 
 export const AccountMenuButton = React.forwardRef<
   HTMLButtonElement,
   AccountMenuButtonProps
->(({ avatarUrl, name, avatarSizeClass, className, ...props }, ref) => {
+>(({ avatarUrl, name, userId, avatarSizeClass, className, ...props }, ref) => {
   return (
     <button
       ref={ref}
@@ -26,15 +27,13 @@ export const AccountMenuButton = React.forwardRef<
       )}
       {...props} // ← Radix が必要とする props を受け取れるようにする
     >
-      <Avatar className={avatarSizeClass}>
-        {avatarUrl ? (
-          // アバター画像がある場合は表示
-          <AvatarImage src={avatarUrl} alt={name ?? "user"} />
-        ) : (
-          // 画像がない場合はイニシャルを表示
-          <AvatarFallback>{(name || "U").slice(0, 1)}</AvatarFallback>
-        )}
-      </Avatar>
+      <UserAvatar
+        userId={userId ?? "unknown"} // Fallback to "unknown" if no ID (though it should be provided)
+        name={name}
+        avatarUrl={avatarUrl}
+        className={cn("w-full h-full", avatarSizeClass)}
+        size="md" // Size is controlled/overridden by className driven by avatarSizeClass often, but setting a default
+      />
     </button>
   );
 });
