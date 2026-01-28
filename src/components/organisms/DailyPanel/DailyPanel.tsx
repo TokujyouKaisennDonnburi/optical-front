@@ -4,19 +4,19 @@ import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Text } from "@/components/atoms/Text";
 import {
-  DailyScheduleHeader,
-  type DailyScheduleHeaderProps,
-} from "@/components/molecules/DailyScheduleHeader";
+  DailyHeader,
+  type DailyHeaderProps,
+} from "@/components/molecules/DailyHeader";
 import type {
-  DailyScheduleTimelineEvent,
-  DailyScheduleTimelineSlot,
-} from "@/components/molecules/DailyScheduleTimeline";
-import { DailyScheduleTimeline } from "@/components/molecules/DailyScheduleTimeline";
+  DailyTimelineEvent,
+  DailyTimelineSlot,
+} from "@/components/molecules/DailyTimeline";
+import { DailyTimeline } from "@/components/molecules/DailyTimeline";
 import { EventSection } from "@/components/molecules/EventSection/EventSection";
 import { useSettings } from "@/providers/SettingsProvider";
 import { cn } from "@/utils_constants_styles/utils";
 
-export type DailySchedulePanelItem = {
+export type DailyPanelItem = {
   id: string;
   title: string;
   timeRange: {
@@ -25,7 +25,7 @@ export type DailySchedulePanelItem = {
   };
   startsAt?: string;
   endsAt?: string;
-  statusVariant?: DailyScheduleTimelineEvent["statusVariant"];
+  statusVariant?: DailyTimelineEvent["statusVariant"];
   location?: string;
   locationUrl?: string;
   memo?: string;
@@ -35,14 +35,14 @@ export type DailySchedulePanelItem = {
   calendarName?: string;
 };
 
-export type DailySchedulePanelProps = {
+export type DailyPanelProps = {
   header: Pick<
-    DailyScheduleHeaderProps,
+    DailyHeaderProps,
     "title" | "dateLabel" | "description" | "actions"
   >;
-  items: DailySchedulePanelItem[];
+  items: DailyPanelItem[];
   timeline?: {
-    slots?: DailyScheduleTimelineSlot[];
+    slots?: DailyTimelineSlot[];
     className?: string;
     contentClassName?: string;
   };
@@ -53,7 +53,7 @@ export type DailySchedulePanelProps = {
 };
 
 /* ===== 終日判定 ===== */
-function isAllDay(item: DailySchedulePanelItem) {
+function isAllDay(item: DailyPanelItem) {
   if (!item.startsAt || !item.endsAt) return false;
 
   const start = new Date(item.startsAt);
@@ -75,7 +75,7 @@ function isAllDay(item: DailySchedulePanelItem) {
   return isStartMidnight && isEndEndOfDay && sameDay;
 }
 
-export function DailySchedulePanel({
+export function DailyPanel({
   header,
   items,
   timeline,
@@ -83,7 +83,7 @@ export function DailySchedulePanel({
   emptyMessage = "今日の予定はありません。お疲れ様です",
   className,
   contentClassName,
-}: DailySchedulePanelProps) {
+}: DailyPanelProps) {
   // ===== DATE SELECTION LOGIC =====
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
@@ -169,7 +169,7 @@ export function DailySchedulePanel({
       )}
     >
       <CardHeader className="border-b border-border px-4 py-2 space-y-2">
-        <DailyScheduleHeader
+        <DailyHeader
           title={header.title}
           dateLabel={displayDateLabel}
           description={header.description}
@@ -251,7 +251,7 @@ export function DailySchedulePanel({
                   ref={timelineWrapRef}
                   className="relative flex flex-1 min-h-0"
                 >
-                  <DailyScheduleTimeline
+                  <DailyTimeline
                     slots={derivedSlots}
                     items={timedItems}
                     className={cn("flex-1", timeline?.className)}
@@ -279,23 +279,19 @@ export function DailySchedulePanel({
   );
 }
 
-function buildSlotsFromItems(
-  _items: DailySchedulePanelItem[],
-): DailyScheduleTimelineSlot[] {
+function buildSlotsFromItems(_items: DailyPanelItem[]): DailyTimelineSlot[] {
   return defaultSlots();
 }
 
-function defaultSlots(): DailyScheduleTimelineSlot[] {
-  const result: DailyScheduleTimelineSlot[] = [];
+function defaultSlots(): DailyTimelineSlot[] {
+  const result: DailyTimelineSlot[] = [];
   for (let minute = 0; minute < 24 * 60; minute += 60) {
     result.push({ time: minutesToTimeLabel(minute) });
   }
   return result;
 }
 
-function markCurrentSlot(
-  slots: DailyScheduleTimelineSlot[],
-): DailyScheduleTimelineSlot[] {
+function markCurrentSlot(slots: DailyTimelineSlot[]): DailyTimelineSlot[] {
   const now = new Date();
   const currentMinutes = now.getHours() * 60;
   return slots.map((slot) => ({

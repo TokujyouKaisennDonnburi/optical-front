@@ -14,11 +14,11 @@ import React, {
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
-import { DailyScheduleHeader } from "@/components/molecules/DailyScheduleHeader";
+import { DailyHeader } from "@/components/molecules/DailyHeader";
 import { InitialLoading } from "@/components/molecules/InitialLoading/InitialLoading";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { AgentChatView } from "@/components/organisms/AgentChat";
-import { DailySchedulePanel } from "@/components/organisms/DailySchedulePanel";
+import { DailyPanel } from "@/components/organisms/DailyPanel";
 import { HomeBoardArea } from "@/components/organisms/HomeBoardArea";
 import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/GeneralSearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
@@ -233,7 +233,7 @@ function HomeContent() {
                     >
                       <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden shadow-xl">
                         <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
-                          <DailyScheduleHeader
+                          <DailyHeader
                             title="OptiCal Agent"
                             dateLabel={dateLabel}
                             actions={
@@ -268,7 +268,7 @@ function HomeContent() {
                       transition={{ duration: 0.2 }}
                       className="absolute inset-0 h-full w-full"
                     >
-                      <DailySchedulePanel
+                      <DailyPanel
                         header={{
                           ...boardHeader,
                           actions: (

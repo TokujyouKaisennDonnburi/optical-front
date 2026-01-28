@@ -16,10 +16,10 @@ import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
-import type { DailySchedulePanelItem } from "@/components/organisms/DailySchedulePanel";
+import type { DailyPanelItem } from "@/components/organisms/DailyPanel";
 import { cn } from "@/utils_constants_styles/utils";
 
-export type DailyScheduleTimelineEvent = {
+export type DailyTimelineEvent = {
   id: string;
   title: string;
   start: string; // HH:mm
@@ -30,17 +30,17 @@ export type DailyScheduleTimelineEvent = {
   memo?: string; // Added missing property based on previous usage
 };
 
-export type DailyScheduleTimelineSlot = {
+export type DailyTimelineSlot = {
   time: string; // HH:mm
-  events?: DailyScheduleTimelineEvent[];
+  events?: DailyTimelineEvent[];
   isCurrent?: boolean;
   suffix?: string;
 };
 
-export type DailyScheduleTimelineProps = {
-  slots: DailyScheduleTimelineSlot[];
-  items?: DailySchedulePanelItem[];
-  onEventClick?: (event: DailyScheduleTimelineEvent) => void;
+export type DailyTimelineProps = {
+  slots: DailyTimelineSlot[];
+  items?: DailyPanelItem[];
+  onEventClick?: (event: DailyTimelineEvent) => void;
   className?: string;
   contentClassName?: string;
 };
@@ -80,13 +80,13 @@ function withAlpha(color: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export function DailyScheduleTimeline({
+export function DailyTimeline({
   slots,
   items = [],
   onEventClick: _onEventClick,
   className,
   contentClassName,
-}: DailyScheduleTimelineProps) {
+}: DailyTimelineProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const currentSlotRef = useRef<HTMLDivElement | null>(null);
   const hasAutoScrolledRef = useRef(false);

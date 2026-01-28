@@ -1,7 +1,7 @@
 import { Text } from "@/components/atoms/Text";
 import { cn } from "@/utils_constants_styles/utils";
 
-export type DailyScheduleHeaderProps = {
+export type DailyHeaderProps = {
   title: string;
   dateLabel: string;
   description?: string;
@@ -9,13 +9,13 @@ export type DailyScheduleHeaderProps = {
   className?: string;
 };
 
-export function DailyScheduleHeader({
+export function DailyHeader({
   title,
   dateLabel,
   description,
   actions,
   className,
-}: DailyScheduleHeaderProps) {
+}: DailyHeaderProps) {
   return (
     <div
       className={cn(

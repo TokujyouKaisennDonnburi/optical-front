@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Button } from "@/components/atoms/Button";
-import { DailySchedulePanel } from "@/components/organisms/DailySchedulePanel";
+import { DailyPanel } from "@/components/organisms/DailyPanel";
 
-const meta: Meta<typeof DailySchedulePanel> = {
-  title: "Organisms/DailySchedulePanel",
-  component: DailySchedulePanel,
+const meta: Meta<typeof DailyPanel> = {
+  title: "Organisms/DailyPanel",
+  component: DailyPanel,
   tags: ["autodocs"],
   args: {
     header: {
@@ -53,7 +53,7 @@ const meta: Meta<typeof DailySchedulePanel> = {
 
 export default meta;
 
-type Story = StoryObj<typeof DailySchedulePanel>;
+type Story = StoryObj<typeof DailyPanel>;
 
 export const Default: Story = {};
 export const WithActions: Story = {

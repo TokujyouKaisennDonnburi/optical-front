@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { DailyScheduleTimeline } from "@/components/molecules/DailyScheduleTimeline";
+import { DailyTimeline } from "@/components/molecules/DailyTimeline";
 
-const meta: Meta<typeof DailyScheduleTimeline> = {
-  title: "Molecules/DailyScheduleTimeline",
-  component: DailyScheduleTimeline,
+const meta: Meta<typeof DailyTimeline> = {
+  title: "Molecules/DailyTimeline",
+  component: DailyTimeline,
   tags: ["autodocs"],
   args: {
     slots: [
@@ -43,7 +43,7 @@ const meta: Meta<typeof DailyScheduleTimeline> = {
 
 export default meta;
 
-type Story = StoryObj<typeof DailyScheduleTimeline>;
+type Story = StoryObj<typeof DailyTimeline>;
 
 /* ===== ストーリー ===== */
 export const Default: Story = {};
