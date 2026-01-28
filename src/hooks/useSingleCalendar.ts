@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
+import type { DailyPanelItem } from "@/components/organisms/DailyPanel";
 import { getCalendarDetail } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
@@ -9,7 +9,7 @@ import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
 /**
  * 単体カレンダーのスケジュールとオプションを取得するフック
  */
-export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
+export function useSingleCalendar(calendarId: string, viewDate?: Date) {
   const [calendar, setCalendar] = useState<CalendarDetail | null>(null);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,8 +133,8 @@ export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
     nextMonthParam,
   ]);
 
-  // TodaySchedulePanelItem 形式に変換
-  const items: TodaySchedulePanelItem[] = useMemo(() => {
+  // 直近の予定パネル用（DailyPanelItem）形式に変換
+  const items: DailyPanelItem[] = useMemo(() => {
     return scheduleItems.map((item) => ({
       id: item.id,
       title: item.title,

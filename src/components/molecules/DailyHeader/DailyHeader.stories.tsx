@@ -1,21 +1,21 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Button } from "@/components/atoms/Button";
-import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
+import { DailyHeader } from "@/components/molecules/DailyHeader";
 
-const meta: Meta<typeof TodayScheduleHeader> = {
-  title: "Molecules/TodayScheduleHeader",
-  component: TodayScheduleHeader,
+const meta: Meta<typeof DailyHeader> = {
+  title: "Molecules/DailyHeader",
+  component: DailyHeader,
   tags: ["autodocs"],
   args: {
-    title: "今日の予定",
+    title: "直近の予定",
     dateLabel: "2024年4月12日 (金)",
   },
   parameters: {
     docs: {
       description: {
         component:
-          "今日の予定パネルのヘッダー。タイトル、日付ラベル、説明文、アクションボタンの配置を制御します。",
+          "直近の予定パネルのヘッダー。タイトル、日付ラベル、説明文、アクションボタンの配置を制御します。",
       },
     },
   },
@@ -23,7 +23,7 @@ const meta: Meta<typeof TodayScheduleHeader> = {
 
 export default meta;
 
-type Story = StoryObj<typeof TodayScheduleHeader>;
+type Story = StoryObj<typeof DailyHeader>;
 
 export const Default: Story = {};
 export const WithActions: Story = {

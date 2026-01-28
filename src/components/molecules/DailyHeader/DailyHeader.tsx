@@ -1,23 +1,21 @@
-import type { ReactNode } from "react";
-
 import { Text } from "@/components/atoms/Text";
 import { cn } from "@/utils_constants_styles/utils";
 
-export type TodayScheduleHeaderProps = {
+export type DailyHeaderProps = {
   title: string;
-  dateLabel?: string;
+  dateLabel: string;
   description?: string;
-  actions?: ReactNode;
+  actions?: React.ReactNode;
   className?: string;
 };
 
-export function TodayScheduleHeader({
+export function DailyHeader({
   title,
   dateLabel,
   description,
   actions,
   className,
-}: TodayScheduleHeaderProps) {
+}: DailyHeaderProps) {
   return (
     <div
       className={cn(

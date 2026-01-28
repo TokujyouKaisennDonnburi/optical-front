@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { TodaySchedulePanelItem } from "@/components/organisms/TodaySchedulePanel";
+import type { DailyPanelItem } from "@/components/organisms/DailyPanel";
 import { getCalendarList } from "@/lib/api-calendars";
 import { getMonthSchedule } from "@/lib/api-schedule";
 import type { CalendarDetail, ScheduleItem } from "@/types/schedule";
@@ -111,7 +111,7 @@ export function useGeneralCalendar(viewDate?: Date) {
     };
   }, [refreshTrigger, currentMonthParam, prevMonthParam, nextMonthParam]);
 
-  const items: TodaySchedulePanelItem[] = useMemo(() => {
+  const items: DailyPanelItem[] = useMemo(() => {
     if (schedules.length === 0) return [];
 
     return schedules.map((item) => {

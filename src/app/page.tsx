@@ -14,14 +14,14 @@ import React, {
 import { Button } from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal/ConfirmModal";
+import { DailyHeader } from "@/components/molecules/DailyHeader";
 import { InitialLoading } from "@/components/molecules/InitialLoading/InitialLoading";
-import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { AgentChatView } from "@/components/organisms/AgentChat";
+import { DailyPanel } from "@/components/organisms/DailyPanel";
 import { HomeBoardArea } from "@/components/organisms/HomeBoardArea";
 import { GeneralSearchHeader } from "@/components/organisms/SearchHeader/GeneralSearchHeader";
 import { SelectCalendarStrip } from "@/components/organisms/SelectCalendarStrip";
-import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
 
@@ -103,28 +103,6 @@ function HomeContent() {
     });
   }, [items, searchTerm, selectedCalendars]);
 
-  const todayItems = useMemo(() => {
-    const todayStart = startOfDay(new Date());
-    const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
-
-    // 今日用のスケジュールからフィルタリング（カレンダーグリッドの月移動に影響されない）
-    return todayMonthItems.filter((item) => {
-      const startsAt = item.startsAt ? new Date(item.startsAt) : null;
-      const endsAt = item.endsAt ? new Date(item.endsAt) : null;
-
-      if (!startsAt || Number.isNaN(startsAt.getTime())) {
-        return false;
-      }
-
-      const hasValidEnd = endsAt && !Number.isNaN(endsAt.getTime());
-      const rangeStart = startsAt;
-      const rangeEnd = hasValidEnd ? endsAt : startsAt;
-
-      return rangeStart < todayEnd && rangeEnd >= todayStart;
-    });
-  }, [todayMonthItems]);
-
   const calendarOptions = useMemo(() => {
     return calendars.map((calendar) => ({
       label: calendar.name,
@@ -135,7 +113,7 @@ function HomeContent() {
 
   const boardHeader = useMemo(
     () => ({
-      title: "今日の予定",
+      title: "直近の予定",
       dateLabel: dateLabel || "取得中...",
     }),
     [dateLabel],
@@ -255,8 +233,9 @@ function HomeContent() {
                     >
                       <Card className="flex h-full w-full min-h-0 flex-col overflow-hidden shadow-xl">
                         <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
-                          <TodayScheduleHeader
+                          <DailyHeader
                             title="OptiCal Agent"
+                            dateLabel={dateLabel}
                             actions={
                               <Button
                                 variant="ghost"
@@ -289,7 +268,7 @@ function HomeContent() {
                       transition={{ duration: 0.2 }}
                       className="absolute inset-0 h-full w-full"
                     >
-                      <TodaySchedulePanel
+                      <DailyPanel
                         header={{
                           ...boardHeader,
                           actions: (
@@ -304,7 +283,7 @@ function HomeContent() {
                             </Button>
                           ),
                         }}
-                        items={todayItems}
+                        items={todayMonthItems}
                         isLoading={isTodayLoading}
                         emptyMessage={
                           error

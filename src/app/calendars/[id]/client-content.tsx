@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader } from "@/components/atoms/Card";
 import { Text } from "@/components/atoms/Text";
 import { CalendarBoardHeader } from "@/components/molecules/CalendarBoardHeader";
 import { CalendarSwitcher } from "@/components/molecules/CalendarSwitcher";
-import { TodayScheduleHeader } from "@/components/molecules/TodayScheduleHeader";
+import { DailyHeader } from "@/components/molecules/DailyHeader";
 import { AccountMenu } from "@/components/organisms/AccountMenu/AccountMenu";
 import { AgentChatView } from "@/components/organisms/AgentChat";
 import { SidePanelWrapper } from "@/components/organisms/AgentChat/SidePanelWrapper";
@@ -35,7 +35,7 @@ import {
 import { TodoPanel } from "@/components/organisms/TodoPanel";
 import { useAuth } from "@/hooks/useAuth";
 import { useGeneralCalendar } from "@/hooks/useGeneralCalendar";
-import { useSingleCalendarSchedule } from "@/hooks/useSingleCalendarSchedule";
+import { useSingleCalendar } from "@/hooks/useSingleCalendar";
 import { useTodo } from "@/hooks/useTodo";
 import {
   connectGitHubAccount,
@@ -77,10 +77,17 @@ export function CalendarDetailClient({
 
   // 検索機能とビュー日付（フックより前に定義）
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewDate, setViewDate] = useState(() => startOfDay(new Date()));
+  const [viewDate, setViewDate] = useState(new Date());
 
-  const { calendar, items, isLoading, error, hasGitHubOptions, refresh } =
-    useSingleCalendarSchedule(calendarId, viewDate);
+  const {
+    calendar,
+    items,
+    dateLabel,
+    isLoading,
+    error,
+    refresh,
+    hasGitHubOptions,
+  } = useSingleCalendar(calendarId, viewDate);
 
   // 全カレンダー一覧を取得（カレンダー切り替え用）
   const { calendars: allCalendars, isLoading: calendarsLoading } =
@@ -454,8 +461,9 @@ export function CalendarDetailClient({
             {selectedSidebarItem === "agent" && (
               <>
                 <CardHeader className="border-b border-border px-4 py-3 bg-muted/30">
-                  <TodayScheduleHeader
+                  <DailyHeader
                     title="OptiCal Agent"
+                    dateLabel={dateLabel}
                     actions={
                       <Button
                         variant="ghost"
@@ -720,7 +728,7 @@ function BoardArea({
 }: {
   className?: string;
   calendarId: string;
-  items: ReturnType<typeof useSingleCalendarSchedule>["items"];
+  items: ReturnType<typeof useSingleCalendar>["items"];
   isLoading: boolean;
   error: Error | null;
   viewDate: Date;

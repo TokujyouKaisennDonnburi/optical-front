@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Button } from "@/components/atoms/Button";
-import { TodaySchedulePanel } from "@/components/organisms/TodaySchedulePanel";
+import { DailyPanel } from "@/components/organisms/DailyPanel";
 
-const meta: Meta<typeof TodaySchedulePanel> = {
-  title: "Organisms/TodaySchedulePanel",
-  component: TodaySchedulePanel,
+const meta: Meta<typeof DailyPanel> = {
+  title: "Organisms/DailyPanel",
+  component: DailyPanel,
   tags: ["autodocs"],
   args: {
     header: {
@@ -17,7 +17,7 @@ const meta: Meta<typeof TodaySchedulePanel> = {
         id: "1",
         title: "朝会",
         timeRange: { start: "09:00", end: "09:30" },
-        statusVariant: "info",
+        statusVariant: "default",
         memo: "オンラインで進行状況を共有します。",
         calendarColor: "#22d3ee",
       },
@@ -53,7 +53,7 @@ const meta: Meta<typeof TodaySchedulePanel> = {
 
 export default meta;
 
-type Story = StoryObj<typeof TodaySchedulePanel>;
+type Story = StoryObj<typeof DailyPanel>;
 
 export const Default: Story = {};
 export const WithActions: Story = {

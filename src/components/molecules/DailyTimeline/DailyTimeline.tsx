@@ -16,33 +16,31 @@ import type { StatusDotVariant } from "@/components/atoms/StatusDot";
 import { Text } from "@/components/atoms/Text";
 import { TimeLabel } from "@/components/atoms/TimeLabel";
 import { ScheduleEventCard } from "@/components/molecules/ScheduleEventCard";
+import type { DailyPanelItem } from "@/components/organisms/DailyPanel";
 import { cn } from "@/utils_constants_styles/utils";
 
-export type TodayScheduleTimelineEvent = {
+export type DailyTimelineEvent = {
   id: string;
   title: string;
-  memo?: string;
+  start: string; // HH:mm
+  end?: string; // HH:mm
+  statusVariant?: "default" | "success" | "warning" | "danger";
   location?: string;
   calendarColor?: string;
-  statusVariant?: StatusDotVariant;
-  startsAt?: string;
-  endsAt?: string;
-  timeRange?: {
-    start: string;
-    end?: string;
-  };
+  memo?: string; // Added missing property based on previous usage
 };
 
-export type TodayScheduleTimelineSlot = {
-  time: string;
-  suffix?: string;
-  description?: string;
+export type DailyTimelineSlot = {
+  time: string; // HH:mm
+  events?: DailyTimelineEvent[];
   isCurrent?: boolean;
+  suffix?: string;
 };
 
-export type TodayScheduleTimelineProps = {
-  slots: TodayScheduleTimelineSlot[];
-  items: TodayScheduleTimelineEvent[];
+export type DailyTimelineProps = {
+  slots: DailyTimelineSlot[];
+  items?: DailyPanelItem[];
+  onEventClick?: (event: DailyTimelineEvent) => void;
   className?: string;
   contentClassName?: string;
 };
@@ -82,12 +80,13 @@ function withAlpha(color: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export function TodayScheduleTimeline({
+export function DailyTimeline({
   slots,
-  items,
+  items = [],
+  onEventClick: _onEventClick,
   className,
   contentClassName,
-}: TodayScheduleTimelineProps) {
+}: DailyTimelineProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const currentSlotRef = useRef<HTMLDivElement | null>(null);
   const hasAutoScrolledRef = useRef(false);
@@ -102,19 +101,29 @@ export function TodayScheduleTimeline({
     currentSlotRef.current = node;
   }, []);
 
-  /* ===== 現在時刻へ自動スクロール ===== */
+  /* ===== スクロール同期 ===== */
+  // Reset auto-scroll flag when items change (e.g. date change)
   useEffect(() => {
+    hasAutoScrolledRef.current = false;
+    void items;
+  }, [items]);
+
+  useLayoutEffect(() => {
     if (hasAutoScrolledRef.current) return;
-    if (!viewportRef.current || !currentSlotRef.current) return;
 
-    const target =
-      currentSlotRef.current.offsetTop -
-      viewportRef.current.clientHeight / 2 +
-      currentSlotRef.current.offsetHeight / 2;
+    if (currentSlotRef.current && viewportRef.current) {
+      const viewport = viewportRef.current;
+      const slot = currentSlotRef.current;
 
-    viewportRef.current.scrollTo({ top: Math.max(target, 0) });
-    hasAutoScrolledRef.current = true;
-  }, []);
+      // Center the current slot
+      const top =
+        slot.offsetTop - viewport.clientHeight / 2 + slot.clientHeight / 2;
+
+      viewport.scrollTo({ top, behavior: "smooth" });
+      hasAutoScrolledRef.current = true;
+    }
+    void slots;
+  }, [slots]);
 
   /* ===== イベント正規化 ===== */
   const events = useMemo<NormalizedEvent[]>(() => {
