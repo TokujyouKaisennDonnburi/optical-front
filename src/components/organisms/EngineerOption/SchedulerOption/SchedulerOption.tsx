@@ -149,10 +149,14 @@ export function SchedulerOption({
         dates: newSchedulerData.dates,
       });
       try {
-        await postSchedulerAttendance(calendarId, createdScheduler.schedulerId, {
-          comment,
-          status: buildAttendanceStatus(availability),
-        });
+        await postSchedulerAttendance(
+          calendarId,
+          createdScheduler.schedulerId,
+          {
+            comment,
+            status: buildAttendanceStatus(availability),
+          },
+        );
         toast.success("スケジューラーを作成しました");
       } catch (_attendanceError) {
         toast.error(
@@ -202,10 +206,7 @@ export function SchedulerOption({
         const startDatetime = new Date(d.startTime);
         const endDatetime = new Date(d.endTime);
         return {
-          date: new Date(d.date)
-            .toISOString()
-            .slice(0, 10)
-            .replace(/-/g, "/"),
+          date: new Date(d.date).toISOString().slice(0, 10).replace(/-/g, "/"),
           startTime:
             startDatetime.getHours().toString() +
             ":" +
