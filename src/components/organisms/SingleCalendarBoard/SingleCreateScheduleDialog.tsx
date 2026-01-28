@@ -33,6 +33,7 @@ export type SingleCreateScheduleDialogProps = {
   initialStartTime?: string;
   initialEndTime?: string;
   initialIsAllDay?: boolean;
+  initialMemo?: string;
 };
 
 /**
@@ -53,6 +54,7 @@ export function SingleCreateScheduleDialog({
   initialStartTime,
   initialEndTime,
   initialIsAllDay,
+  initialMemo,
 }: SingleCreateScheduleDialogProps) {
   const formatDateInput = (target: Date) => {
     const y = target.getFullYear();
@@ -105,7 +107,7 @@ export function SingleCreateScheduleDialog({
   const [title, setTitle] = useState(initialTitle || "");
   const [startTime, setStartTime] = useState(initialStartTime || "09:00");
   const [endTime, setEndTime] = useState(initialEndTime || "10:00");
-  const [memo, setMemo] = useState("");
+  const [memo, setMemo] = useState(initialMemo || "");
   const [location, setLocation] = useState("");
   const [isAllDay, setIsAllDay] = useState(initialIsAllDay ?? false);
   const [allDayStartDate, setAllDayStartDate] = useState<Date>(date);
@@ -129,7 +131,7 @@ export function SingleCreateScheduleDialog({
       setStartTime(initialStart);
       setEndTime(initialEnd);
 
-      setMemo("");
+      setMemo(initialMemo || "");
       setLocation("");
       setIsAllDay(initialIsAllDay ?? false);
       setAllDayStartDate(date);
@@ -143,6 +145,7 @@ export function SingleCreateScheduleDialog({
     initialStartTime,
     initialEndTime,
     initialIsAllDay,
+    initialMemo,
     getRoundedNowTime,
     addOneHour,
   ]);

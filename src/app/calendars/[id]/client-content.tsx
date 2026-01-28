@@ -56,6 +56,7 @@ type CreateDialogData = {
   startTime?: string;
   endTime?: string;
   isAllDay?: boolean;
+  memo?: string;
 };
 
 export function CalendarDetailClient({
@@ -272,6 +273,7 @@ export function CalendarDetailClient({
     startTime: string;
     endTime: string;
     isAllDay: boolean;
+    memo: string;
   }) => {
     const newDate = new Date(data.date);
     // Adjust for timezone offset if needed
@@ -284,6 +286,7 @@ export function CalendarDetailClient({
       startTime: data.startTime,
       endTime: data.endTime,
       isAllDay: data.isAllDay,
+      memo: data.memo,
     });
     setSelectedSidebarItem(null); // Close the scheduler panel
   };
@@ -698,6 +701,7 @@ export function CalendarDetailClient({
           initialStartTime={createDialogData.startTime}
           initialEndTime={createDialogData.endTime}
           initialIsAllDay={createDialogData.isAllDay}
+          initialMemo={createDialogData.memo}
         />
       ) : null}
     </div>

@@ -40,6 +40,7 @@ type Props = {
     startTime: string;
     endTime: string;
     isAllDay: boolean;
+    memo: string;
   }) => void;
 };
 
@@ -238,6 +239,7 @@ export function SchedulerSummary({
       startTime: dateInfo.startTime,
       endTime: dateInfo.endTime,
       isAllDay: poll.isAllDay,
+      memo: poll.memo,
     };
     onConfirm(confirmationData);
   };
