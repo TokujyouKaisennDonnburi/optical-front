@@ -67,12 +67,8 @@ function isAllDay(item: DailyPanelItem) {
       end.getMinutes() === 59 &&
       end.getSeconds() === 59);
 
-  const sameDay =
-    start.getFullYear() === end.getFullYear() &&
-    start.getMonth() === end.getMonth() &&
-    start.getDate() === end.getDate();
-
-  return isStartMidnight && isEndEndOfDay && sameDay;
+  // 複数日にまたがる終日予定にも対応
+  return isStartMidnight && isEndEndOfDay;
 }
 
 export function DailyPanel({
