@@ -133,7 +133,7 @@ export function useSingleCalendarSchedule(calendarId: string, viewDate?: Date) {
     nextMonthParam,
   ]);
 
-  // TodaySchedulePanelItem 形式に変換
+  // 直近の予定パネル用（DailySchedulePanelItem）形式に変換
   const items: DailySchedulePanelItem[] = useMemo(() => {
     return scheduleItems.map((item) => ({
       id: item.id,
