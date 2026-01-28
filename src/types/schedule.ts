@@ -142,3 +142,21 @@ export type CalendarEvent = {
   item: ScheduleBoardItem;
   sortKey: number;
 };
+
+/** メンバー招待APIのリクエスト型 */
+export type InviteMemberRequest = {
+  emails: string[];
+};
+
+/** メンバーステータス */
+export type MemberStatus = "pending" | "joined";
+
+/** メンバー一覧取得APIのレスポンス型 */
+export type GetMemberResponse = {
+  userId: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
+  status: MemberStatus;
+  joinedAt?: string;
+};

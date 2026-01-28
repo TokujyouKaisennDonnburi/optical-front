@@ -1,6 +1,11 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/utils_constants_styles/utils";
 
 // ユーザーIDから一貫した色を生成
@@ -66,16 +71,25 @@ export function UserAvatar({
   const initials = getInitials(name ?? userId);
 
   return (
-    <Avatar className={cn(sizeClasses[size], className)}>
-      {avatarUrl && <AvatarImage src={avatarUrl} alt={name ?? "User avatar"} />}
-      <AvatarFallback
-        className={cn(
-          colorClass,
-          "text-white font-medium flex items-center justify-center",
-        )}
-      >
-        {initials}
-      </AvatarFallback>
-    </Avatar>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Avatar className={cn(sizeClasses[size], className)}>
+          {avatarUrl && (
+            <AvatarImage src={avatarUrl} alt={name ?? "User avatar"} />
+          )}
+          <AvatarFallback
+            className={cn(
+              colorClass,
+              "text-white font-medium flex items-center justify-center",
+            )}
+          >
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" sideOffset={4}>
+        {name ?? userId}
+      </TooltipContent>
+    </Tooltip>
   );
 }

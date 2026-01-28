@@ -66,3 +66,29 @@ export async function deleteCalendar(calendarId: string) {
     method: "DELETE",
   });
 }
+
+/** メンバー招待 */
+export async function inviteMembers(calendarId: string, emails: string[]) {
+  return apiPost<void>(`/calendars/${calendarId}/members`, { emails });
+}
+
+/** メンバー一覧取得 */
+export async function getCalendarMembers(calendarId: string) {
+  return apiGet<
+    Array<{
+      userId: string;
+      name: string;
+      email?: string;
+      avatarUrl?: string;
+      status: "pending" | "joined";
+      joinedAt?: string;
+    }>
+  >(`/calendars/${calendarId}/members`);
+}
+
+/** カレンダー退出（招待拒否） */
+export async function leaveCalendar(calendarId: string) {
+  return apiRequest<void>(`/calendars/${calendarId}/members`, {
+    method: "DELETE",
+  });
+}

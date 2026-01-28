@@ -4,6 +4,7 @@ import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
 import { Icon } from "@/components/atoms/Icon";
 import { UserAvatar } from "@/components/atoms/UserAvatar/UserAvatar";
+import { MemberInviteDialog } from "@/components/molecules/MemberInviteDialog/MemberInviteDialog";
 import { cn } from "@/utils_constants_styles/utils";
 
 export type CalendarBoardHeaderProps = {
@@ -19,6 +20,8 @@ export type CalendarBoardHeaderProps = {
     name: string;
     avatarUrl?: string;
   }>;
+  calendarId?: string;
+  onMemberInvited?: () => void;
 };
 
 export function CalendarBoardHeader({
@@ -30,6 +33,8 @@ export function CalendarBoardHeader({
   badgeIcon,
   className,
   members = [],
+  calendarId,
+  onMemberInvited,
 }: CalendarBoardHeaderProps) {
   return (
     <div className={cn("flex items-center justify-between", className)}>
@@ -38,25 +43,29 @@ export function CalendarBoardHeader({
           {badgeIcon ? <Icon icon={badgeIcon} size="sm" /> : null}
           {badgeLabel}
         </Badge>
-        {members.length > 0 && (
-          <div className="flex items-center -space-x-1.5 hover:space-x-0.5 transition-all">
-            {members.slice(0, 5).map((member) => (
-              <UserAvatar
-                key={member.userId}
-                userId={member.userId}
-                name={member.name}
-                avatarUrl={member.avatarUrl}
-                size="sm"
-                className="border-2 border-background ring-0"
-              />
-            ))}
-            {members.length > 5 && (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-medium text-muted-foreground ring-0">
-                +{members.length - 5}
-              </div>
-            )}
-          </div>
-        )}
+        <div className="flex items-center space-x-0.5">
+          {members.slice(0, 5).map((member) => (
+            <UserAvatar
+              key={member.userId}
+              userId={member.userId}
+              name={member.name}
+              avatarUrl={member.avatarUrl}
+              size="sm"
+              className="border-2 border-background ring-0"
+            />
+          ))}
+          {members.length > 5 && (
+            <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[10px] font-medium text-muted-foreground ring-0">
+              +{members.length - 5}
+            </div>
+          )}
+          {calendarId && (
+            <MemberInviteDialog
+              calendarId={calendarId}
+              onInvited={onMemberInvited}
+            />
+          )}
+        </div>
       </div>
       <div
         className={cn(
