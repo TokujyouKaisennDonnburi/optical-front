@@ -168,7 +168,6 @@ function HomeContent() {
     setPendingEmail(null);
   };
 
-  // モーダルの「キャンセル」ボタン押下時のハンドラ
   const handleCancelEmailSave = () => {
     setIsEmailConfirmOpen(false);
     setPendingEmail(null);
@@ -363,7 +362,7 @@ function HomeContent() {
       {/* カレンダー削除確認モーダル */}
       <ConfirmModal
         isOpen={isDeleteConfirmOpen}
-        title="カレンダー削除"
+        title="カレンダーの削除"
         message={`カレンダー「${deletingCalendarName}」を本当に削除しますか？`}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
