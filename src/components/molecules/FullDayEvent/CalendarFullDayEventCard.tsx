@@ -5,14 +5,24 @@ import { cn, getContrastTextColor } from "@/utils_constants_styles/utils";
 /**
  * タイムライン（時間軸）用の終日判定
  *
- * - ISO文字列で「00:00:00 〜 23:59」を満たす場合に
- *   「単日終日イベント」とみなす
+ * - isAllDay フラグが存在すればそれを優先（推奨）
+ * - フラグがない場合のみ、ISO文字列で「00:00:00 〜 23:59」を満たす場合に
+ *   「単日終日イベント」とみなす（後方互換性のため）
  * - 日を跨ぐ（複数日）イベントはここでは考慮しない
  *
  * ※ 日跨ぎイベントについては UI 表現や分割ロジックが変わるため、
  *    別 issue で variant を利用した実装を行う想定
  */
-export function isFullDayEventISO(startIso: string, endIso?: string): boolean {
+export function isFullDayEventISO(
+  startIso: string,
+  endIso?: string,
+  isAllDay?: boolean,
+): boolean {
+  // isAllDay フラグが既に存在すればそれを優先
+  if (isAllDay !== undefined) {
+    return isAllDay;
+  }
+
   if (!endIso) {
     return false;
   }

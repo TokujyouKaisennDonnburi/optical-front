@@ -33,6 +33,7 @@ export type DailyPanelItem = {
   calendarColor?: string;
   members?: string[];
   calendarName?: string;
+  isAllDay?: boolean;
 };
 
 export type DailyPanelProps = {
@@ -54,6 +55,12 @@ export type DailyPanelProps = {
 
 /* ===== 終日判定 ===== */
 function isAllDay(item: DailyPanelItem) {
+  // isAllDay フラグが既に存在すればそれを優先
+  if (item.isAllDay !== undefined) {
+    return item.isAllDay;
+  }
+
+  // フラグがない場合は時刻境界から推論（後方互換性のため）
   if (!item.startsAt || !item.endsAt) return false;
 
   const start = new Date(item.startsAt);
@@ -67,7 +74,6 @@ function isAllDay(item: DailyPanelItem) {
       end.getMinutes() === 59 &&
       end.getSeconds() === 59);
 
-  // 複数日にまたがる終日予定にも対応
   return isStartMidnight && isEndEndOfDay;
 }
 

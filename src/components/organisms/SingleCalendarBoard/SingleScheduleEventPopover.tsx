@@ -253,7 +253,12 @@ export function SingleScheduleEventPopover({
     setEndDateValue(initialEnd);
     setStartTimeValue(formatTime(initialStart));
     setEndTimeValue(initialEnd ? formatTime(initialEnd) : "10:00");
-    setIsAllDayValue(isAllDayFromRange(initialStart, initialEnd));
+    // item.isAllDay フラグが存在すればそれを優先、なければ時刻境界から推論
+    setIsAllDayValue(
+      item.isAllDay !== undefined
+        ? item.isAllDay
+        : isAllDayFromRange(initialStart, initialEnd),
+    );
 
     setEditingTitle(false);
     setEditingDate(false);

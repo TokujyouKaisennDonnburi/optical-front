@@ -26,6 +26,7 @@ export type ScheduleBoardItem = {
   calendarName?: string;
   calendarColor?: string;
   calendarId?: string; // 削除用
+  isAllDay?: boolean;
 };
 
 /** カレンダー一覧取得APIのレスポンス型 */
