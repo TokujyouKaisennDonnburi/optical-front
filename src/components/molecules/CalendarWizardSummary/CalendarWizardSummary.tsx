@@ -97,14 +97,6 @@ export function CalendarWizardSummary({
             {templateName}
           </Text>
         </div>
-        <div>
-          <Text size="sm" weight="medium" className="text-muted-foreground">
-            カラー
-          </Text>
-          <Text size="sm" className="font-mono">
-            {color}
-          </Text>
-        </div>
         {customOptions.length > 0 && (
           <div className="sm:col-span-2">
             <Text size="sm" weight="medium" className="text-muted-foreground">
