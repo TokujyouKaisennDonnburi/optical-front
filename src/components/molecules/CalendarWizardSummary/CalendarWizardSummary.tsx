@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/atoms/Dialog";
 import { Text } from "@/components/atoms/Text";
+import { MembersDialog } from "@/components/molecules/MembersDialog/MembersDialog";
 import {
   SelectCalendarCard,
   type SelectCalendarCardData,
@@ -102,13 +103,13 @@ export function CalendarWizardSummary({
             <Text size="sm" weight="medium" className="text-muted-foreground">
               オプション
             </Text>
-            <div className="mt-1 flex flex-wrap gap-1">
+            <div className="mt-1 flex flex-nowrap gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {customOptions.map((option) => (
                 <span
                   key={option.name}
-                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
                 >
-                  <Check className="h-3 w-3" />
+                  <Check className="h-4 w-4" />
                   {option.label}
                 </span>
               ))}
@@ -120,20 +121,25 @@ export function CalendarWizardSummary({
             <Text size="sm" weight="medium" className="text-muted-foreground">
               招待メンバー ({activeMembers.length}名)
             </Text>
-            <div className="mt-1 flex flex-wrap gap-1">
+            <div className="mt-1 flex flex-nowrap gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {activeMembers.slice(0, 3).map((member) => (
                 <span
                   key={member.id}
-                  className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-md bg-muted px-3 py-1 text-sm"
                 >
-                  <Mail className="h-3 w-3" />
+                  <Mail className="h-4 w-4" />
                   {member.email.trim()}
                 </span>
               ))}
               {activeMembers.length > 3 && (
-                <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium">
-                  +{activeMembers.length - 3}名
-                </span>
+                <MembersDialog members={activeMembers}>
+                  <button
+                    type="button"
+                    className="inline-flex shrink-0 items-center rounded-md bg-muted px-3 py-1 text-sm font-medium hover:bg-muted/80 transition-colors"
+                  >
+                    +{activeMembers.length - 3}名
+                  </button>
+                </MembersDialog>
               )}
             </div>
           </div>
