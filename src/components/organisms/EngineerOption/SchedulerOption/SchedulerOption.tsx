@@ -6,6 +6,7 @@ import { ApiClientError } from "@/lib/api-client";
 import {
   createScheduler,
   getScheduler,
+  getSchedulerAttendance,
   getSchedulerList,
   postSchedulerAttendance,
 } from "@/types/scheduler";
@@ -43,6 +44,7 @@ export type SummaryMap = Record<string, Summary>;
 
 type Props = {
   calendarId: string;
+  currentUserId: string | null;
   selectedDates: string[];
   onDatesChange: (dates: string[]) => void;
   viewMode: ViewMode;
@@ -57,6 +59,7 @@ type Props = {
 
 export function SchedulerOption({
   calendarId,
+  currentUserId,
   selectedDates,
   onDatesChange,
   viewMode,
@@ -173,62 +176,75 @@ export function SchedulerOption({
     }
   };
 
-  const handleSelectPoll = async (id: string, hasResponded: boolean) => {
+  const handleSelectPoll = async (id: string, _hasResponded: boolean) => {
     setSelectedSchedulerId(id);
-    if (hasResponded) {
-      setViewMode("summary");
-    } else {
-      // Fetch poll data to pre-fill the availability form
-      try {
-        const pollDetails = await getScheduler(calendarId, id);
-        const dates = pollDetails.possibleDate.map((d) => {
-          const startDatetime = new Date(d.startTime);
-          const endDatetime = new Date(d.endTime);
-          return {
-            date: new Date(d.date)
-              .toISOString()
-              .slice(0, 10)
-              .replace(/-/g, "/"),
-            startTime:
-              startDatetime.getHours().toString() +
-              ":" +
-              startDatetime.getMinutes().toString(),
-            endTime:
-              endDatetime.getHours().toString() +
-              ":" +
-              endDatetime.getMinutes().toString(),
-          };
-        });
-        onDatesChange(dates.map((d) => d.date));
-        const isAllDay = pollDetails.isAllDay;
-        const defaultStartTime = isAllDay
-          ? null
-          : new Date(pollDetails.possibleDate[0]?.startTime);
-        const defaultEndTime = isAllDay
-          ? null
-          : new Date(pollDetails.possibleDate[0]?.endTime);
-        setNewSchedulerData({
-          title: pollDetails.title,
-          memo: pollDetails.memo,
-          defaultStartTime: defaultStartTime
-            ? defaultStartTime.getHours().toString() +
-              ":" +
-              defaultStartTime.getMinutes().toString()
-            : "",
-          defaultEndTime: defaultEndTime
-            ? defaultEndTime.getHours().toString() +
-              ":" +
-              defaultEndTime.getMinutes().toString()
-            : "",
-          limitTime: null,
-          isAllDay: isAllDay,
-          dates: dates,
-        });
-        setViewMode("respond"); // A new view for responding
-      } catch (err) {
-        toast.error("スケジューラーの読み込みに失敗しました");
-        console.error(err);
+    try {
+      if (currentUserId) {
+        const attendance = await getSchedulerAttendance(calendarId, id);
+        const hasAttendance = attendance.some(
+          (entry) => entry.userId === currentUserId,
+        );
+        if (hasAttendance) {
+          setViewMode("summary");
+          return;
+        }
       }
+    } catch (error) {
+      if (!(error instanceof ApiClientError && error.code === 404)) {
+        console.error(error);
+      }
+    }
+
+    // Fetch poll data to pre-fill the availability form
+    try {
+      const pollDetails = await getScheduler(calendarId, id);
+      const dates = pollDetails.possibleDate.map((d) => {
+        const startDatetime = new Date(d.startTime);
+        const endDatetime = new Date(d.endTime);
+        return {
+          date: new Date(d.date)
+            .toISOString()
+            .slice(0, 10)
+            .replace(/-/g, "/"),
+          startTime:
+            startDatetime.getHours().toString() +
+            ":" +
+            startDatetime.getMinutes().toString(),
+          endTime:
+            endDatetime.getHours().toString() +
+            ":" +
+            endDatetime.getMinutes().toString(),
+        };
+      });
+      onDatesChange(dates.map((d) => d.date));
+      const isAllDay = pollDetails.isAllDay;
+      const defaultStartTime = isAllDay
+        ? null
+        : new Date(pollDetails.possibleDate[0]?.startTime);
+      const defaultEndTime = isAllDay
+        ? null
+        : new Date(pollDetails.possibleDate[0]?.endTime);
+      setNewSchedulerData({
+        title: pollDetails.title,
+        memo: pollDetails.memo,
+        defaultStartTime: defaultStartTime
+          ? defaultStartTime.getHours().toString() +
+            ":" +
+            defaultStartTime.getMinutes().toString()
+          : "",
+        defaultEndTime: defaultEndTime
+          ? defaultEndTime.getHours().toString() +
+            ":" +
+            defaultEndTime.getMinutes().toString()
+          : "",
+        limitTime: null,
+        isAllDay: isAllDay,
+        dates: dates,
+      });
+      setViewMode("respond"); // A new view for responding
+    } catch (err) {
+      toast.error("スケジューラーの読み込みに失敗しました");
+      console.error(err);
     }
   };
 

@@ -491,6 +491,7 @@ export function CalendarDetailClient({
                 <CardContent className="flex-1 overflow-auto p-4">
                   <SchedulerOption
                     calendarId={calendarId}
+                    currentUserId={user?.id ?? null}
                     selectedDates={selectedDates}
                     onDatesChange={setSelectedDates}
                     viewMode={schedulerViewMode}
