@@ -110,7 +110,8 @@ export type CreateCalendarRequest = {
 
 /** カレンダー作成APIのレスポンス型 */
 export type CreateCalendarResponse = {
-  calendar: CalendarDetail;
+  id: string;
+  name: string;
 };
 
 /** カレンダーグリッドのセル情報（GeneralCalendarBoard/SingleCalendarBoard共通） */
