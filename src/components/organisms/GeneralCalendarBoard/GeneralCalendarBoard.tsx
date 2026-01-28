@@ -282,6 +282,7 @@ export function GeneralCalendarBoard({
                           const isAllDay = isFullDayEventISO(
                             event.item.start,
                             event.item.end,
+                            event.item.isAllDay,
                           );
 
                           return (
