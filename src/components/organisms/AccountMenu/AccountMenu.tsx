@@ -91,6 +91,7 @@ export function AccountMenu({
       {/* プロフィール画像 (メニューを開くトリガー) */}
       <DropdownMenuTrigger asChild>
         <AccountMenuButton
+          userId={user.id}
           name={user.name}
           avatarUrl={avatarUrl}
           avatarSizeClass={avatarSizeClass}
