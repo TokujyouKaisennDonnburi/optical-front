@@ -1,7 +1,6 @@
 "use client";
 
-import { Calendar } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import {
   Card,
@@ -38,6 +37,10 @@ type Props = {
   selectedDates: string[];
   setSelectedDates: (dates: string[]) => void;
   initialData?: Partial<SchedulerCreateData> | null;
+  limitDate: string;
+  onLimitDateChange: (date: string) => void;
+  dateSelectionMode: "candidates" | "limit";
+  onDateSelectionModeChange: (mode: "candidates" | "limit") => void;
 };
 
 export function SchedulerCreate({
@@ -46,15 +49,13 @@ export function SchedulerCreate({
   selectedDates,
   setSelectedDates,
   initialData,
+  limitDate,
+  onLimitDateChange,
+  dateSelectionMode,
+  onDateSelectionModeChange,
 }: Props) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [memo, setMemo] = useState(initialData?.memo || "");
-  const [limitDate, setLimitDate] = useState(
-    initialData?.limitTime
-      ? new Date(initialData.limitTime).toISOString().slice(0, 10)
-      : "",
-  );
-  const limitInputRef = useRef<HTMLInputElement | null>(null);
   const [isAllDay, setIsAllDay] = useState(initialData?.isAllDay ?? true);
   const [defaultStartTime, setDefaultStartTime] = useState(
     initialData?.defaultStartTime || "",
@@ -135,34 +136,22 @@ export function SchedulerCreate({
     return dateString.replace(/-/g, "/");
   };
 
-  const openLimitPicker = () => {
-    const input = limitInputRef.current;
-    if (!input) return;
-    const picker = (input as HTMLInputElement & { showPicker?: () => void })
-      .showPicker;
-    if (typeof picker === "function") {
-      picker.call(input);
-      return;
-    }
-    input.focus();
-    input.click();
-  };
-
   return (
     <Card className="border-stone-300 bg-stone-50 dark:border-slate-700 dark:bg-slate-900">
       <CardHeader className="space-y-1 pb-3">
         <CardTitle className="text-base text-stone-900 dark:text-slate-50">
           スケジューラーを新規作成
         </CardTitle>
-        <CardDescription className="text-stone-600 dark:text-slate-400">
-          候補日と共有内容を設定します。
-        </CardDescription>
+        <CardDescription className="text-stone-600 dark:text-slate-400" />
       </CardHeader>
 
       <CardContent className="space-y-6">
         {/* タイトル */}
         <div className="space-y-1">
-          <Label htmlFor="title">タイトル</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="title">タイトル</Label>
+            <span className="text-xs text-muted-foreground">必須</span>
+          </div>
           <Input
             id="title"
             value={title}
@@ -199,7 +188,10 @@ export function SchedulerCreate({
 
         {/* 候補日一覧（縦並び、右端−削除） */}
         <div className="space-y-1">
-          <Label>候補日</Label>
+          <div className="flex items-center gap-2">
+            <Label>候補日</Label>
+            <span className="text-xs text-muted-foreground">必須</span>
+          </div>
 
           <div className="rounded-lg border p-3 space-y-2">
             {selectedDates.length === 0 && (
@@ -240,32 +232,46 @@ export function SchedulerCreate({
 
         {/* 回答期限 */}
         <div className="space-y-1">
-          <Label htmlFor="limit">回答締切</Label>
-          <div className="relative">
-            <Input
-              id="limit"
-              type="text"
-              readOnly
-              placeholder="MM/DD"
-              value={limitDate ? limitDate.slice(5).replace("-", "/") : ""}
-              onClick={openLimitPicker}
-              className="pr-9"
+          <div className="flex items-center gap-2">
+            <Label htmlFor="limit-mode" className="text-sm text-foreground">
+              締切
+            </Label>
+            <Switch
+              id="limit-mode"
+              checked={dateSelectionMode === "limit"}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  onLimitDateChange("");
+                }
+                onDateSelectionModeChange(checked ? "limit" : "candidates");
+              }}
+              className="data-[state=checked]:bg-red-500 dark:data-[state=checked]:bg-red-400"
             />
-            <button
-              type="button"
-              aria-label="回答締切のカレンダーを開く"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={openLimitPicker}
-            >
-              <Calendar className="h-4 w-4" />
-            </button>
-            <input
-              ref={limitInputRef}
-              type="date"
-              className="absolute inset-0 h-0 w-0 opacity-0"
-              value={limitDate}
-              onChange={(e) => setLimitDate(e.target.value)}
-            />
+            <span className="text-xs text-muted-foreground">必須</span>
+          </div>
+          <div className="rounded-lg border p-3">
+            {limitDate && dateSelectionMode !== "limit" ? (
+              <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                <span className="text-sm">{formatDateToJP(limitDate)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">終日</span>
+                  <Button
+                    onClick={() => onLimitDateChange("")}
+                    variant="ghost"
+                    className="
+                    text-red-500
+                    hover:bg-red-500 hover:text-white
+                    "
+                  >
+                    -
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                カレンダーから日付を選択してください
+              </p>
+            )}
           </div>
         </div>
 

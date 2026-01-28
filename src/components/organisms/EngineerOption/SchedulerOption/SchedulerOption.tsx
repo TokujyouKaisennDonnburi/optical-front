@@ -49,6 +49,10 @@ type Props = {
   onDatesChange: (dates: string[]) => void;
   viewMode: ViewMode;
   setViewMode: Dispatch<SetStateAction<ViewMode>>;
+  limitDate: string;
+  onLimitDateChange: (date: string) => void;
+  dateSelectionMode: "candidates" | "limit";
+  onDateSelectionModeChange: (mode: "candidates" | "limit") => void;
   onScheduleConfirm: (data: {
     title: string;
     date: string;
@@ -66,6 +70,10 @@ export function SchedulerOption({
   onDatesChange,
   viewMode,
   setViewMode,
+  limitDate,
+  onLimitDateChange,
+  dateSelectionMode,
+  onDateSelectionModeChange,
   onScheduleConfirm,
 }: Props) {
   const [newSchedulerData, setNewSchedulerData] =
@@ -299,6 +307,10 @@ export function SchedulerOption({
           setSelectedDates={onDatesChange}
           onNext={handleCreateNext}
           onBack={handleBackToList}
+          limitDate={limitDate}
+          onLimitDateChange={onLimitDateChange}
+          dateSelectionMode={dateSelectionMode}
+          onDateSelectionModeChange={onDateSelectionModeChange}
         />
       )}
 
