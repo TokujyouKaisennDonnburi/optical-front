@@ -504,7 +504,7 @@ export function CalendarDetailClient({
                   />
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col overflow-hidden px-0 py-0">
-                  <AgentChatView />
+                  <AgentChatView calendarId={calendarId} />
                 </CardContent>
               </>
             )}
