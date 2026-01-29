@@ -52,7 +52,7 @@ export type CreateSchedulerRequest = {
 };
 
 export type CreateSchedulerResponse = {
-  id: string;
+  schedulerId: string;
 };
 
 export const createScheduler = async (
@@ -65,12 +65,12 @@ export const createScheduler = async (
   );
 };
 
-export type SchedulerAttendaceResponse = {
-  user_id: string;
+export type SchedulerAttendanceResponse = {
+  userId: string;
   comment: string;
   status: {
     date: string;
-    status: number;
+    status: 1 | 2 | 3;
   }[];
 };
 
@@ -78,23 +78,63 @@ export const getSchedulerAttendance = async (
   calendarId: string,
   schedulerId: string,
 ) => {
-  return apiPost<SchedulerAttendaceResponse>(
-    `/calendars/${calendarId}/schedulers/${schedulerId}/attendaces`,
+  return apiGet<SchedulerAttendanceResponse[]>(
+    `/calendars/${calendarId}/schedulers/${schedulerId}/attendance`,
   );
 };
 
+export type PostSchedulerAttendanceRequest = {
+  comment: string;
+  status: {
+    date: string;
+    status: 1 | 2 | 3; // 1=ok, 2=maybe, 3=ng
+  }[];
+};
+
+export const postSchedulerAttendance = async (
+  calendarId: string,
+  schedulerId: string,
+  request: PostSchedulerAttendanceRequest,
+) => {
+  return apiPost(
+    `/calendars/${calendarId}/schedulers/${schedulerId}/attendance`,
+    request,
+  );
+};
+
+export type SchedulerResultResponse = {
+  ownerId: string;
+  title: string;
+  memo: string;
+  limitTime: string;
+  isAllDay: boolean;
+  members: {
+    userId: string;
+    userName: string;
+  }[];
+  date: {
+    date: string;
+    startTime: string;
+    endTime: string;
+  }[];
+};
+
+export const getSchedulerResult = async (schedulerId: string) => {
+  return apiGet<SchedulerResultResponse>(`/schedulers/${schedulerId}/result`);
+};
+
 export type SchedulerResponse = {
-  SchedulerId: string;
-  CalendarId: string;
-  UserId: string;
-  Title: string;
-  Memo: string;
-  LimitTime: string;
-  IsAllDay: boolean;
-  PossibleDate: {
-    Date: string;
-    StartTime: string;
-    EndTime: string;
+  id: string;
+  calendarId: string;
+  userId: string;
+  title: string;
+  memo: string;
+  limitTime: string;
+  isAllDay: boolean;
+  possibleDate: {
+    date: string;
+    startTime: string;
+    endTime: string;
   }[];
 };
 

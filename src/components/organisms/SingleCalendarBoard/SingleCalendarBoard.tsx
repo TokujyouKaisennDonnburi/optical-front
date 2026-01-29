@@ -55,6 +55,8 @@ export type SingleCalendarBoardProps = {
   onDateSelect?: (date: Date) => void;
   /** 選択中の日付 */
   selectedDates?: string[];
+  /** 回答締切の選択日 */
+  limitDate?: string;
 };
 
 /**
@@ -103,6 +105,7 @@ export function SingleCalendarBoard({
   onCreateItem,
   onDateSelect,
   selectedDates = [],
+  limitDate,
 }: SingleCalendarBoardProps) {
   // 長押し判定用の参照
   const longPressTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
@@ -282,7 +285,9 @@ export function SingleCalendarBoard({
                 {week.map((cell) => {
                   const events = eventsByDay.get(cell.key) ?? [];
                   const isWeekend = cell.weekday === 0 || cell.weekday === 6;
-                  const isSelected = selectedDates.includes(cell.key);
+                  const isCandidateSelected = selectedDates.includes(cell.key);
+                  const isLimitSelected = limitDate === cell.key;
+                  const isOverlap = isCandidateSelected && isLimitSelected;
 
                   return (
                     <div
@@ -312,7 +317,21 @@ export function SingleCalendarBoard({
                         (onCreateItem || onDateSelect) &&
                           cell.isCurrentMonth &&
                           "cursor-pointer hover:bg-stone-200/70 dark:hover:bg-slate-900/60",
-                        isSelected && "bg-blue-200/50",
+                        isOverlap && "bg-amber-100/70 dark:bg-amber-500/20",
+                        isOverlap &&
+                          "hover:bg-amber-200/80 dark:hover:bg-amber-500/30",
+                        !isOverlap &&
+                          isCandidateSelected &&
+                          "bg-emerald-100/70 dark:bg-emerald-500/15",
+                        !isOverlap &&
+                          isCandidateSelected &&
+                          "hover:bg-emerald-200/80 dark:hover:bg-emerald-500/25",
+                        !isOverlap &&
+                          isLimitSelected &&
+                          "bg-red-100/70 dark:bg-red-500/15",
+                        !isOverlap &&
+                          isLimitSelected &&
+                          "hover:bg-red-200/80 dark:hover:bg-red-500/25",
                       )}
                     >
                       {cell.isToday ? (

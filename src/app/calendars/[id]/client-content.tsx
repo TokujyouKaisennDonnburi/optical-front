@@ -55,7 +55,11 @@ type CreateDialogData = {
   title?: string;
   startTime?: string;
   endTime?: string;
+  isAllDay?: boolean;
+  memo?: string;
 };
+
+type SchedulerDateSelectionMode = "candidates" | "limit";
 
 export function CalendarDetailClient({
   calendarId,
@@ -109,6 +113,9 @@ export function CalendarDetailClient({
     null,
   );
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [schedulerDateSelectionMode, setSchedulerDateSelectionMode] =
+    useState<SchedulerDateSelectionMode>("candidates");
+  const [schedulerLimitDate, setSchedulerLimitDate] = useState<string>("");
   const [schedulerViewMode, setSchedulerViewMode] =
     useState<SchedulerViewMode>("list");
   const [createDialogData, setCreateDialogData] =
@@ -118,6 +125,7 @@ export function CalendarDetailClient({
   useEffect(() => {
     if (selectedSidebarItem !== "scheduler") {
       setSelectedDates([]);
+      setSchedulerDateSelectionMode("candidates");
     }
   }, [selectedSidebarItem]);
 
@@ -132,6 +140,11 @@ export function CalendarDetailClient({
 
   const handleDateSelect = (date: Date) => {
     const dateStr = format(date, "yyyy-MM-dd");
+    if (schedulerDateSelectionMode === "limit") {
+      setSchedulerLimitDate(dateStr);
+      setSchedulerDateSelectionMode("candidates");
+      return;
+    }
     setSelectedDates((prev) =>
       prev.includes(dateStr)
         ? prev.filter((d) => d !== dateStr)
@@ -277,6 +290,8 @@ export function CalendarDetailClient({
     date: string;
     startTime: string;
     endTime: string;
+    isAllDay: boolean;
+    memo: string;
   }) => {
     const newDate = new Date(data.date);
     // Adjust for timezone offset if needed
@@ -288,6 +303,8 @@ export function CalendarDetailClient({
       title: data.title,
       startTime: data.startTime,
       endTime: data.endTime,
+      isAllDay: data.isAllDay,
+      memo: data.memo,
     });
     setSelectedSidebarItem(null); // Close the scheduler panel
   };
@@ -446,6 +463,18 @@ export function CalendarDetailClient({
                   : undefined
               }
               selectedDates={selectedDates}
+              limitDate={
+                selectedSidebarItem === "scheduler" &&
+                schedulerViewMode === "create"
+                  ? schedulerLimitDate
+                  : undefined
+              }
+              dateSelectionMode={
+                selectedSidebarItem === "scheduler" &&
+                schedulerViewMode === "create"
+                  ? schedulerDateSelectionMode
+                  : undefined
+              }
               setCreateDialogData={setCreateDialogData}
               members={calendar?.members}
             />
@@ -500,10 +529,15 @@ export function CalendarDetailClient({
                 <CardContent className="flex-1 overflow-auto p-4">
                   <SchedulerOption
                     calendarId={calendarId}
+                    currentUserId={user?.id ?? null}
                     selectedDates={selectedDates}
                     onDatesChange={setSelectedDates}
                     viewMode={schedulerViewMode}
                     setViewMode={setSchedulerViewMode}
+                    limitDate={schedulerLimitDate}
+                    onLimitDateChange={setSchedulerLimitDate}
+                    dateSelectionMode={schedulerDateSelectionMode}
+                    onDateSelectionModeChange={setSchedulerDateSelectionMode}
                     onScheduleConfirm={handleScheduleConfirm}
                   />
                 </CardContent>
@@ -702,6 +736,8 @@ export function CalendarDetailClient({
           initialTitle={createDialogData.title}
           initialStartTime={createDialogData.startTime}
           initialEndTime={createDialogData.endTime}
+          initialIsAllDay={createDialogData.isAllDay}
+          initialMemo={createDialogData.memo}
         />
       ) : null}
     </div>
@@ -721,6 +757,8 @@ function BoardArea({
   onScheduleCreated,
   onDateSelect,
   selectedDates,
+  limitDate,
+  dateSelectionMode,
   setCreateDialogData,
   members,
 }: {
@@ -736,6 +774,8 @@ function BoardArea({
   onScheduleCreated?: () => void;
   onDateSelect?: (date: Date) => void;
   selectedDates: string[];
+  limitDate?: string;
+  dateSelectionMode?: "candidates" | "limit";
   setCreateDialogData: React.Dispatch<
     React.SetStateAction<CreateDialogData | null>
   >;
@@ -881,6 +921,8 @@ function BoardArea({
     setCreateDialogData({ date });
   };
 
+  const isDateSelectable = Boolean(onDateSelect);
+
   return (
     <Card
       className={cn(
@@ -889,6 +931,10 @@ function BoardArea({
         "border-stone-300 bg-stone-100/90 text-stone-800",
         // ダークモード
         "dark:border-primary/30 dark:bg-slate-800/90 dark:text-white",
+        isDateSelectable &&
+          (dateSelectionMode === "limit"
+            ? "border-2 border-red-500 ring-4 ring-red-500/35 dark:border-red-400 dark:ring-red-400/45"
+            : "border-2 border-emerald-500 ring-4 ring-emerald-500/35 dark:border-emerald-400 dark:ring-emerald-400/45"),
         className,
       )}
     >
@@ -916,6 +962,7 @@ function BoardArea({
           onCreateItem={handleCreateItem}
           onDateSelect={onDateSelect}
           selectedDates={selectedDates}
+          limitDate={limitDate}
         />
       </CardContent>
       {selectedItem ? (

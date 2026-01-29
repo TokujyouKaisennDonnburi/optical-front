@@ -20,9 +20,9 @@ export const API_BASE_URL =
  * API エラークラス
  */
 export class ApiClientError extends Error {
-  code: number;
+  code: number | string;
 
-  constructor(code: number, message: string) {
+  constructor(code: number | string, message: string) {
     super(message);
     this.name = "ApiClientError";
     this.code = code;

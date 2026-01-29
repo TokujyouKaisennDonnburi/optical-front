@@ -37,6 +37,10 @@ type Props = {
   selectedDates: string[];
   setSelectedDates: (dates: string[]) => void;
   initialData?: Partial<SchedulerCreateData> | null;
+  limitDate: string;
+  onLimitDateChange: (date: string) => void;
+  dateSelectionMode: "candidates" | "limit";
+  onDateSelectionModeChange: (mode: "candidates" | "limit") => void;
 };
 
 export function SchedulerCreate({
@@ -45,15 +49,13 @@ export function SchedulerCreate({
   selectedDates,
   setSelectedDates,
   initialData,
+  limitDate,
+  onLimitDateChange,
+  dateSelectionMode,
+  onDateSelectionModeChange,
 }: Props) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [memo, setMemo] = useState(initialData?.memo || "");
-  // datetime-local input needs a specific format `YYYY-MM-DDTHH:mm`
-  const [limit, setLimit] = useState(
-    initialData?.limitTime
-      ? new Date(initialData.limitTime).toISOString().slice(0, 16)
-      : "",
-  );
   const [isAllDay, setIsAllDay] = useState(initialData?.isAllDay ?? true);
   const [defaultStartTime, setDefaultStartTime] = useState(
     initialData?.defaultStartTime || "",
@@ -115,7 +117,9 @@ export function SchedulerCreate({
     onNext({
       title,
       memo,
-      limitTime: limit ? new Date(limit).toISOString() : null,
+      limitTime: limitDate
+        ? new Date(`${limitDate}T23:59:59Z`).toISOString()
+        : null,
       isAllDay,
       dates: backendDates,
       defaultStartTime,
@@ -138,15 +142,16 @@ export function SchedulerCreate({
         <CardTitle className="text-base text-stone-900 dark:text-slate-50">
           スケジューラーを新規作成
         </CardTitle>
-        <CardDescription className="text-stone-600 dark:text-slate-400">
-          候補日と共有内容を設定します。
-        </CardDescription>
+        <CardDescription className="text-stone-600 dark:text-slate-400" />
       </CardHeader>
 
       <CardContent className="space-y-6">
         {/* タイトル */}
         <div className="space-y-1">
-          <Label htmlFor="title">タイトル</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="title">タイトル</Label>
+            <span className="text-xs text-muted-foreground">必須</span>
+          </div>
           <Input
             id="title"
             value={title}
@@ -183,7 +188,10 @@ export function SchedulerCreate({
 
         {/* 候補日一覧（縦並び、右端−削除） */}
         <div className="space-y-1">
-          <Label>候補日</Label>
+          <div className="flex items-center gap-2">
+            <Label>候補日</Label>
+            <span className="text-xs text-muted-foreground">必須</span>
+          </div>
 
           <div className="rounded-lg border p-3 space-y-2">
             {selectedDates.length === 0 && (
@@ -224,13 +232,47 @@ export function SchedulerCreate({
 
         {/* 回答期限 */}
         <div className="space-y-1">
-          <Label htmlFor="limit">回答締切</Label>
-          <Input
-            id="limit"
-            type="datetime-local"
-            value={limit}
-            onChange={(e) => setLimit(e.target.value)}
-          />
+          <div className="flex items-center gap-2">
+            <Label htmlFor="limit-mode" className="text-sm text-foreground">
+              締切
+            </Label>
+            <Switch
+              id="limit-mode"
+              checked={dateSelectionMode === "limit"}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  onLimitDateChange("");
+                }
+                onDateSelectionModeChange(checked ? "limit" : "candidates");
+              }}
+              className="data-[state=checked]:bg-red-500 dark:data-[state=checked]:bg-red-400"
+            />
+            <span className="text-xs text-muted-foreground">必須</span>
+          </div>
+          <div className="rounded-lg border p-3">
+            {limitDate && dateSelectionMode !== "limit" ? (
+              <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                <span className="text-sm">{formatDateToJP(limitDate)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">終日</span>
+                  <Button
+                    onClick={() => onLimitDateChange("")}
+                    variant="ghost"
+                    className="
+                    text-red-500
+                    hover:bg-red-500 hover:text-white
+                    "
+                  >
+                    -
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                カレンダーから日付を選択してください
+              </p>
+            )}
+          </div>
         </div>
 
         {/* メモ */}
@@ -249,7 +291,10 @@ export function SchedulerCreate({
             onClick={handleNext}
             className="w-full"
             disabled={
-              !title || selectedDates.length === 0 || isTimeInputInvalid
+              !title ||
+              selectedDates.length === 0 ||
+              !limitDate ||
+              isTimeInputInvalid
             }
           >
             候補日時の回答に進む

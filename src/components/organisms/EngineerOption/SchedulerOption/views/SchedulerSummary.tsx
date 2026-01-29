@@ -22,11 +22,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/atoms/ui/table";
-import { getSchedulerPoll } from "@/lib/api-scheduler-polls";
-import type { SchedulerPollDetailResponse } from "@/types/scheduler-poll";
+import {
+  getSchedulerAttendance,
+  getSchedulerResult,
+  type SchedulerAttendanceResponse,
+  type SchedulerResultResponse,
+} from "@/types/scheduler";
 import { cn } from "@/utils_constants_styles/utils";
 
 type Props = {
+  calendarId: string;
   schedulerId: string;
   onBack: () => void;
   onConfirm: (data: {
@@ -34,6 +39,8 @@ type Props = {
     date: string;
     startTime: string;
     endTime: string;
+    isAllDay: boolean;
+    memo: string;
   }) => void;
 };
 
@@ -50,8 +57,30 @@ const statusToColor = {
 };
 
 const formatDateToJP = (dateString: string) => {
-  return dateString.replace(/-/g, "/");
+  const date = new Date(dateString);
+  return Number.isNaN(date.getTime())
+    ? dateString
+    : date.toLocaleDateString("ja-JP");
 };
+
+const formatTime = (dateString: string) => {
+  // ISO 形式の日時文字列（例: "2024-01-15T14:30:00Z"）の場合のみ Date パースを行う
+  // 時刻のみの文字列（例: "14:30"）などはそのまま返す
+  if (!/\d{4}-\d{2}-\d{2}T/.test(dateString)) {
+    return dateString;
+  }
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+  return date.toLocaleTimeString("ja-JP", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
+const toDateKey = (dateString: string) => new Date(dateString).toISOString();
 
 type SummaryCount = {
   date: string;
@@ -84,8 +113,88 @@ function getBestDates(summaryCounts: SummaryCount[]): string[] {
   return bestDates;
 }
 
-export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
-  const [poll, setPoll] = useState<SchedulerPollDetailResponse | null>(null);
+type PollViewData = {
+  title: string;
+  memo: string;
+  isAllDay: boolean;
+  dates: {
+    date: string;
+    startTime: string;
+    endTime: string;
+  }[];
+  submissions: {
+    user: {
+      id: string;
+      name: string;
+    };
+    availabilities: { [date: string]: "ok" | "maybe" | "ng" };
+    comment: string;
+  }[];
+};
+
+const statusToAvailability = (status: number): "ok" | "maybe" | "ng" | null => {
+  switch (status) {
+    case 1:
+      return "ok";
+    case 2:
+      return "maybe";
+    case 3:
+      return "ng";
+    default:
+      console.warn("Unexpected scheduler status:", status);
+      return null;
+  }
+};
+
+const buildPollViewData = (
+  result: SchedulerResultResponse,
+  attendance: SchedulerAttendanceResponse[],
+): PollViewData => {
+  const memberNameMap = new Map(
+    result.members.map((member) => [member.userId, member.userName]),
+  );
+  const dates = result.date.map((d) => ({
+    date: toDateKey(d.date),
+    startTime: formatTime(d.startTime),
+    endTime: formatTime(d.endTime),
+  }));
+  const submissions = attendance.map((entry) => {
+    const availabilities = Object.fromEntries(
+      entry.status
+        .map((s) => {
+          const availability = statusToAvailability(s.status);
+          if (!availability) return null;
+          return [toDateKey(s.date), availability] as const;
+        })
+        .filter(
+          (value): value is [string, "ok" | "maybe" | "ng"] => value !== null,
+        ),
+    );
+    return {
+      user: {
+        id: entry.userId,
+        name: memberNameMap.get(entry.userId) ?? "不明",
+      },
+      availabilities,
+      comment: entry.comment,
+    };
+  });
+  return {
+    title: result.title,
+    memo: result.memo,
+    isAllDay: result.isAllDay,
+    dates,
+    submissions,
+  };
+};
+
+export function SchedulerSummary({
+  calendarId,
+  schedulerId,
+  onBack,
+  onConfirm,
+}: Props) {
+  const [poll, setPoll] = useState<PollViewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedFinalDate, setSelectedFinalDate] = useState<string | null>(
     null,
@@ -95,8 +204,11 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
     const fetchPoll = async () => {
       setLoading(true);
       try {
-        const data = await getSchedulerPoll(schedulerId);
-        setPoll(data);
+        const [result, attendance] = await Promise.all([
+          getSchedulerResult(schedulerId),
+          getSchedulerAttendance(calendarId, schedulerId),
+        ]);
+        setPoll(buildPollViewData(result, attendance));
       } catch (error) {
         toast.error("集計結果の読み込みに失敗しました。");
         console.error(error);
@@ -105,7 +217,7 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
       }
     };
     fetchPoll();
-  }, [schedulerId]);
+  }, [calendarId, schedulerId]);
 
   const summaryCounts = useMemo(() => {
     if (!poll) return [];
@@ -133,6 +245,8 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
       date: dateInfo.date,
       startTime: dateInfo.startTime,
       endTime: dateInfo.endTime,
+      isAllDay: poll.isAllDay,
+      memo: poll.memo,
     };
     onConfirm(confirmationData);
   };
@@ -229,7 +343,9 @@ export function SchedulerSummary({ schedulerId, onBack, onConfirm }: Props) {
                               </Text>
                             </div>
                             <Text size="sm">
-                              {dateInfo.startTime}~{dateInfo.endTime}
+                              {poll.isAllDay
+                                ? "終日"
+                                : `${dateInfo.startTime}~${dateInfo.endTime}`}
                             </Text>
                           </div>
                         </Label>
