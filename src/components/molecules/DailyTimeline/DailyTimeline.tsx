@@ -103,9 +103,9 @@ export function DailyTimeline({
 
   /* ===== スクロール同期 ===== */
   // Reset auto-scroll flag when items change (e.g. date change)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: items 変更時に自動スクロールをリセットする必要があるため
   useEffect(() => {
     hasAutoScrolledRef.current = false;
-    void items;
   }, [items]);
 
   useLayoutEffect(() => {
@@ -122,8 +122,7 @@ export function DailyTimeline({
       viewport.scrollTo({ top, behavior: "smooth" });
       hasAutoScrolledRef.current = true;
     }
-    void slots;
-  }, [slots]);
+  }, []);
 
   /* ===== イベント正規化 ===== */
   const events = useMemo<NormalizedEvent[]>(() => {
@@ -214,7 +213,6 @@ export function DailyTimeline({
         }
 
         maxCols = Math.max(maxCols, active.length);
-
         placed.push({ ...ev, col, colCount: 0 });
       }
 
@@ -279,7 +277,7 @@ export function DailyTimeline({
             return (
               <div
                 key={ev.id}
-                className="absolute pointer-events-auto transition-all ease-out"
+                className="absolute pointer-events-auto transition-[opacity,transform] ease-out"
                 style={{
                   top: ev.start * PX_PER_MIN,
                   height: ev.displayHeight,
@@ -331,7 +329,7 @@ export function DailyTimeline({
                     <HoverCardContent
                       side="left"
                       align="center"
-                      className="w-72 space-y-1.5"
+                      className="w-72 space-y-1.5 z-[9999]"
                     >
                       <Text as="p" weight="semibold" className="leading-tight">
                         {ev.title}
@@ -368,20 +366,23 @@ export function DailyTimeline({
           })}
         </div>
 
-        {/* ===== 時刻目盛り描画 ===== */}
+        {/* ===== 時刻目盛り描画（グリッド厳密化済み） ===== */}
         {slots.map((slot) => (
           <div
             key={slot.time}
             ref={slot.isCurrent ? setCurrentSlotRef : undefined}
-            className="border-b border-border px-2.5 py-2 bg-background"
+            className="border-b border-border bg-background"
             style={{ height: SLOT_HEIGHT_PX }}
           >
-            <TimeLabel
-              time={slot.time}
-              suffix={slot.suffix}
-              isCurrent={slot.isCurrent}
-              size="md"
-            />
+            {/* padding は内側に寄せる（外側は純粋なグリッド） */}
+            <div className="h-full px-2.5 py-2 flex items-start">
+              <TimeLabel
+                time={slot.time}
+                suffix={slot.suffix}
+                isCurrent={slot.isCurrent}
+                size="md"
+              />
+            </div>
           </div>
         ))}
       </div>
