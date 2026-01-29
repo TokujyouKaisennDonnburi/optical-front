@@ -291,7 +291,10 @@ export function SchedulerCreate({
             onClick={handleNext}
             className="w-full"
             disabled={
-              !title || selectedDates.length === 0 || isTimeInputInvalid
+              !title ||
+              selectedDates.length === 0 ||
+              !limitDate ||
+              isTimeInputInvalid
             }
           >
             候補日時の回答に進む
