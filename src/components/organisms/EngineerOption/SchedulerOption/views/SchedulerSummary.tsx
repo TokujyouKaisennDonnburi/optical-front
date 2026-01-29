@@ -141,6 +141,7 @@ const statusToAvailability = (status: number): "ok" | "maybe" | "ng" | null => {
     case 3:
       return "ng";
     default:
+      console.warn("Unexpected scheduler status:", status);
       return null;
   }
 };
@@ -172,7 +173,7 @@ const buildPollViewData = (
     return {
       user: {
         id: entry.userId,
-        name: memberNameMap.get(entry.userId) ?? "Unknown",
+        name: memberNameMap.get(entry.userId) ?? "不明",
       },
       availabilities,
       comment: entry.comment,
