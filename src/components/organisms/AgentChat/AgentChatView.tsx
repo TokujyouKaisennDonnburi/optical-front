@@ -106,11 +106,13 @@ export type AgentChatViewProps = {
   className?: string;
   /** 選択可能なカレンダーのリスト */
   calendars?: CalendarInfo[];
+  calendarId?: string;
 };
 
 export function AgentChatView({
   className,
   calendars = [],
+  calendarId,
 }: AgentChatViewProps) {
   const enableAgentEnv = process.env.NEXT_PUBLIC_ENABLE_AGENT;
   // デフォルト: 環境変数が未設定または空文字列の場合はエージェントを有効にする
@@ -136,6 +138,9 @@ export function AgentChatView({
 
   // カレンダーリストが変わったら、選択中のカレンダーが存在しなければリセット（undefinedは常に有効）
   useEffect(() => {
+    if (calendarId) {
+      setSelectedCalendarId(calendarId);
+    }
     if (
       selectedCalendarId !== undefined &&
       calendars.length > 0 &&
@@ -143,7 +148,7 @@ export function AgentChatView({
     ) {
       setSelectedCalendarId(undefined);
     }
-  }, [calendars, selectedCalendarId]);
+  }, [calendarId, calendars, selectedCalendarId]);
 
   const selectedCalendar = calendars.find((c) => c.id === selectedCalendarId);
 
