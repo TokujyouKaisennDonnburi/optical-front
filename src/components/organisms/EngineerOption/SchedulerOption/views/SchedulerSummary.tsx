@@ -64,14 +64,20 @@ const formatDateToJP = (dateString: string) => {
 };
 
 const formatTime = (dateString: string) => {
+  // ISO 形式の日時文字列（例: "2024-01-15T14:30:00Z"）の場合のみ Date パースを行う
+  // 時刻のみの文字列（例: "14:30"）などはそのまま返す
+  if (!/\d{4}-\d{2}-\d{2}T/.test(dateString)) {
+    return dateString;
+  }
   const date = new Date(dateString);
-  return Number.isNaN(date.getTime())
-    ? dateString
-    : date.toLocaleTimeString("ja-JP", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+  return date.toLocaleTimeString("ja-JP", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 };
 
 const toDateKey = (dateString: string) => new Date(dateString).toISOString();
