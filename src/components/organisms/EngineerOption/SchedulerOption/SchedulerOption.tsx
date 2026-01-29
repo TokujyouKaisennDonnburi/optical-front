@@ -181,7 +181,7 @@ export function SchedulerOption({
     } catch (error) {
       if (
         error instanceof ApiClientError &&
-        error.message.includes("limit time must be after current time")
+        error.code === "LIMIT_TIME_AFTER_CURRENT_TIME"
       ) {
         toast.error("回答締切は現在時刻より後に設定してください");
       } else {
