@@ -88,7 +88,7 @@ export interface GoogleAuthCallback {
 export interface ApiError {
   error: {
     /** HTTP ステータスコード */
-    code: number;
+    code: number | string;
     /** エラーメッセージ */
     message: string;
   };
