@@ -9,9 +9,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { joinCalendar } from "@/lib/api-calendars";
 import { postGoogleCreateUser } from "@/lib/api-google";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
-import { clearPendingInvite, getPendingInviteUrl } from "@/lib/calendar-invite";
+import { clearPendingInvite, getPendingInvite } from "@/lib/calendar-invite";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -79,11 +80,18 @@ function CallbackPageContent() {
         await refreshAuth();
         toast.success("Googleアカウントでログインしました", { duration: 2000 });
 
-        // 招待情報があればそのURLへ、なければホームへ
-        const pendingInviteUrl = getPendingInviteUrl();
-        if (pendingInviteUrl) {
+        // 招待情報があればjoin APIを呼び出し、なければホームへ
+        const pendingInvite = getPendingInvite();
+        if (pendingInvite) {
           clearPendingInvite();
-          router.push(pendingInviteUrl);
+          try {
+            await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
+            toast.success("カレンダーに参加しました", { duration: 2000 });
+            router.push(`/calendars/${pendingInvite.calendarId}`);
+          } catch {
+            toast.error("カレンダーへの参加に失敗しました", { duration: 2000 });
+            router.push("/");
+          }
         } else {
           router.push("/");
         }

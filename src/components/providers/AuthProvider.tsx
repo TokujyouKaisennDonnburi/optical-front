@@ -21,6 +21,7 @@ import {
   logout as requestLogout,
   signup as requestSignup,
 } from "@/lib/api-auth";
+import { joinCalendar } from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
 import { postGoogleOauth } from "@/lib/api-google";
 import {
@@ -30,7 +31,7 @@ import {
   saveRefreshToken,
   saveToken,
 } from "@/lib/auth";
-import { clearPendingInvite, getPendingInviteUrl } from "@/lib/calendar-invite";
+import { clearPendingInvite, getPendingInvite } from "@/lib/calendar-invite";
 import type { LoginRequest, SignupRequest, User } from "@/types/auth";
 
 /**
@@ -141,12 +142,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         toast.success("ログインしました", { duration: 2000 });
 
-        // 招待情報があればそのURLへ、なければホームへ
-        const pendingInviteUrl = getPendingInviteUrl();
-        if (pendingInviteUrl) {
+        // 招待情報があればjoin APIを呼び出し、なければホームへ
+        console.log("[AuthProvider] Checking for pending invite...");
+        const pendingInvite = getPendingInvite();
+        console.log("[AuthProvider] pendingInvite:", pendingInvite);
+        if (pendingInvite) {
           clearPendingInvite();
-          router.push(pendingInviteUrl);
+          try {
+            console.log("[AuthProvider] Calling joinCalendar...");
+            await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
+            toast.success("カレンダーに参加しました", { duration: 2000 });
+            router.push(`/calendars/${pendingInvite.calendarId}`);
+          } catch (joinErr) {
+            console.error("[AuthProvider] joinCalendar error:", joinErr);
+            toast.error("カレンダーへの参加に失敗しました", { duration: 2000 });
+            router.push("/");
+          }
         } else {
+          console.log("[AuthProvider] No pending invite, redirecting to /");
           router.push("/");
         }
       } catch (err) {
@@ -260,11 +273,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         toast.success("アカウントを作成しました", { duration: 2000 });
 
-        // 招待情報があればそのURLへ、なければホームへ
-        const pendingInviteUrl = getPendingInviteUrl();
-        if (pendingInviteUrl) {
+        // 招待情報があればjoin APIを呼び出し、なければホームへ
+        const pendingInvite = getPendingInvite();
+        if (pendingInvite) {
           clearPendingInvite();
-          router.push(pendingInviteUrl);
+          try {
+            await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
+            toast.success("カレンダーに参加しました", { duration: 2000 });
+            router.push(`/calendars/${pendingInvite.calendarId}`);
+          } catch {
+            toast.error("カレンダーへの参加に失敗しました", { duration: 2000 });
+            router.push("/");
+          }
         } else {
           router.push("/");
         }

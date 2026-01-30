@@ -21,6 +21,9 @@ export function savePendingInvite(calendarId: string, token: string): void {
 
   // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store APIはSafari未サポートのため使用しない
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(value)}; SameSite=Strict; Path=/; Max-Age=${COOKIE_MAX_AGE}${secureFlag}`;
+
+  console.log("[calendar-invite] savePendingInvite:", { calendarId, token });
+  console.log("[calendar-invite] document.cookie after save:", document.cookie);
 }
 
 /**
@@ -53,15 +56,4 @@ export function getPendingInvite(): PendingCalendarInvite | null {
 export function clearPendingInvite(): void {
   // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store APIはSafari未サポートのため使用しない
   document.cookie = `${COOKIE_NAME}=; SameSite=Strict; Path=/; Max-Age=0`;
-}
-
-/**
- * 招待情報があれば参加URLを返す、なければnull
- */
-export function getPendingInviteUrl(): string | null {
-  const invite = getPendingInvite();
-  if (!invite) {
-    return null;
-  }
-  return `/calendars/${invite.calendarId}/join?token=${encodeURIComponent(invite.token)}`;
 }
