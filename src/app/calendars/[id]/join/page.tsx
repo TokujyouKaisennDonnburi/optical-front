@@ -11,6 +11,7 @@ import { Suspense, use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { joinCalendar } from "@/lib/api-calendars";
+import { ApiClientError } from "@/lib/api-client";
 import { savePendingInvite } from "@/lib/calendar-invite";
 
 /**
@@ -77,9 +78,23 @@ function CalendarJoinPageContent({
         toast.success("カレンダーに参加しました", { duration: 2000 });
       } catch (err) {
         console.error("[JoinPage] joinCalendar error:", err);
-        const errorMessage = "カレンダーに参加できませんでした";
+        const apiErrorMessage =
+          err instanceof ApiClientError ? err.message.toLowerCase() : "";
+        let errorMessage: string;
+        if (apiErrorMessage.includes("already used")) {
+          errorMessage = "この招待リンクは既に使用されています";
+          toast.error(errorMessage, { duration: 4000 });
+        } else if (
+          apiErrorMessage.includes("expired") ||
+          apiErrorMessage.includes("invalid")
+        ) {
+          errorMessage = "この招待リンクは期限切れまたは無効です";
+          toast.error(errorMessage, { duration: 4000 });
+        } else {
+          errorMessage = "カレンダーへの参加に失敗しました";
+          toast.error(errorMessage, { duration: 2000 });
+        }
         setError(errorMessage);
-        toast.error(errorMessage, { duration: 2000 });
         router.push("/");
       }
     };

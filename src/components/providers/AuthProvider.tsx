@@ -155,7 +155,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
             router.push(`/calendars/${pendingInvite.calendarId}`);
           } catch (joinErr) {
             console.error("[AuthProvider] joinCalendar error:", joinErr);
-            toast.error("カレンダーへの参加に失敗しました", { duration: 2000 });
+            const errorMessage =
+              joinErr instanceof ApiClientError
+                ? joinErr.message.toLowerCase()
+                : "";
+            if (errorMessage.includes("already used")) {
+              toast.error("この招待リンクは既に使用されています", {
+                duration: 4000,
+              });
+            } else if (
+              errorMessage.includes("expired") ||
+              errorMessage.includes("invalid")
+            ) {
+              toast.error("この招待リンクは期限切れまたは無効です", {
+                duration: 4000,
+              });
+            } else {
+              toast.error("カレンダーへの参加に失敗しました", {
+                duration: 2000,
+              });
+            }
             router.push("/");
           }
         } else {
@@ -281,8 +300,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
             await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
             toast.success("カレンダーに参加しました", { duration: 2000 });
             router.push(`/calendars/${pendingInvite.calendarId}`);
-          } catch {
-            toast.error("カレンダーへの参加に失敗しました", { duration: 2000 });
+          } catch (joinErr) {
+            const errorMessage =
+              joinErr instanceof ApiClientError
+                ? joinErr.message.toLowerCase()
+                : "";
+            if (errorMessage.includes("already used")) {
+              toast.error("この招待リンクは既に使用されています", {
+                duration: 4000,
+              });
+            } else if (
+              errorMessage.includes("expired") ||
+              errorMessage.includes("invalid")
+            ) {
+              toast.error("この招待リンクは期限切れまたは無効です", {
+                duration: 4000,
+              });
+            } else {
+              toast.error("カレンダーへの参加に失敗しました", {
+                duration: 2000,
+              });
+            }
             router.push("/");
           }
         } else {

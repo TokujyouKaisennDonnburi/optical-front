@@ -10,6 +10,7 @@ import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { joinCalendar } from "@/lib/api-calendars";
+import { ApiClientError } from "@/lib/api-client";
 import { postGoogleCreateUser } from "@/lib/api-google";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
 import { clearPendingInvite, getPendingInvite } from "@/lib/calendar-invite";
@@ -88,8 +89,27 @@ function CallbackPageContent() {
             await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
             toast.success("カレンダーに参加しました", { duration: 2000 });
             router.push(`/calendars/${pendingInvite.calendarId}`);
-          } catch {
-            toast.error("カレンダーへの参加に失敗しました", { duration: 2000 });
+          } catch (joinErr) {
+            const errorMessage =
+              joinErr instanceof ApiClientError
+                ? joinErr.message.toLowerCase()
+                : "";
+            if (errorMessage.includes("already used")) {
+              toast.error("この招待リンクは既に使用されています", {
+                duration: 4000,
+              });
+            } else if (
+              errorMessage.includes("expired") ||
+              errorMessage.includes("invalid")
+            ) {
+              toast.error("この招待リンクは期限切れまたは無効です", {
+                duration: 4000,
+              });
+            } else {
+              toast.error("カレンダーへの参加に失敗しました", {
+                duration: 2000,
+              });
+            }
             router.push("/");
           }
         } else {
