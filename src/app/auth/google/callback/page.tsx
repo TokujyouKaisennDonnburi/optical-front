@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { postGoogleCreateUser } from "@/lib/api-google";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
+import { clearPendingInvite, getPendingInviteUrl } from "@/lib/calendar-invite";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -77,20 +78,19 @@ function CallbackPageContent() {
         saveRefreshToken(response.refreshToken);
         await refreshAuth();
         toast.success("Googleアカウントでログインしました", { duration: 2000 });
-        router.push("/");
+
+        // 招待情報があればそのURLへ、なければホームへ
+        const pendingInviteUrl = getPendingInviteUrl();
+        if (pendingInviteUrl) {
+          clearPendingInvite();
+          router.push(pendingInviteUrl);
+        } else {
+          router.push("/");
+        }
       } catch (_) {
         toast.error("認証に失敗しました", { duration: 2000 });
         router.push("/auth/login");
       }
-
-      // 認証状態を更新
-      await refreshAuth();
-
-      // 成功メッセージ
-      toast.success("Googleでログインしました", { duration: 2000 });
-
-      // カレンダーページにリダイレクト
-      router.push("/");
     };
 
     void handleCallback();

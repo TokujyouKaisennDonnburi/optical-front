@@ -2,12 +2,16 @@
 
 /**
  * 招待参加承認ページ
+ * - ログイン済み: join APIを呼び出してカレンダーに参加
+ * - 未ログイン: 招待情報をCookieに保存してログインページにリダイレクト
  */
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, use, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import { joinCalendar } from "@/lib/api-calendars";
+import { savePendingInvite } from "@/lib/calendar-invite";
 
 /**
  * カレンダー参加ページコンポーネント
@@ -19,11 +23,12 @@ function CalendarJoinPageContent({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const { id } = use(params);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
+    if (!id || isAuthLoading) {
       return;
     }
 
@@ -36,6 +41,17 @@ function CalendarJoinPageContent({
       return;
     }
 
+    // 未ログインの場合: Cookieに保存してログインページへ
+    if (!user) {
+      savePendingInvite(id, token);
+      toast.info("カレンダーに参加するにはログインが必要です", {
+        duration: 3000,
+      });
+      router.push("/auth/login");
+      return;
+    }
+
+    // ログイン済みの場合: join APIを呼び出す
     const fetchJoin = async () => {
       try {
         await joinCalendar(id, token);
@@ -49,7 +65,7 @@ function CalendarJoinPageContent({
       }
     };
     fetchJoin();
-  }, [id, searchParams, router]);
+  }, [id, searchParams, router, user, isAuthLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

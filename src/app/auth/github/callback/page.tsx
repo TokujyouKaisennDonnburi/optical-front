@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { postGitHubCallback } from "@/lib/api-auth";
 import { postGithubAppInstall } from "@/lib/api-github";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
+import { clearPendingInvite, getPendingInviteUrl } from "@/lib/calendar-invite";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -38,6 +39,16 @@ function CallbackPageContent() {
         return;
       }
 
+      // 招待情報があればそのURLへ、なければホームへリダイレクト
+      const getRedirectUrl = () => {
+        const pendingInviteUrl = getPendingInviteUrl();
+        if (pendingInviteUrl) {
+          clearPendingInvite();
+          return pendingInviteUrl;
+        }
+        return "/";
+      };
+
       // GitHub App インストール（既存ユーザーがGitHub組織を連携する場合）
       // codeはオプショナル（code作成者と別の人がインストールした場合は発行されない）
       if (installationId) {
@@ -50,7 +61,7 @@ function CallbackPageContent() {
           toast.success("カレンダーにGitHub組織を紐づけました", {
             duration: 2000,
           });
-          router.push("/");
+          router.push(getRedirectUrl());
         } catch (_) {
           toast.error("認証に失敗しました", { duration: 2000 });
           router.push("/auth/login");
@@ -78,14 +89,14 @@ function CallbackPageContent() {
           ) {
             // 既存ユーザーに紐づけ
             toast.success("GitHubアカウントを紐づけました", { duration: 2000 });
-            router.push("/");
+            router.push(getRedirectUrl());
           } else {
             // OAuthでログイン
             saveToken(response.accessToken);
             saveRefreshToken(response.refreshToken);
             await refreshAuth();
             toast.success("GitHubでログインしました", { duration: 2000 });
-            router.push("/");
+            router.push(getRedirectUrl());
           }
         } catch (_) {
           toast.error("認証に失敗しました", { duration: 2000 });

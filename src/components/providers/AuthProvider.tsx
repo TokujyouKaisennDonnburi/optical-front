@@ -30,6 +30,7 @@ import {
   saveRefreshToken,
   saveToken,
 } from "@/lib/auth";
+import { clearPendingInvite, getPendingInviteUrl } from "@/lib/calendar-invite";
 import type { LoginRequest, SignupRequest, User } from "@/types/auth";
 
 /**
@@ -139,7 +140,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.user);
 
         toast.success("ログインしました", { duration: 2000 });
-        router.push("/");
+
+        // 招待情報があればそのURLへ、なければホームへ
+        const pendingInviteUrl = getPendingInviteUrl();
+        if (pendingInviteUrl) {
+          clearPendingInvite();
+          router.push(pendingInviteUrl);
+        } else {
+          router.push("/");
+        }
       } catch (err) {
         // デバッグ: エラー内容を確認（本番環境では出力しない）
         if (process.env.NODE_ENV !== "production") {
@@ -250,7 +259,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.user);
 
         toast.success("アカウントを作成しました", { duration: 2000 });
-        router.push("/");
+
+        // 招待情報があればそのURLへ、なければホームへ
+        const pendingInviteUrl = getPendingInviteUrl();
+        if (pendingInviteUrl) {
+          clearPendingInvite();
+          router.push(pendingInviteUrl);
+        } else {
+          router.push("/");
+        }
       } catch (err) {
         // デバッグ: エラー内容を確認（本番環境では出力しない）
         if (process.env.NODE_ENV !== "production") {
