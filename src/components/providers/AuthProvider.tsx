@@ -143,18 +143,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toast.success("ログインしました", { duration: 2000 });
 
         // 招待情報があればjoin APIを呼び出し、なければホームへ
-        console.log("[AuthProvider] Checking for pending invite...");
         const pendingInvite = getPendingInvite();
-        console.log("[AuthProvider] pendingInvite:", pendingInvite);
         if (pendingInvite) {
           clearPendingInvite();
           try {
-            console.log("[AuthProvider] Calling joinCalendar...");
             await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
             toast.success("カレンダーに参加しました", { duration: 2000 });
             router.push(`/calendars/${pendingInvite.calendarId}`);
           } catch (joinErr) {
-            console.error("[AuthProvider] joinCalendar error:", joinErr);
             const errorMessage =
               joinErr instanceof ApiClientError
                 ? joinErr.message.toLowerCase()
@@ -178,7 +174,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
             router.push("/");
           }
         } else {
-          console.log("[AuthProvider] No pending invite, redirecting to /");
           router.push("/");
         }
       } catch (err) {

@@ -21,9 +21,6 @@ export function savePendingInvite(calendarId: string, token: string): void {
 
   // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store APIはSafari未サポートのため使用しない
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(value)}; SameSite=Strict; Path=/; Max-Age=${COOKIE_MAX_AGE}${secureFlag}`;
-
-  console.log("[calendar-invite] savePendingInvite:", { calendarId, token });
-  console.log("[calendar-invite] document.cookie after save:", document.cookie);
 }
 
 /**

@@ -29,22 +29,11 @@ function CalendarJoinPageContent({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("[JoinPage] useEffect triggered", {
-      id,
-      isAuthLoading,
-      user: !!user,
-    });
-
     if (!id || isAuthLoading) {
-      console.log("[JoinPage] Waiting for auth or id...", {
-        id,
-        isAuthLoading,
-      });
       return;
     }
 
     const token = searchParams.get("token");
-    console.log("[JoinPage] token from URL:", token);
 
     if (!token) {
       const errorMessage = "招待トークンが見つかりません";
@@ -56,9 +45,6 @@ function CalendarJoinPageContent({
 
     // 未ログインの場合: Cookieに保存してログインページへ
     if (!user) {
-      console.log(
-        "[JoinPage] User not logged in, saving to cookie and redirecting to login",
-      );
       savePendingInvite(id, token);
       toast.info("カレンダーに参加するにはログインが必要です", {
         duration: 3000,
@@ -68,16 +54,12 @@ function CalendarJoinPageContent({
     }
 
     // ログイン済みの場合: join APIを呼び出す
-    console.log("[JoinPage] User logged in, calling join API", { id, token });
     const fetchJoin = async () => {
       try {
-        console.log("[JoinPage] Calling joinCalendar...");
         await joinCalendar(id, token);
-        console.log("[JoinPage] joinCalendar success!");
         router.push(`/calendars/${id}`);
         toast.success("カレンダーに参加しました", { duration: 2000 });
       } catch (err) {
-        console.error("[JoinPage] joinCalendar error:", err);
         const apiErrorMessage =
           err instanceof ApiClientError ? err.message.toLowerCase() : "";
         let errorMessage: string;
