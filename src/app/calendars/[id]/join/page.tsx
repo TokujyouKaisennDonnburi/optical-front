@@ -4,13 +4,13 @@
  * 招待参加承認ページ
  */
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { joinCalendar } from "@/lib/api-calendars";
 
 /**
- * OAuth コールバックページコンポーネント
+ * カレンダー参加ページコンポーネント
  */
 function CalendarJoinPageContent({
   params,
@@ -18,6 +18,7 @@ function CalendarJoinPageContent({
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { id } = use(params);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,9 +26,19 @@ function CalendarJoinPageContent({
     if (!id) {
       return;
     }
+
+    const token = searchParams.get("token");
+    if (!token) {
+      const errorMessage = "招待トークンが見つかりません";
+      setError(errorMessage);
+      toast.error(errorMessage, { duration: 2000 });
+      router.push("/");
+      return;
+    }
+
     const fetchJoin = async () => {
       try {
-        await joinCalendar(id);
+        await joinCalendar(id, token);
         router.push(`/calendars/${id}`);
         toast.success("カレンダーに参加しました", { duration: 2000 });
       } catch {
@@ -38,7 +49,7 @@ function CalendarJoinPageContent({
       }
     };
     fetchJoin();
-  }, [id, router.push]);
+  }, [id, searchParams, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -63,11 +74,11 @@ function CalendarJoinPageContent({
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
-              認証に失敗しました
+              参加に失敗しました
             </h2>
             <p className="text-gray-600">{error}</p>
             <p className="text-sm text-gray-500">
-              ログインページにリダイレクトします...
+              ホームページにリダイレクトします...
             </p>
           </>
         ) : (
@@ -76,7 +87,7 @@ function CalendarJoinPageContent({
               className="animate-spin h-16 w-16 mx-auto text-blue-600"
               viewBox="0 0 24 24"
               role="status"
-              aria-label="認証中"
+              aria-label="参加処理中"
             >
               <title>Loading</title>
               <circle
@@ -94,9 +105,9 @@ function CalendarJoinPageContent({
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               />
             </svg>
-            <h2 className="text-2xl font-bold text-gray-900">認証中...</h2>
+            <h2 className="text-2xl font-bold text-gray-900">参加処理中...</h2>
             <p className="text-gray-600">
-              Githubアカウント認証を処理しています。しばらくお待ちください。
+              カレンダーへの参加を処理しています。しばらくお待ちください。
             </p>
           </>
         )}

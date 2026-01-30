@@ -22,7 +22,11 @@ import {
 import { CalendarWizardStepIndicator } from "@/components/molecules/CalendarWizardStepIndicator";
 import { CalendarWizardSummary } from "@/components/molecules/CalendarWizardSummary";
 import { ConfirmModal } from "@/components/molecules/ConfirmModal";
-import { createCalendar, uploadCalendarImage } from "@/lib/api-calendars";
+import {
+  createCalendar,
+  inviteMembers,
+  uploadCalendarImage,
+} from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
 import type { CreateCalendarRequest } from "@/types/schedule";
 
@@ -423,14 +427,17 @@ export function CalendarCreationWizard() {
     setIsConfirmModalOpen(false);
 
     try {
+      // 招待するメールアドレスのリスト
+      const memberEmails = state.useSolo
+        ? []
+        : state.members
+            .map((member) => member.email.trim())
+            .filter((email) => email.length > 0);
+
       const payload: CreateCalendarRequest = {
         name: state.name.trim(),
         color: state.color,
-        members: state.useSolo
-          ? []
-          : state.members
-              .map((member) => member.email.trim())
-              .filter((email) => email.length > 0),
+        members: memberEmails,
         optionIds: Object.entries(state.customOptions)
           .filter(([, enabled]) => enabled)
           .map(([id]) => Number(id)),
@@ -442,6 +449,18 @@ export function CalendarCreationWizard() {
         payload,
       );
       const response = await createCalendar(payload);
+
+      // カレンダー作成後、メンバーがいれば招待APIを呼び出す
+      if (memberEmails.length > 0) {
+        console.log(
+          "[CalendarCreationWizard] Calling POST /api/calendars/" +
+            response.id +
+            "/invitations",
+          memberEmails,
+        );
+        await inviteMembers(response.id, memberEmails);
+      }
+
       setState((prev) => ({
         ...prev,
         createdCalendarId: response.id,
