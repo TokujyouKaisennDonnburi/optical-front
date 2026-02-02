@@ -21,6 +21,7 @@ import {
   logout as requestLogout,
   signup as requestSignup,
 } from "@/lib/api-auth";
+import { joinCalendar } from "@/lib/api-calendars";
 import { ApiClientError } from "@/lib/api-client";
 import { postGoogleOauth } from "@/lib/api-google";
 import {
@@ -30,6 +31,7 @@ import {
   saveRefreshToken,
   saveToken,
 } from "@/lib/auth";
+import { clearPendingInvite, getPendingInvite } from "@/lib/calendar-invite";
 import type { LoginRequest, SignupRequest, User } from "@/types/auth";
 
 /**
@@ -139,7 +141,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.user);
 
         toast.success("ログインしました", { duration: 2000 });
-        router.push("/");
+
+        // 招待情報があればjoin APIを呼び出し、なければホームへ
+        const pendingInvite = getPendingInvite();
+        if (pendingInvite) {
+          clearPendingInvite();
+          try {
+            await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
+            toast.success("カレンダーに参加しました", { duration: 2000 });
+            router.push(`/calendars/${pendingInvite.calendarId}`);
+          } catch (joinErr) {
+            const errorMessage =
+              joinErr instanceof ApiClientError
+                ? joinErr.message.toLowerCase()
+                : "";
+            if (errorMessage.includes("already used")) {
+              toast.error("この招待リンクは既に使用されています", {
+                duration: 4000,
+              });
+            } else if (
+              errorMessage.includes("expired") ||
+              errorMessage.includes("invalid")
+            ) {
+              toast.error("この招待リンクは期限切れまたは無効です", {
+                duration: 4000,
+              });
+            } else {
+              toast.error("カレンダーへの参加に失敗しました", {
+                duration: 2000,
+              });
+            }
+            router.push("/");
+          }
+        } else {
+          router.push("/");
+        }
       } catch (err) {
         // デバッグ: エラー内容を確認（本番環境では出力しない）
         if (process.env.NODE_ENV !== "production") {
@@ -250,7 +286,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.user);
 
         toast.success("アカウントを作成しました", { duration: 2000 });
-        router.push("/");
+
+        // 招待情報があればjoin APIを呼び出し、なければホームへ
+        const pendingInvite = getPendingInvite();
+        if (pendingInvite) {
+          clearPendingInvite();
+          try {
+            await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
+            toast.success("カレンダーに参加しました", { duration: 2000 });
+            router.push(`/calendars/${pendingInvite.calendarId}`);
+          } catch (joinErr) {
+            const errorMessage =
+              joinErr instanceof ApiClientError
+                ? joinErr.message.toLowerCase()
+                : "";
+            if (errorMessage.includes("already used")) {
+              toast.error("この招待リンクは既に使用されています", {
+                duration: 4000,
+              });
+            } else if (
+              errorMessage.includes("expired") ||
+              errorMessage.includes("invalid")
+            ) {
+              toast.error("この招待リンクは期限切れまたは無効です", {
+                duration: 4000,
+              });
+            } else {
+              toast.error("カレンダーへの参加に失敗しました", {
+                duration: 2000,
+              });
+            }
+            router.push("/");
+          }
+        } else {
+          router.push("/");
+        }
       } catch (err) {
         // デバッグ: エラー内容を確認（本番環境では出力しない）
         if (process.env.NODE_ENV !== "production") {

@@ -10,8 +10,11 @@ import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { postGitHubCallback } from "@/lib/api-auth";
+import { joinCalendar } from "@/lib/api-calendars";
+import { ApiClientError } from "@/lib/api-client";
 import { postGithubAppInstall } from "@/lib/api-github";
 import { saveRefreshToken, saveToken } from "@/lib/auth";
+import { clearPendingInvite, getPendingInvite } from "@/lib/calendar-invite";
 
 /**
  * OAuth コールバックページコンポーネント
@@ -38,6 +41,42 @@ function CallbackPageContent() {
         return;
       }
 
+      // 招待情報があればjoin APIを呼び出し、リダイレクト先を返す
+      const handlePendingInvite = async (): Promise<string> => {
+        const pendingInvite = getPendingInvite();
+        if (pendingInvite) {
+          clearPendingInvite();
+          try {
+            await joinCalendar(pendingInvite.calendarId, pendingInvite.token);
+            toast.success("カレンダーに参加しました", { duration: 2000 });
+            return `/calendars/${pendingInvite.calendarId}`;
+          } catch (joinErr) {
+            const errorMessage =
+              joinErr instanceof ApiClientError
+                ? joinErr.message.toLowerCase()
+                : "";
+            if (errorMessage.includes("already used")) {
+              toast.error("この招待リンクは既に使用されています", {
+                duration: 4000,
+              });
+            } else if (
+              errorMessage.includes("expired") ||
+              errorMessage.includes("invalid")
+            ) {
+              toast.error("この招待リンクは期限切れまたは無効です", {
+                duration: 4000,
+              });
+            } else {
+              toast.error("カレンダーへの参加に失敗しました", {
+                duration: 2000,
+              });
+            }
+            return "/";
+          }
+        }
+        return "/";
+      };
+
       // GitHub App インストール（既存ユーザーがGitHub組織を連携する場合）
       // codeはオプショナル（code作成者と別の人がインストールした場合は発行されない）
       if (installationId) {
@@ -50,7 +89,7 @@ function CallbackPageContent() {
           toast.success("カレンダーにGitHub組織を紐づけました", {
             duration: 2000,
           });
-          router.push("/");
+          router.push(await handlePendingInvite());
         } catch (_) {
           toast.error("認証に失敗しました", { duration: 2000 });
           router.push("/auth/login");
@@ -78,14 +117,14 @@ function CallbackPageContent() {
           ) {
             // 既存ユーザーに紐づけ
             toast.success("GitHubアカウントを紐づけました", { duration: 2000 });
-            router.push("/");
+            router.push(await handlePendingInvite());
           } else {
             // OAuthでログイン
             saveToken(response.accessToken);
             saveRefreshToken(response.refreshToken);
             await refreshAuth();
             toast.success("GitHubでログインしました", { duration: 2000 });
-            router.push("/");
+            router.push(await handlePendingInvite());
           }
         } catch (_) {
           toast.error("認証に失敗しました", { duration: 2000 });

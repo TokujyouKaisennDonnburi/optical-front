@@ -1,4 +1,4 @@
-import { apiGet, apiPatch, apiPost, apiRequest } from "@/lib/api-client";
+import { apiGet, apiPost, apiRequest } from "@/lib/api-client";
 import type {
   CalendarDetailApiResponse,
   CalendarDetailResponse,
@@ -57,8 +57,10 @@ export async function createCalendar(payload: CreateCalendarRequest) {
   return apiPost<CreateCalendarResponse>("/calendars", payload);
 }
 
-export async function joinCalendar(calendarId: string) {
-  return apiPatch<void>(`/calendars/${calendarId}/members`);
+export async function joinCalendar(calendarId: string, token: string) {
+  return apiPost<void>(
+    `/calendars/${calendarId}/join?token=${encodeURIComponent(token)}`,
+  );
 }
 
 export async function deleteCalendar(calendarId: string) {
@@ -69,7 +71,9 @@ export async function deleteCalendar(calendarId: string) {
 
 /** メンバー招待 */
 export async function inviteMembers(calendarId: string, emails: string[]) {
-  return apiPost<void>(`/calendars/${calendarId}/members`, { email: emails });
+  return apiPost<string>(`/calendars/${calendarId}/invitations`, {
+    email: emails,
+  });
 }
 
 /** メンバー一覧取得 */

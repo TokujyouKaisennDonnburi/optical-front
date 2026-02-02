@@ -2,15 +2,20 @@
 
 /**
  * 招待参加承認ページ
+ * - ログイン済み: join APIを呼び出してカレンダーに参加
+ * - 未ログイン: 招待情報をCookieに保存してログインページにリダイレクト
  */
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, use, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import { joinCalendar } from "@/lib/api-calendars";
+import { ApiClientError } from "@/lib/api-client";
+import { savePendingInvite } from "@/lib/calendar-invite";
 
 /**
- * OAuth コールバックページコンポーネント
+ * カレンダー参加ページコンポーネント
  */
 function CalendarJoinPageContent({
   params,
@@ -18,27 +23,65 @@ function CalendarJoinPageContent({
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const { id } = use(params);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
+    if (!id || isAuthLoading) {
       return;
     }
+
+    const token = searchParams.get("token");
+
+    if (!token) {
+      const errorMessage = "招待トークンが見つかりません";
+      setError(errorMessage);
+      toast.error(errorMessage, { duration: 2000 });
+      router.push("/");
+      return;
+    }
+
+    // 未ログインの場合: Cookieに保存してログインページへ
+    if (!user) {
+      savePendingInvite(id, token);
+      toast.info("カレンダーに参加するにはログインが必要です", {
+        duration: 3000,
+      });
+      router.push("/auth/login");
+      return;
+    }
+
+    // ログイン済みの場合: join APIを呼び出す
     const fetchJoin = async () => {
       try {
-        await joinCalendar(id);
+        await joinCalendar(id, token);
         router.push(`/calendars/${id}`);
         toast.success("カレンダーに参加しました", { duration: 2000 });
-      } catch {
-        const errorMessage = "カレンダーに参加できませんでした";
+      } catch (err) {
+        const apiErrorMessage =
+          err instanceof ApiClientError ? err.message.toLowerCase() : "";
+        let errorMessage: string;
+        if (apiErrorMessage.includes("already used")) {
+          errorMessage = "この招待リンクは既に使用されています";
+          toast.error(errorMessage, { duration: 4000 });
+        } else if (
+          apiErrorMessage.includes("expired") ||
+          apiErrorMessage.includes("invalid")
+        ) {
+          errorMessage = "この招待リンクは期限切れまたは無効です";
+          toast.error(errorMessage, { duration: 4000 });
+        } else {
+          errorMessage = "カレンダーへの参加に失敗しました";
+          toast.error(errorMessage, { duration: 2000 });
+        }
         setError(errorMessage);
-        toast.error(errorMessage, { duration: 2000 });
         router.push("/");
       }
     };
     fetchJoin();
-  }, [id, router.push]);
+  }, [id, searchParams, router, user, isAuthLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -63,11 +106,11 @@ function CalendarJoinPageContent({
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
-              認証に失敗しました
+              参加に失敗しました
             </h2>
             <p className="text-gray-600">{error}</p>
             <p className="text-sm text-gray-500">
-              ログインページにリダイレクトします...
+              ホームページにリダイレクトします...
             </p>
           </>
         ) : (
@@ -76,7 +119,7 @@ function CalendarJoinPageContent({
               className="animate-spin h-16 w-16 mx-auto text-blue-600"
               viewBox="0 0 24 24"
               role="status"
-              aria-label="認証中"
+              aria-label="参加処理中"
             >
               <title>Loading</title>
               <circle
@@ -94,9 +137,9 @@ function CalendarJoinPageContent({
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               />
             </svg>
-            <h2 className="text-2xl font-bold text-gray-900">認証中...</h2>
+            <h2 className="text-2xl font-bold text-gray-900">参加処理中...</h2>
             <p className="text-gray-600">
-              Githubアカウント認証を処理しています。しばらくお待ちください。
+              カレンダーへの参加を処理しています。しばらくお待ちください。
             </p>
           </>
         )}
