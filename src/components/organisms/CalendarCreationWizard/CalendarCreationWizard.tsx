@@ -437,7 +437,6 @@ export function CalendarCreationWizard() {
       const payload: CreateCalendarRequest = {
         name: state.name.trim(),
         color: state.color,
-        members: memberEmails,
         optionIds: Object.entries(state.customOptions)
           .filter(([, enabled]) => enabled)
           .map(([id]) => Number(id)),
