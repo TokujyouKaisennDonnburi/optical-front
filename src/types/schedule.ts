@@ -105,7 +105,6 @@ export type CalendarListResponse = CalendarQueryResponse[];
 export type CreateCalendarRequest = {
   name: string;
   color: string;
-  members: string[];
   optionIds: number[];
   imageId: string | null;
 };
